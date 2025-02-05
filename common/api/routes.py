@@ -6,21 +6,27 @@ import logging
 import json
 from datetime import datetime
 
+# Импорты для SEO Advisor
 from ..core.models.advisor import SEOAdvisor
 from ..config.advisor_config import AdvisorConfig
 from ..monitoring.performance import PerformanceMonitor
+
+# Импорты для DimensionReducer
+from ..core.models.dim_reducer.model import DimensionReducer
+from ..core.models.dim_reducer.inference import DimReducerInference
+from ..config.dim_reducer_config import DimReducerConfig
 
 # Инициализация логгера
 logger = logging.getLogger(__name__)
 
 # Инициализация FastAPI приложения
 app = FastAPI(
-    title="SEO Advisor API",
+    title="SEO Models API",
     description="API для SEO рекомендаций и оптимизации",
     version="1.0.0"
 )
 
-# Модели данных
+# Модели данных для SEO Advisor
 class ContentInput(BaseModel):
     """Входные данные для анализа"""
     text: str
@@ -35,53 +41,88 @@ class AnalysisResponse(BaseModel):
     importance_scores: List[float]
     metrics: dict
 
+# Модели данных для DimensionReducer
+class DimReducerInput(BaseModel):
+    """Входные данные для анализа текста"""
+    text: str
+    html: Optional[str] = None
+    return_importance: bool = True
+
+class DimReducerBatchInput(BaseModel):
+    """Входные данные для пакетной обработки"""
+    texts: List[str]
+    html_texts: Optional[List[str]] = None
+
+class DimReducerResult(BaseModel):
+    """Результаты сжатия размерности"""
+    latent_features: List[float]
+    feature_importance: Optional[List[float]]
+    reconstruction_error: float
+
 # Глобальные объекты
-model = None
-config = None
+seo_advisor_model = None
+dim_reducer_model = None
+advisor_config = None
+dim_reducer_config = None
 monitor = PerformanceMonitor()
 
-def get_model():
-    """Получение инициализированной модели"""
-    global model, config
-    if model is None:
+def get_advisor_model():
+    """Получение инициализированной модели SEO Advisor"""
+    global seo_advisor_model, advisor_config
+    if seo_advisor_model is None:
         try:
-            config = AdvisorConfig()
-            model = SEOAdvisor(config)
-            model.load_state_dict(
+            advisor_config = AdvisorConfig()
+            seo_advisor_model = SEOAdvisor(advisor_config)
+            seo_advisor_model.load_state_dict(
                 torch.load('models/seo_advisor.pth')
             )
-            model.eval()
+            seo_advisor_model.eval()
         except Exception as e:
-            logger.error(f"Ошибка при загрузке модели: {e}")
+            logger.error(f"Ошибка при загрузке SEO Advisor: {e}")
             raise HTTPException(
                 status_code=500,
-                detail="Ошибка инициализации модели"
+                detail="Ошибка инициализации SEO Advisor"
             )
-    return model
+    return seo_advisor_model
 
-@app.post("/analyze", response_model=AnalysisResponse)
+def get_dim_reducer_model():
+    """Получение инициализированной модели DimensionReducer"""
+    global dim_reducer_model, dim_reducer_config
+    if dim_reducer_model is None:
+        try:
+            dim_reducer_config = DimReducerConfig()
+            dim_reducer_model = DimReducerInference(
+                'models/dim_reducer/final_model.pt',
+                dim_reducer_config,
+                device='cuda' if torch.cuda.is_available() else 'cpu'
+            )
+        except Exception as e:
+            logger.error(f"Ошибка при загрузке DimensionReducer: {e}")
+            raise HTTPException(
+                status_code=500,
+                detail="Ошибка инициализации DimensionReducer"
+            )
+    return dim_reducer_model
+
+# Маршруты SEO Advisor
+@app.post("/advisor/analyze", response_model=AnalysisResponse, tags=["seo-advisor"])
 async def analyze_content(
     content: ContentInput,
-    model: SEOAdvisor = Depends(get_model)
+    model: SEOAdvisor = Depends(get_advisor_model)
 ):
-    """
-    Анализ контента и генерация рекомендаций
-    """
+    """Анализ контента и генерация рекомендаций"""
     try:
         start_time = datetime.now()
         
-        # Подготовка входных данных
         inputs = {
             'text': content.text,
             'language': content.language,
             'keywords': content.keywords
         }
         
-        # Получение предсказаний
         with torch.no_grad():
             outputs = model(inputs)
             
-        # Формирование ответа
         response = AnalysisResponse(
             rank_score=float(outputs['rank_score'].mean()),
             suggestions=model.decode_suggestions(
@@ -95,7 +136,6 @@ async def analyze_content(
             )
         )
         
-        # Мониторинг производительности
         end_time = datetime.now()
         monitor.track_inference(start_time, end_time)
         monitor.track_memory()
@@ -109,11 +149,71 @@ async def analyze_content(
             detail=str(e)
         )
 
+# Маршруты DimensionReducer
+@app.post("/dim-reducer/analyze", response_model=DimReducerResult, tags=["dimension-reducer"])
+async def reduce_dimensions(
+    input_data: DimReducerInput,
+    model: DimReducerInference = Depends(get_dim_reducer_model)
+):
+    """Сжатие размерности и анализ текста"""
+    try:
+        start_time = datetime.now()
+        
+        results = model.process_text(
+            text=input_data.text,
+            html=input_data.html
+        )
+        
+        response = {
+            'latent_features': results['latent_features'].tolist(),
+            'feature_importance': results['feature_importance'].tolist() if input_data.return_importance else None,
+            'reconstruction_error': float(results.get('reconstruction_error', 0.0))
+        }
+        
+        end_time = datetime.now()
+        monitor.track_inference(start_time, end_time)
+        monitor.track_memory()
+        
+        return response
+        
+    except Exception as e:
+        logger.error(f"Ошибка при обработке текста: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/dim-reducer/batch", response_model=List[DimReducerResult], tags=["dimension-reducer"])
+async def batch_reduce_dimensions(
+    input_data: DimReducerBatchInput,
+    model: DimReducerInference = Depends(get_dim_reducer_model)
+):
+    """Пакетная обработка текстов"""
+    try:
+        start_time = datetime.now()
+        
+        results = []
+        for idx, text in enumerate(input_data.texts):
+            html = input_data.html_texts[idx] if input_data.html_texts else None
+            result = model.process_text(text=text, html=html)
+            
+            results.append({
+                'latent_features': result['latent_features'].tolist(),
+                'feature_importance': result['feature_importance'].tolist(),
+                'reconstruction_error': float(result.get('reconstruction_error', 0.0))
+            })
+        
+        end_time = datetime.now()
+        monitor.track_inference(start_time, end_time)
+        monitor.track_memory()
+        
+        return results
+        
+    except Exception as e:
+        logger.error(f"Ошибка при пакетной обработке: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Общие маршруты
 @app.get("/metrics")
 async def get_metrics():
-    """
-    Получение метрик производительности
-    """
+    """Получение метрик производительности"""
     try:
         return monitor.get_performance_stats()
     except Exception as e:
@@ -125,11 +225,10 @@ async def get_metrics():
 
 @app.get("/health")
 async def health_check():
-    """
-    Проверка работоспособности сервиса
-    """
+    """Проверка работоспособности сервиса"""
     return {
         "status": "healthy",
-        "model_loaded": model is not None,
+        "seo_advisor_loaded": seo_advisor_model is not None,
+        "dim_reducer_loaded": dim_reducer_model is not None,
         "timestamp": datetime.now().isoformat()
     }
