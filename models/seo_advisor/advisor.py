@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-import torch
-import torch.nn as nn
-import logging
-
-from models.seo_advisor.config.model_config import ModelConfig
-=======
-# core/models/advisor.py
-
 import torch
 import torch.nn as nn
 from typing import Dict, Union, List
@@ -16,26 +7,10 @@ from ...config.advisor_config import AdvisorConfig
 from .content_analyzer import ContentAnalyzer
 from .rank_predictor import RankPredictor
 from .suggester import OptimizationSuggester
->>>>>>> 5edde6d0b91ff21202294a88b2e58c1e12840bb1
 
 logger = logging.getLogger(__name__)
 
 class SEOAdvisor(nn.Module):
-<<<<<<< HEAD
-    def __init__(self, config: ModelConfig):
-        super().__init__()
-        self.config = config
-        self.feature_extractor = nn.Sequential(
-            nn.Linear(config.input_dim, config.hidden_dim),
-            nn.LayerNorm(config.hidden_dim),
-            nn.Dropout(config.dropout_rate),
-            nn.ReLU()
-        )
-        
-    def forward(self, x: dict) -> dict:
-        features = self.feature_extractor(x)
-        return {'features': features}
-=======
     """Основная модель SEO-советника"""
     def __init__(self, config: AdvisorConfig):
         super().__init__()
@@ -108,4 +83,3 @@ class SEOAdvisor(nn.Module):
             cache_result(self.cache, content, result)
         
         return result
->>>>>>> 5edde6d0b91ff21202294a88b2e58c1e12840bb1
