@@ -1,153 +1,152 @@
+from typing import Dict, Any, Optional, List, Union
 import torch
-import torch.nn as nn
-from typing import Dict, Optional, List
+from torch import nn
+import numpy as np
+import os
 from tqdm import tqdm
-import logging
-from pathlib import Path
-
-from common.config.dim_reducer_config import DimReducerConfig
-from .model import DimensionReducer
 from common.monitoring.metrics import MetricsTracker
-from common.utils.visualization import VisualizationManager
-
-logger = logging.getLogger(__name__)
 
 class DimReducerTrainer:
-    """Класс для обучения модели DimensionReducer"""
-    
-    def __init__(
-        self,
-        model: DimensionReducer,
-        config: DimReducerConfig,
-        device: str = 'cuda' if torch.cuda.is_available() else 'cpu'
-    ):
-        self.model = model.to(device)
-        self.config = config
-        self.device = device
-        
-        # Оптимизатор
-        self.optimizer = torch.optim.AdamW(
-            model.parameters(),
-            lr=config.learning_rate,
-            weight_decay=config.weight_decay
-        )
-        
-        # Функции потерь
-        self.reconstruction_loss = nn.MSELoss()
-        
-        # Мониторинг и визуализация
+    def __init__(self, 
+                 input_dim: int = 768,
+                 output_dim: int = 128,
+                 learning_rate: float = 1e-3,
+                 device: Optional[str] = None):
+        self.input_dim = input_dim
+        self.output_dim = output_dim
+        self.learning_rate = learning_rate
+        self.device = device or ('cuda' if torch.cuda.is_available() else 'cpu')
         self.metrics = MetricsTracker()
-        self.visualizer = VisualizationManager()
         
-        # История обучения
-        self.history = {
-            'train_loss': [],
-            'val_loss': [],
-            'feature_importance': []
-        }
+        self.encoder = nn.Sequential(
+            nn.Linear(input_dim, output_dim * 2),
+            nn.ReLU(),
+            nn.Linear(output_dim * 2, output_dim)
+        ).to(self.device)
+        
+        self.decoder = nn.Sequential(
+            nn.Linear(output_dim, output_dim * 2),
+            nn.ReLU(),
+            nn.Linear(output_dim * 2, input_dim)
+        ).to(self.device)
+        
+        self.optimizer = torch.optim.Adam(
+            list(self.encoder.parameters()) + list(self.decoder.parameters()), 
+            lr=learning_rate
+        )
+        self.criterion = nn.MSELoss()
+        
+        self.train_history: List[float] = []
+        self.val_history: List[float] = []
+        
+    def _process_batch(self, batch: Union[torch.Tensor, List, tuple]) -> torch.Tensor:
+        """Обработка батча из DataLoader"""
+        if isinstance(batch, (list, tuple)):
+            batch = batch[0]  # Берем первый элемент, так как у нас TensorDataset
+        return batch.to(self.device)
+        
+    def train_epoch(self, train_loader: torch.utils.data.DataLoader, 
+                   val_loader: Optional[torch.utils.data.DataLoader] = None) -> Dict[str, float]:
+        """Обучение на одной эпохе"""
+        self.encoder.train()
+        self.decoder.train()
+        epoch_losses = []
+        
+        with tqdm(train_loader, desc="Training") as pbar:
+            for batch in pbar:
+                batch = self._process_batch(batch)
+                loss = self.train_step(batch)['loss']
+                epoch_losses.append(loss)
+                pbar.set_postfix({'loss': f'{loss:.4f}'})
+                
+        avg_train_loss = np.mean(epoch_losses)
+        self.train_history.append(avg_train_loss)
+        metrics = {'train_loss': avg_train_loss}
+        
+        if val_loader is not None:
+            val_loss = self.evaluate_loader(val_loader)['eval_loss']
+            self.val_history.append(val_loss)
+            metrics['val_loss'] = val_loss
+            
+        return metrics
+    
+    def evaluate_loader(self, data_loader: torch.utils.data.DataLoader) -> Dict[str, float]:
+        """Оценка на всем датасете"""
+        self.encoder.eval()
+        self.decoder.eval()
+        total_loss = 0
+        num_batches = 0
+        
+        with torch.no_grad():
+            for batch in data_loader:
+                batch = self._process_batch(batch)
+                encoded = self.encoder(batch)
+                decoded = self.decoder(encoded)
+                loss = self.criterion(decoded, batch)
+                total_loss += loss.item()
+                num_batches += 1
+                
+        avg_loss = total_loss / num_batches
+        self.metrics.add_metric('eval_loss', avg_loss)
+        return {'eval_loss': avg_loss}
         
     def train_step(self, batch: torch.Tensor) -> Dict[str, float]:
         """Один шаг обучения"""
-        self.model.train()
+        batch = self._process_batch(batch)
         self.optimizer.zero_grad()
         
-        batch = batch.to(self.device)
-        outputs = self.model(batch)
+        encoded = self.encoder(batch)
+        decoded = self.decoder(encoded)
         
-        # Расчет различных компонентов потерь
-        rec_loss = self.reconstruction_loss(outputs['reconstructed'], batch)
-        sparsity_loss = torch.mean(torch.abs(outputs['latent']))
-        importance_reg = torch.mean(torch.abs(outputs['importance']))
-        
-        # Общие потери
-        total_loss = rec_loss + 0.1 * sparsity_loss + 0.05 * importance_reg
-        
-        total_loss.backward()
-        torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
+        loss = self.criterion(decoded, batch)
+        loss.backward()
         self.optimizer.step()
         
-        return {
-            'total_loss': total_loss.item(),
-            'reconstruction_loss': rec_loss.item(),
-            'sparsity_loss': sparsity_loss.item(),
-            'importance_reg': importance_reg.item()
-        }
-        
-    def train_epoch(
-        self,
-        train_loader,
-        epoch: int,
-        val_loader = None
-    ) -> Dict[str, float]:
-        """Обучение одной эпохи"""
-        total_loss = 0
-        num_batches = len(train_loader)
-        
-        progress_bar = tqdm(
-            train_loader,
-            desc=f'Epoch {epoch + 1}/{self.config.num_epochs}'
-        )
-        
-        for batch in progress_bar:
-            metrics = self.train_step(batch)
-            total_loss += metrics['total_loss']
-            
-            # Обновление прогресс-бара
-            progress_bar.set_postfix(
-                loss=f"{metrics['total_loss']:.4f}",
-                rec_loss=f"{metrics['reconstruction_loss']:.4f}"
-            )
-            
-        avg_loss = total_loss / num_batches
-        self.history['train_loss'].append(avg_loss)
-        
-        # Валидация
-        if val_loader:
-            val_metrics = self.validate(val_loader)
-            self.history['val_loss'].append(val_metrics['val_loss'])
-            
-            return {
-                'train_loss': avg_loss,
-                **val_metrics
-            }
-            
-        return {'train_loss': avg_loss}
-        
-    def validate(self, val_loader) -> Dict[str, float]:
-        """Валидация модели"""
-        self.model.eval()
-        total_loss = 0
+        self.metrics.add_metric('train_loss', loss.item())
+        return {'loss': loss.item()}
+    
+    def evaluate(self, data: torch.Tensor) -> Dict[str, float]:
+        """Оценка на тензоре данных"""
+        data = self._process_batch(data)
+        self.encoder.eval()
+        self.decoder.eval()
         
         with torch.no_grad():
-            for batch in val_loader:
-                batch = batch.to(self.device)
-                outputs = self.model(batch)
-                loss = self.reconstruction_loss(outputs['reconstructed'], batch)
-                total_loss += loss.item()
-                
-        return {'val_loss': total_loss / len(val_loader)}
-        
-    def save_checkpoint(self, path: str, epoch: int, metrics: Dict[str, float]):
-        """Сохранение чекпоинта"""
-        Path(path).parent.mkdir(parents=True, exist_ok=True)
-        
-        checkpoint = {
-            'epoch': epoch,
-            'model_state_dict': self.model.state_dict(),
+            encoded = self.encoder(data)
+            decoded = self.decoder(encoded)
+            loss = self.criterion(decoded, data)
+            
+        self.metrics.add_metric('eval_loss', loss.item())
+        return {'eval_loss': loss.item()}
+    
+    def encode(self, data: torch.Tensor) -> torch.Tensor:
+        """Кодирование данных"""
+        data = self._process_batch(data)
+        self.encoder.eval()
+        with torch.no_grad():
+            return self.encoder(data).cpu()
+            
+    def save_model(self, path: str) -> None:
+        """Сохранение модели"""
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        torch.save({
+            'encoder_state_dict': self.encoder.state_dict(),
+            'decoder_state_dict': self.decoder.state_dict(),
             'optimizer_state_dict': self.optimizer.state_dict(),
-            'metrics': metrics,
-            'history': self.history
-        }
+            'input_dim': self.input_dim,
+            'output_dim': self.output_dim,
+            'device': self.device,
+            'train_history': self.train_history,
+            'val_history': self.val_history
+        }, path)
         
-        torch.save(checkpoint, path)
-        logger.info(f"Checkpoint saved: {path}")
-        
-    def load_checkpoint(self, path: str):
-        """Загрузка чекпоинта"""
+    def load_model(self, path: str) -> None:
+        """Загрузка модели"""
         checkpoint = torch.load(path, map_location=self.device)
-        
-        self.model.load_state_dict(checkpoint['model_state_dict'])
+        self.encoder.load_state_dict(checkpoint['encoder_state_dict'])
+        self.decoder.load_state_dict(checkpoint['decoder_state_dict'])
         self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-        self.history = checkpoint['history']
-        
-        return checkpoint['epoch'], checkpoint['metrics']
+        self.input_dim = checkpoint['input_dim']
+        self.output_dim = checkpoint['output_dim']
+        self.train_history = checkpoint.get('train_history', [])
+        self.val_history = checkpoint.get('val_history', [])
