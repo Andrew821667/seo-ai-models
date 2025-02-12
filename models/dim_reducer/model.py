@@ -25,22 +25,6 @@ class DimensionReducer(nn.Module):
     def __init__(self, config: DimReducerConfig):
         super().__init__()
         self.config = config
-<<<<<<< HEAD
-        self.encoder = nn.Sequential(
-            nn.Linear(config.input_dim, config.hidden_dim),
-            nn.BatchNorm1d(config.hidden_dim) if config.use_batch_norm else nn.Identity(),
-            nn.LeakyReLU() if config.activation == "leaky_relu" else nn.ReLU(),
-            nn.Linear(config.hidden_dim, config.latent_dim)
-        )
-        self.seo_attention = SEOAttentionLayer(config.latent_dim, config.num_attention_heads)
-        
-    def forward(self, x: torch.Tensor) -> Dict[str, torch.Tensor]:
-        z = self.encoder(x)
-        attended = self.seo_attention(z)
-        return {
-            'latent': attended,
-            'attention': self.seo_attention
-=======
         
         # Энкодер
         encoder_layers = []
@@ -91,5 +75,4 @@ class DimensionReducer(nn.Module):
             'latent': z,
             'reconstructed': reconstructed,
             'importance': importance
->>>>>>> 5edde6d0b91ff21202294a88b2e58c1e12840bb1
         }
