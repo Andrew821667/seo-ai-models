@@ -1,26 +1,33 @@
-from typing import Optional
-from .....config.base_config import BaseConfig
 
-class KeywordModelConfig(BaseConfig):
-    """Конфигурация модели для извлечения ключевых слов"""
-    # Базовые параметры
-    model_name: str = "bert-base-uncased"
-    input_dim: int = 768
-    hidden_dim: int = 512
-    num_heads: int = 8
-    dropout_rate: float = 0.1
+from pydantic import BaseModel, Field
+from typing import Optional, List
+
+class KeywordExtractorConfig(BaseModel):
+    """Конфигурация для KeywordExtractor"""
+    # Параметры модели
+    model_name: str = "cointegrated/rubert-tiny2"
     max_length: int = 512
-    num_labels: int = 2
+    language: str = "russian"
     
-    # Дополнительные параметры
-    use_cache: bool = True
-    cache_ttl: int = 3600  # 1 час
+    # Параметры извлечения ключевых слов
+    min_word_length: int = 3
+    max_keywords: int = 20
     
-    # Параметры обучения
-    learning_rate: float = 1e-4
-    batch_size: int = 32
-    weight_decay: float = 0.01
+    # Параметры TF-IDF
+    ngram_range: tuple = (1, 2)
+    min_df: int = 1
+    max_df: float = 1.0
+    max_features: int = 5000
+    use_idf: bool = True
+    smooth_idf: bool = True
+    sublinear_tf: bool = True
     
-    class Config:
-        """Настройки Pydantic модели"""
-        arbitrary_types_allowed = True
+    # Фильтрация по частям речи
+    valid_pos_tags: List[str] = Field(
+        default=["NOUN", "ADJ", "VERB"],
+        description="Допустимые части речи для ключевых слов"
+    )
+
+def get_default_config() -> KeywordExtractorConfig:
+    """Возвращает конфигурацию по умолчанию"""
+    return KeywordExtractorConfig()
