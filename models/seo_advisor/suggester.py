@@ -1,218 +1,207 @@
-import torch
-import torch.nn as nn
-from typing import Dict, List, Optional, Union
-import logging
 
-from ...config.advisor_config import ModelConfig
+from typing import Dict, List, Optional, Tuple
+from models.seo_advisor.improved_rank_predictor import ImprovedRankPredictor
 
-logger = logging.getLogger(__name__)
-
-class OptimizationSuggester(nn.Module):
-    """Генератор рекомендаций по оптимизации"""
+class Suggester:
+    def __init__(self, industry: str = 'default'):
+        """
+        Инициализация Suggester
+        
+        Args:
+            industry (str): Тип индустрии ('default', 'blog', 'scientific_blog', 'ecommerce')
+        """
+        self.rank_predictor = ImprovedRankPredictor(industry=industry)
+        self.industry = industry
+        
+    def analyze_content(self, features: Dict[str, float]) -> Dict[str, any]:
+        """
+        Анализ контента и генерация подробных рекомендаций
+        
+        Args:
+            features (Dict[str, float]): Характеристики страницы
+            
+        Returns:
+            Dict[str, any]: Результаты анализа и рекомендации
+        """
+        # Получаем базовый прогноз и рекомендации
+        prediction = self.rank_predictor.predict_position(features)
+        base_recommendations = self.rank_predictor.generate_recommendations(features)
+        
+        # Расширяем анализ
+        detailed_analysis = self._perform_detailed_analysis(features, prediction)
+        priority_tasks = self._generate_priority_tasks(detailed_analysis)
+        competitor_insights = self._generate_competitor_insights(features)
+        
+        return {
+            'current_position': prediction['position'],
+            'score_analysis': detailed_analysis,
+            'priority_tasks': priority_tasks,
+            'base_recommendations': base_recommendations,
+            'competitor_insights': competitor_insights
+        }
     
-    def __init__(self, config: ModelConfig):
-        super().__init__()
-        self.config = config
-        
-        # Генератор рекомендаций
-        self.suggestion_generator = nn.Sequential(
-            # Первый слой с нормализацией
-            nn.Linear(config.content_dim, config.hidden_dim),
-            nn.LayerNorm(config.hidden_dim),
-            nn.Dropout(config.dropout),
-            nn.ReLU(),
-            
-            # Второй слой с повышением размерности
-            nn.Linear(config.hidden_dim, config.hidden_dim * 2),
-            nn.LayerNorm(config.hidden_dim * 2),
-            nn.Dropout(config.dropout),
-            nn.ReLU(),
-            
-            # Выходной слой для генерации рекомендаций
-            nn.Linear(
-                config.hidden_dim * 2,
-                config.num_suggestions * config.hidden_dim
-            )
-        )
-        
-        # Оценка важности рекомендаций
-        self.importance_estimator = nn.Sequential(
-            nn.Linear(config.hidden_dim, config.hidden_dim // 2),
-            nn.ReLU(),
-            nn.Linear(config.hidden_dim // 2, 1),
-            nn.Sigmoid()
-        )
-        
-        # Анализ сложности внедрения
-        self.complexity_analyzer = nn.Sequential(
-            nn.Linear(config.hidden_dim, config.hidden_dim // 2),
-            nn.ReLU(),
-            nn.Linear(config.hidden_dim // 2, 3)  # Легко/Средне/Сложно
-        )
-        
-        # Оценка потенциального влияния
-        self.impact_estimator = nn.Sequential(
-            nn.Linear(config.hidden_dim, config.hidden_dim // 2),
-            nn.ReLU(),
-            nn.Linear(config.hidden_dim // 2, 1),
-            nn.Sigmoid()
-        )
-        
-    def forward(
-        self,
-        features: torch.Tensor,
-        attention_mask: Optional[torch.Tensor] = None
-    ) -> Dict[str, torch.Tensor]:
+    def _perform_detailed_analysis(
+        self, 
+        features: Dict[str, float], 
+        prediction: Dict[str, any]
+    ) -> Dict[str, Dict[str, any]]:
         """
-        Генерация рекомендаций
-        Args:
-            features: входные признаки
-            attention_mask: маска внимания
-        Returns:
-            словарь с рекомендациями и их характеристиками
+        Подробный анализ всех факторов
         """
-        try:
-            batch_size = features.size(0)
+        analysis = {}
+        feature_scores = prediction['feature_scores']
+        weighted_scores = prediction['weighted_scores']
+        
+        for feature_name, score in feature_scores.items():
+            current_value = features[feature_name]
+            thresholds = getattr(self.rank_predictor.thresholds, feature_name)
             
-            # Генерация базовых рекомендаций
-            suggestions = self.suggestion_generator(features)
-            suggestions = suggestions.view(
-                batch_size,
-                self.config.num_suggestions,
-                -1
-            )
+            status = self._get_feature_status(feature_name, current_value, thresholds)
+            impact = weighted_scores[feature_name] / prediction['total_score']
             
-            # Оценка важности каждой рекомендации
-                        # Оценка важности каждой рекомендации
-            importance_scores = self.importance_estimator(suggestions)
-            
-            # Анализ сложности внедрения
-            complexity_scores = self.complexity_analyzer(suggestions)
-            complexity_probs = torch.softmax(complexity_scores, dim=-1)
-            
-            # Оценка потенциального влияния
-            impact_scores = self.impact_estimator(suggestions)
-            
-            # Если есть маска внимания, применяем её
-            if attention_mask is not None:
-                mask = attention_mask.unsqueeze(-1).expand_as(suggestions)
-                suggestions = suggestions * mask
-                importance_scores = importance_scores * mask[:, :, :1]
-                complexity_scores = complexity_scores * mask[:, :, :3]
-                impact_scores = impact_scores * mask[:, :, :1]
-            
-            return {
-                'suggestions': suggestions,
-                'importance_scores': importance_scores,
-                'complexity_scores': complexity_probs,
-                'impact_scores': impact_scores
+            analysis[feature_name] = {
+                'current_value': current_value,
+                'score': score,
+                'weighted_score': weighted_scores[feature_name],
+                'impact_percentage': impact * 100,
+                'status': status,
+                'thresholds': thresholds
             }
             
-        except Exception as e:
-            logger.error(f"Ошибка при генерации рекомендаций: {e}")
-            raise
-            
-    def decode_suggestions(
-        self,
-        suggestions: torch.Tensor,
-        tokenizer
-    ) -> List[str]:
+        return analysis
+    
+    def _get_feature_status(
+        self, 
+        feature_name: str, 
+        value: float, 
+        thresholds: Dict[str, float]
+    ) -> str:
         """
-        Декодирование рекомендаций в текст
-        Args:
-            suggestions: тензор рекомендаций
-            tokenizer: токенизатор для декодирования
-        Returns:
-            список текстовых рекомендаций
+        Определение статуса параметра
         """
-        try:
-            # Преобразование в индексы токенов
-            token_ids = torch.argmax(suggestions, dim=-1)
-            
-            # Декодирование каждой рекомендации
-            texts = []
-            for suggestion in token_ids:
-                text = tokenizer.decode(suggestion, skip_special_tokens=True)
-                texts.append(text.strip())
-            
-            return texts
-            
-        except Exception as e:
-            logger.error(f"Ошибка при декодировании рекомендаций: {e}")
-            raise
-            
-    def filter_suggestions(
-        self,
-        suggestions: Dict[str, torch.Tensor],
-        min_importance: float = 0.5,
-        max_complexity: float = 0.7
-    ) -> Dict[str, torch.Tensor]:
-        """
-        Фильтрация рекомендаций по важности и сложности
-        Args:
-            suggestions: словарь с рекомендациями
-            min_importance: минимальная важность
-            max_complexity: максимальная сложность
-        Returns:
-            отфильтрованные рекомендации
-        """
-        try:
-            # Создание маски для фильтрации
-            importance_mask = suggestions['importance_scores'] >= min_importance
-            complexity_mask = suggestions['complexity_scores'].max(dim=-1)[0] <= max_complexity
-            
-            # Применение маски ко всем компонентам
-            filtered = {}
-            for key, value in suggestions.items():
-                if key in ['suggestions', 'importance_scores', 'impact_scores']:
-                    filtered[key] = value[importance_mask & complexity_mask]
-                elif key == 'complexity_scores':
-                    filtered[key] = value[importance_mask & complexity_mask]
-                    
-            return filtered
-            
-        except Exception as e:
-            logger.error(f"Ошибка при фильтрации рекомендаций: {e}")
-            raise
-            
-    def prioritize_suggestions(
-        self,
-        suggestions: Dict[str, torch.Tensor],
-        weights: Dict[str, float] = None
-    ) -> Dict[str, torch.Tensor]:
-        """
-        Приоритизация рекомендаций
-        Args:
-            suggestions: словарь с рекомендациями
-            weights: веса для различных факторов
-        Returns:
-            приоритизированные рекомендации
-        """
-        if weights is None:
-            weights = {
-                'importance': 0.4,
-                'impact': 0.4,
-                'complexity': 0.2
-            }
-            
-        try:
-            # Расчет общего скора для каждой рекомендации
-            importance_score = suggestions['importance_scores'] * weights['importance']
-            impact_score = suggestions['impact_scores'] * weights['impact']
-            complexity_score = (1 - suggestions['complexity_scores'].max(dim=-1)[0]) * weights['complexity']
-            
-            total_score = importance_score + impact_score + complexity_score
-            
-            # Сортировка по общему скору
-            _, indices = torch.sort(total_score, descending=True)
-            
-            # Сортировка всех компонентов
-            prioritized = {}
-            for key, value in suggestions.items():
-                prioritized[key] = value[indices]
+        if feature_name == 'content_length':
+            if thresholds['optimal_min'] <= value <= thresholds['optimal_max']:
+                return 'optimal'
+            elif value < thresholds['low']:
+                return 'critical'
+            elif value < thresholds['optimal_min']:
+                return 'needs_improvement'
+            elif value > thresholds['optimal_max']:
+                return 'excessive'
+        else:
+            if value < thresholds['low']:
+                return 'below_threshold'
+            elif value > thresholds['high']:
+                return 'above_threshold'
+            else:
+                return 'optimal'
                 
-            return prioritized
+        return 'unknown'
+    
+    def _generate_priority_tasks(
+        self, 
+        detailed_analysis: Dict[str, Dict[str, any]]
+    ) -> List[Dict[str, any]]:
+        """
+        Генерация приоритетных задач на основе анализа
+        """
+        tasks = []
+        
+        # Сортируем факторы по их влиянию и статусу
+        factors = [(name, data) for name, data in detailed_analysis.items()]
+        factors.sort(key=lambda x: (
+            x[1]['status'] != 'critical',  # Критические первые
+            x[1]['status'] != 'needs_improvement',  # Потом требующие улучшения
+            -x[1]['impact_percentage']  # Затем по влиянию (по убыванию)
+        ))
+        
+        for feature_name, data in factors:
+            if data['status'] in ['critical', 'needs_improvement', 'below_threshold']:
+                task = self._create_improvement_task(feature_name, data)
+                if task:
+                    tasks.append(task)
+                    
+        return tasks
+    
+    def _create_improvement_task(
+        self, 
+        feature_name: str, 
+        data: Dict[str, any]
+    ) -> Optional[Dict[str, any]]:
+        """
+        Создание конкретной задачи по улучшению
+        """
+        task_templates = {
+            'content_length': {
+                'critical': {
+                    'title': 'Критически низкий объем контента',
+                    'description': f'Текущий объем ({data["current_value"]:.0f} слов) значительно ниже минимального порога. '
+                                 f'Необходимо увеличить до как минимум {data["thresholds"]["low"]} слов.',
+                    'priority': 'high'
+                },
+                'needs_improvement': {
+                    'title': 'Недостаточный объем контента',
+                    'description': f'Рекомендуется увеличить объем контента с {data["current_value"]:.0f} '
+                                 f'до {data["thresholds"]["optimal_min"]} слов для оптимальных результатов.',
+                    'priority': 'medium'
+                }
+            },
+            'keyword_density': {
+                'below_threshold': {
+                    'title': 'Низкая плотность ключевых слов',
+                    'description': f'Увеличьте плотность ключевых слов с {data["current_value"]*100:.1f}% '
+                                 f'до {data["thresholds"]["low"]*100:.1f}%.',
+                    'priority': 'medium'
+                }
+            },
+            'readability_score': {
+                'below_threshold': {
+                    'title': 'Низкая читабельность текста',
+                    'description': 'Упростите текст для лучшего восприятия.',
+                    'priority': 'medium'
+                }
+            }
+        }
+        
+        if feature_name in task_templates and data['status'] in task_templates[feature_name]:
+            template = task_templates[feature_name][data['status']]
+            return {
+                'feature': feature_name,
+                'title': template['title'],
+                'description': template['description'],
+                'priority': template['priority'],
+                'impact': data['impact_percentage']
+            }
             
-        except Exception as e:
-            logger.error(f"Ошибка при приоритизации рекомендаций: {e}")
-            raise
+        return None
+    
+    def _generate_competitor_insights(self, features: Dict[str, float]) -> List[str]:
+        """
+        Генерация инсайтов на основе сравнения с конкурентами
+        """
+        # В будущем здесь будет реальное сравнение с конкурентами
+        # Пока возвращаем базовые рекомендации для индустрии
+        if self.industry == 'blog':
+            return [
+                "У успешных блогов в вашей нише среднее время чтения составляет 7 минут",
+                "Рекомендуется использовать больше визуального контента",
+                "Популярные блоги используют структуру с 3-4 подзаголовками"
+            ]
+        elif self.industry == 'ecommerce':
+            return [
+                "Успешные конкуренты используют расширенные описания продуктов (300+ слов)",
+                "Рекомендуется добавить секцию FAQ для ключевых продуктов",
+                "Используйте больше качественных изображений продукта"
+            ]
+        elif self.industry == 'scientific_blog':
+            return [
+                "Добавьте больше ссылок на исследования и источники",
+                "Используйте графики и диаграммы для визуализации данных",
+                "Включите методологию исследования в контент"
+            ]
+        
+        return [
+            "Добавьте больше уникального контента",
+            "Улучшите структуру заголовков",
+            "Используйте больше релевантных ключевых слов"
+        ]
