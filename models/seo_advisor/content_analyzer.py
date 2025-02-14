@@ -1,177 +1,80 @@
+
+from typing import Dict, List
+from dataclasses import dataclass
+from transformers import AutoTokenizer, AutoModel
 import torch
-import torch.nn as nn
-from transformers import AutoModel, AutoTokenizer
-from typing import Dict, List, Union
-import logging
+import re
 
-from ...config.advisor_config import ModelConfig
-from ...utils.text_processing import TextProcessor
+@dataclass
+class ContentMetrics:
+    keyword_density: float
+    readability_score: float
+    header_structure: Dict
+    meta_tags_score: float
 
-logger = logging.getLogger(__name__)
-
-class ContentAnalyzer(nn.Module):
-    """Анализатор контента для SEO"""
+class ContentAnalyzer:
+    def __init__(self, model_name: str = "DeepPavlov/rubert-base-cased"):
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+        self.model = AutoModel.from_pretrained(model_name)
+        
+    def analyze_text(self, content: str, target_keywords: List[str]) -> ContentMetrics:
+        # Подсчет плотности ключевых слов
+        keyword_density = self._calculate_keyword_density(content, target_keywords)
+        
+        # Оценка читаемости
+        readability = self._calculate_readability(content)
+        
+        # Анализ заголовков
+        headers = self._analyze_headers(content)
+        
+        # Проверка мета-тегов
+        meta_score = self._check_meta_tags(content)
+        
+        return ContentMetrics(
+            keyword_density=keyword_density,
+            readability_score=readability,
+            header_structure=headers,
+            meta_tags_score=meta_score
+        )
     
-    def __init__(self, config: ModelConfig):
-        super().__init__()
-        self.config = config
-        self.text_processor = TextProcessor()
+    def _calculate_keyword_density(self, text: str, keywords: List[str]) -> float:
+        # Приводим текст к нижнему регистру
+        text = text.lower()
         
-        # Загрузка предобученной модели и токенизатора
-        try:
-            self.tokenizer = AutoTokenizer.from_pretrained(config.model_name)
-            self.base_model = AutoModel.from_pretrained(config.model_name)
-        except Exception as e:
-            logger.error(f"Ошибка загрузки модели: {e}")
-            raise
-            
-        # Дополнительные слои для SEO-анализа
-        self.content_layers = nn.Sequential(
-            nn.Linear(config.content_dim, config.hidden_dim),
-            nn.LayerNorm(config.hidden_dim),
-            nn.Dropout(config.dropout),
-            nn.ReLU(),
-            nn.Linear(config.hidden_dim, config.content_dim)
-        )
+        # Считаем общее количество слов
+        total_words = len(text.split())
         
-        # Слой внимания для выделения важных частей текста
-        self.attention = nn.MultiheadAttention(
-            config.content_dim,
-            config.num_heads,
-            dropout=config.dropout
-        )
+        # Считаем вхождения каждого ключевого слова
+        keyword_count = 0
+        for keyword in keywords:
+            keyword_count += len(re.findall(r'\b' + re.escape(keyword.lower()) + r'\b', text))
+            
+        # Вычисляем плотность
+        return keyword_count / total_words if total_words > 0 else 0
+    
+    def _calculate_readability(self, text: str) -> float:
+        # Простая формула читаемости
+        sentences = text.split('.')
+        words = text.split()
         
-    def forward(
-        self,
-        content: Union[str, List[str], Dict[str, torch.Tensor]]
-    ) -> Dict[str, torch.Tensor]:
-        """
-        Анализ контента
-        Args:
-            content: текстовый контент или уже токенизированные данные
-        Returns:
-            словарь с результатами анализа
-        """
-        try:
-            # Подготовка входных данных
-            if isinstance(content, (str, list)):
-                inputs = self._prepare_inputs(content)
-            else:
-                inputs = content
-                
-            # Получение эмбеддингов из базовой модели
-            outputs = self.base_model(
-                input_ids=inputs['input_ids'],
-                attention_mask=inputs['attention_mask']
-            )
+        if not sentences or not words:
+            return 0
             
-            sequence_output = outputs.last_hidden_state
-            
-            # Применение дополнительных слоев
-            enhanced_features = self.content_layers(sequence_output)
-            
-            # Применение механизма внимания
-            attended_output, attention_weights = self.attention(
-                enhanced_features,
-                enhanced_features,
-                enhanced_features,
-                key_padding_mask=~inputs['attention_mask'].bool()
-            )
-            
-            # Расчет текстовых метрик
-            if isinstance(content, (str, list)):
-                text_metrics = self._calculate_text_metrics(content)
-            else:
-                text_metrics = None
-            
-            return {
-                'embeddings': attended_output,
-                'attention_weights': attention_weights,
-                'sequence_output': sequence_output,
-                'text_metrics': text_metrics
-            }
-            
-        except Exception as e:
-            logger.error(f"Ошибка при анализе контента: {e}")
-            raise
-            
-    def _prepare_inputs(
-        self,
-        texts: Union[str, List[str]]
-    ) -> Dict[str, torch.Tensor]:
-        """
-        Подготовка входных данных
-        Args:
-            texts: текст или список текстов
-        Returns:
-            токенизированные данные
-        """
-        if isinstance(texts, str):
-            texts = [texts]
-            
-        # Предобработка текстов
-        processed_texts = [
-            self.text_processor.normalize_text(text)
-            for text in texts
-        ]
+        avg_sentence_length = len(words) / len(sentences)
+        return max(0, min(1, 1 - (avg_sentence_length - 15) / 10))
         
-        # Токенизация
-        return self.tokenizer(
-            processed_texts,
-            padding=True,
-            truncation=True,
-            max_length=self.config.max_length,
-            return_tensors='pt'
-        )
-        
-    def _calculate_text_metrics(
-        self,
-        texts: Union[str, List[str]]
-    ) -> Dict[str, torch.Tensor]:
-        """
-        Расчет метрик текста
-        Args:
-            texts: текст или список текстов
-        Returns:
-            словарь с метриками
-        """
-        if isinstance(texts, str):
-            texts = [texts]
-            
-        metrics = []
-        for text in texts:
-            text_metrics = self.text_processor.calculate_metrics(text)
-            metrics.append({
-                'word_count': text_metrics.word_count,
-                'char_count': text_metrics.char_count,
-                'sentence_count': text_metrics.sentence_count,
-                'avg_word_length': text_metrics.avg_word_length,
-                'avg_sentence_length': text_metrics.avg_sentence_length
-            })
-            
-        # Преобразование в тензоры
-        return {
-            key: torch.tensor([m[key] for m in metrics])
-            for key in metrics[0].keys()
+    def _analyze_headers(self, content: str) -> Dict:
+        headers = {
+            'h1': len(re.findall(r'<h1.*?>(.*?)</h1>', content)),
+            'h2': len(re.findall(r'<h2.*?>(.*?)</h2>', content)),
+            'h3': len(re.findall(r'<h3.*?>(.*?)</h3>', content))
         }
-
-    def extract_keywords(
-        self,
-        text: Union[str, List[str]],
-        top_k: int = 10
-    ) -> Union[List[str], List[List[str]]]:
-        """
-        Извлечение ключевых слов
-        Args:
-            text: текст или список текстов
-            top_k: количество ключевых слов
-        Returns:
-            список ключевых слов для каждого текста
-        """
-        if isinstance(text, str):
-            return self.text_processor.extract_keywords(text, top_k=top_k)
-            
-        return [
-            self.text_processor.extract_keywords(t, top_k=top_k)
-            for t in text
-        ]
+        return headers
+        
+    def _check_meta_tags(self, content: str) -> float:
+        score = 0
+        if re.search(r'<title.*?>(.*?)</title>', content):
+            score += 0.5
+        if re.search(r'<meta\s+name="description".*?>', content):
+            score += 0.5
+        return score
