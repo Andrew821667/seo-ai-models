@@ -60,24 +60,27 @@ class KeywordProcessor:
 
     def _get_position_multiplier(self, text: str, position: int) -> float:
         """Определение позиционного множителя"""
-        paragraphs = text.split('
-
-')
+        paragraphs = [p for p in text.split('\n\n') if p.strip()]  # Игнорируем пустые параграфы
         if not paragraphs:
             return 1.0
             
-        # Проверяем, находится ли слово в заголовке (первая строка первого параграфа)
-        if position < len(paragraphs[0].split()[0]):
+        # Получаем все слова до текущей позиции
+        words_before_position = ' '.join(paragraphs).split()[:position]
+        
+        # Слова первого параграфа
+        first_para_words = paragraphs[0].split()
+        
+        # Проверяем, находится ли слово в заголовке (первая строка)
+        if position < len(first_para_words[0].split('\n')[0].split()):
             return self.weights['position_multipliers']['title']
             
         # В первом параграфе
-        words_before = sum(len(p.split()) for p in paragraphs[:1])
-        if position < words_before:
+        if position < len(first_para_words):
             return self.weights['position_multipliers']['first_para']
             
         # В последнем параграфе
-        words_before_last = sum(len(p.split()) for p in paragraphs[:-1])
-        if position >= words_before_last:
+        last_para_start = sum(len(p.split()) for p in paragraphs[:-1])
+        if position >= last_para_start:
             return self.weights['position_multipliers']['last_para']
             
         return 1.0
