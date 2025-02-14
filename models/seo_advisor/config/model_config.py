@@ -1,5 +1,19 @@
 
 from pydantic import BaseModel
+from typing import List
+
+class RankPredictorConfig(BaseModel):
+    input_size: int = 50
+    hidden_size: int = 128
+    dropout_rate: float = 0.3
+    learning_rate: float = 0.001
+    ranking_factors: List[str] = [
+        'keyword_density',
+        'content_length',
+        'readability_score',
+        'meta_tags_score',
+        'header_structure_score'
+    ]
 
 class SEOAdvisorConfig(BaseModel):
     # Параметры контента
@@ -8,7 +22,7 @@ class SEOAdvisorConfig(BaseModel):
     max_keyword_density: float = 0.03
     
     # Параметры ранжирования
-    ranking_factors_count: int = 50
+    rank_predictor: RankPredictorConfig = RankPredictorConfig()
     min_confidence_score: float = 0.7
     
     # Параметры рекомендаций

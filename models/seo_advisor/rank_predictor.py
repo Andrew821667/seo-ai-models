@@ -1,135 +1,59 @@
+
 import torch
 import torch.nn as nn
-from typing import Dict, Optional
-import logging
-
-from ...config.advisor_config import ModelConfig
-
-logger = logging.getLogger(__name__)
+from typing import Dict, List
+import numpy as np
 
 class RankPredictor(nn.Module):
-    """Предсказание SEO-рейтинга"""
-    
-    def __init__(self, config: ModelConfig):
+    def __init__(self, input_size: int = 50):
         super().__init__()
-        self.config = config
-        
-        # Основной блок предсказания
-        self.predictor = nn.Sequential(
-            # Первый слой с дропаутом
-            nn.Linear(config.content_dim, config.hidden_dim),
-            nn.LayerNorm(config.hidden_dim),
-            nn.Dropout(config.dropout),
+        self.model = nn.Sequential(
+            nn.Linear(input_size, 128),
             nn.ReLU(),
-            
-            # Второй слой с уменьшением размерности
-            nn.Linear(config.hidden_dim, config.hidden_dim // 2),
-            nn.LayerNorm(config.hidden_dim // 2),
-            nn.Dropout(config.dropout),
+            nn.Dropout(0.3),
+            nn.Linear(128, 64),
             nn.ReLU(),
-            
-            # Выходной слой
-            nn.Linear(config.hidden_dim // 2, 1),
-            nn.Sigmoid()
+            nn.Linear(64, 1)
         )
         
-        # Слой оценки уверенности
-        self.confidence_estimator = nn.Sequential(
-            nn.Linear(config.hidden_dim, config.hidden_dim // 2),
-            nn.ReLU(),
-            nn.Linear(config.hidden_dim // 2, 1),
-            nn.Sigmoid()
-        )
+        # Список факторов ранжирования
+        self.ranking_factors = [
+            'keyword_density',
+            'content_length',
+            'readability_score',
+            'meta_tags_score',
+            'header_structure_score'
+        ]
+    
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.model(x)
+    
+    def _prepare_features(self, page_features: Dict) -> torch.Tensor:
+        # Преобразование признаков в тензор
+        features = []
+        for factor in self.ranking_factors:
+            features.append(page_features.get(factor, 0.0))
+        return torch.tensor(features, dtype=torch.float32)
+    
+    def predict_position(self, page_features: Dict) -> float:
+        # Подготовка данных
+        feature_tensor = self._prepare_features(page_features)
         
-    def forward(
-        self,
-        features: torch.Tensor,
-        attention_mask: Optional[torch.Tensor] = None
-    ) -> Dict[str, torch.Tensor]:
-        """
-        Предсказание рейтинга
-        Args:
-            features: входные признаки
-            attention_mask: маска внимания
-        Returns:
-            словарь с предсказанием и уверенностью
-        """
-        try:
-            # Получение промежуточного представления
-            hidden = self.predictor[:-3](features)  # До последнего линейного слоя
-            
-            # Предсказание рейтинга
-            rank_prediction = self.predictor[-3:](hidden)
-            
-            # Оценка уверенности
-            confidence = self.confidence_estimator(hidden)
-            
-            # Если есть маска внимания, учитываем ее
-            if attention_mask is not None:
-                rank_prediction = rank_prediction * attention_mask.unsqueeze(-1)
-                confidence = confidence * attention_mask.unsqueeze(-1)
-            
-            # Агрегация по последовательности
-            rank_score = rank_prediction.mean(dim=1)
-            confidence_score = confidence.mean(dim=1)
-            
-            return {
-                'rank_score': rank_score,
-                'confidence': confidence_score,
-                'rank_prediction': rank_prediction,
-                'hidden_features': hidden
-            }
-            
-        except Exception as e:
-            logger.error(f"Ошибка при предсказании рейтинга: {e}")
-            raise
-            
-    def explain_prediction(
-        self,
-        features: torch.Tensor,
-        attention_mask: Optional[torch.Tensor] = None
-    ) -> Dict[str, torch.Tensor]:
-        """
-        Объяснение предсказания
-        Args:
-            features: входные признаки
-            attention_mask: маска внимания
-        Returns:
-            словарь с объяснениями
-        """
+        # Прогноз позиции
         with torch.no_grad():
-            # Получение предсказания
-            outputs = self.forward(features, attention_mask)
-            
-            # Расчет градиентов для объяснения
-            gradients = torch.autograd.grad(
-                outputs['rank_score'].sum(),
-                features,
-                create_graph=True
-            )[0]
-            
-            # Нормализация градиентов
-            feature_importance = torch.norm(gradients, dim=-1)
-            if attention_mask is not None:
-                feature_importance = feature_importance * attention_mask
-            
-            return {
-                'feature_importance': feature_importance,
-                'rank_score': outputs['rank_score'],
-                'confidence': outputs['confidence']
-            }
-            
-    def calibrate_confidence(
-        self,
-        confidence: torch.Tensor,
-        temperature: float = 1.0
-    ) -> torch.Tensor:
-        """
-        Калибровка оценки уверенности
-        Args:
-            confidence: исходная оценка уверенности
-            temperature: температура для калибровки
-        Returns:
-            калиброванная оценка
-        """
-        return torch.sigmoid(confidence / temperature)
+            position = self.forward(feature_tensor)
+        
+        return position.item()
+    
+    def evaluate_page_strength(self, page_features: Dict) -> Dict[str, float]:
+        # Оценка важности различных факторов
+        strengths = {}
+        for factor in self.ranking_factors:
+            value = page_features.get(factor, 0.0)
+            if value > 0.7:
+                strengths[factor] = "высокая"
+            elif value > 0.4:
+                strengths[factor] = "средняя"
+            else:
+                strengths[factor] = "низкая"
+        return strengths
