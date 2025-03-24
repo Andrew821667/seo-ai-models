@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SEO Prediction Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .prediction-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .position {
+            font-size: 36px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .probability-bars {
+            margin: 20px 0;
+        }
+        .prob-bar {
+            margin-bottom: 10px;
+        }
+        .bar-label {
+            display: inline-block;
+            width: 80px;
+            font-weight: bold;
+        }
+        .bar-container {
+            display: inline-block;
+            width: 300px;
+            background-color: #eee;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .bar {
+            height: 100%;
+            background-color: #4CAF50;
+            border-radius: 10px;
+        }
+        .bar-value {
+            display: inline-block;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+        .competition {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+        }
+        .features {
+            margin-top: 20px;
+        }
+        .feature-item {
+            margin-bottom: 5px;
+        }
+        .priority-high {
+            color: #D32F2F;
+            font-weight: bold;
+        }
+        .priority-medium {
+            color: #F57C00;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>SEO Prediction Results</h1>
+    
+    <div class="prediction-card">
+        <h2>Predicted Search Position</h2>
+        <div class="position">13.6</div>
+        <p>Industry: <strong>Electronics</strong> (Competition Factor: <strong>1.4</strong>)</p>
+        
+        <div class="probability-bars">
+            <h3>Probability of Ranking</h3>
+            
+            <div class="prob-bar">
+                <span class="bar-label">Top 10:</span>
+                <span class="bar-container">
+                    <span class="bar" style="width: 13.9%"></span>
+                </span>
+                <span class="bar-value">13.9%</span>
+            </div>
+            
+            <div class="prob-bar">
+                <span class="bar-label">Top 20:</span>
+                <span class="bar-container">
+                    <span class="bar" style="width: 81.9%"></span>
+                </span>
+                <span class="bar-value">81.9%</span>
+            </div>
+            
+            <div class="prob-bar">
+                <span class="bar-label">Top 50:</span>
+                <span class="bar-container">
+                    <span class="bar" style="width: 100%"></span>
+                </span>
+                <span class="bar-value">100%</span>
+            </div>
+        </div>
+        
+        <div class="competition">
+            <h3>Industry Competition Analysis</h3>
+            <p>The Electronics industry has <strong>high competition</strong>. Even high-quality content typically ranks between positions 10-15.</p>
+            <p>To achieve better rankings in this competitive space, focus on the priority improvements below.</p>
+        </div>
+        
+        <div class="features">
+            <h3>Priority Improvements</h3>
+            <div class="feature-item priority-high">PRIORITY: Improve semantic depth by adding more industry-specific terminology</div>
+            <div class="feature-item priority-high">PRIORITY: Enhance topic relevance with more detailed product specifications</div>
+            <div class="feature-item priority-medium">Add more multimedia content (comparison tables, product images)</div>
+            <div class="feature-item">Improve internal linking structure</div>
+        </div>
+    </div>
+    
+    <p><em>Note: Predictions are based on calibrated weights optimized for realistic search engine positioning. Actual rankings may vary based on many external factors.</em></p>
+</body>
+</html>

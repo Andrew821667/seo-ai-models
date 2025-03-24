@@ -3,7 +3,7 @@ from typing import Dict, List, Optional, Union
 from datetime import datetime
 from dataclasses import dataclass
 
-from models.seo_advisor.improved_rank_predictor import ImprovedRankPredictor
+from models.seo_advisor.calibrated_rank_predictor import CalibratedRankPredictor
 from models.seo_advisor.content_analyzer import ContentAnalyzer
 from models.seo_advisor.suggester import Suggester
 
@@ -16,7 +16,6 @@ class ContentQualityReport:
    potential_improvements: List[str]
 
 @dataclass
-class SEOAnalysisReport:
    """Расширенный отчет по SEO анализу"""
    timestamp: datetime
    content_metrics: Dict[str, float]
@@ -27,13 +26,14 @@ class SEOAnalysisReport:
    recommendations: Dict[str, List[str]]
    priorities: List[Dict[str, Union[str, float]]]
    industry: str
+   position_probabilities: Dict[str, float]  # Новое поле для вероятностей
 
 class SEOAdvisor:
    """Улучшенный SEO советник с расширенной аналитикой"""
    
    def __init__(self, industry: str = 'default'):
        self.industry = industry
-       self.rank_predictor = ImprovedRankPredictor(industry=industry)
+       self.rank_predictor = CalibratedRankPredictor(industry=industry)
        self.content_analyzer = ContentAnalyzer()
        self.suggester = Suggester()
        self.analysis_history = []
