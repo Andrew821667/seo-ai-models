@@ -1,11 +1,12 @@
-
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, Any
 from datetime import datetime
 from dataclasses import dataclass
 
 from models.seo_advisor.calibrated_rank_predictor import CalibratedRankPredictor
 from models.seo_advisor.content_analyzer import ContentAnalyzer
 from models.seo_advisor.suggester import Suggester
+from models.seo_advisor.semantic_analyzer import SemanticAnalyzer
+from models.seo_advisor.eeat_analyzer import EEATAnalyzer
 
 @dataclass
 class ContentQualityReport:
@@ -16,6 +17,7 @@ class ContentQualityReport:
    potential_improvements: List[str]
 
 @dataclass
+class SEOAnalysisReport:
    """Расширенный отчет по SEO анализу"""
    timestamp: datetime
    content_metrics: Dict[str, float]
@@ -26,7 +28,7 @@ class ContentQualityReport:
    recommendations: Dict[str, List[str]]
    priorities: List[Dict[str, Union[str, float]]]
    industry: str
-   position_probabilities: Dict[str, float]  # Новое поле для вероятностей
+   position_probabilities: Optional[Dict[str, float]] = None
 
 class SEOAdvisor:
    """Улучшенный SEO советник с расширенной аналитикой"""
@@ -36,6 +38,8 @@ class SEOAdvisor:
        self.rank_predictor = CalibratedRankPredictor(industry=industry)
        self.content_analyzer = ContentAnalyzer()
        self.suggester = Suggester()
+       self.semantic_analyzer = SemanticAnalyzer()
+       self.eeat_analyzer = EEATAnalyzer()
        self.analysis_history = []
    
    def analyze_content(self, content: str, target_keywords: List[str]) -> SEOAnalysisReport:
@@ -43,6 +47,28 @@ class SEOAdvisor:
        # Получаем расширенные метрики
        content_metrics = self.content_analyzer.analyze_text(content)
        keyword_analysis = self.content_analyzer.extract_keywords(content, target_keywords)
+       
+       # Выполняем семантический анализ
+       semantic_analysis = self.semantic_analyzer.analyze_text(content, target_keywords)
+       
+       # Добавляем семантические метрики в общий анализ
+       content_metrics.update({
+           "semantic_density": semantic_analysis["semantic_density"],
+           "semantic_coverage": semantic_analysis["semantic_coverage"],
+           "topical_coherence": semantic_analysis["topical_coherence"],
+           "contextual_relevance": semantic_analysis["contextual_relevance"]
+       })
+       
+       # Выполняем анализ E-E-A-T
+       eeat_analysis = self.eeat_analyzer.analyze(content)
+       
+       # Добавляем E-E-A-T метрики в общий анализ
+       content_metrics.update({
+           "expertise_score": eeat_analysis["expertise_score"],
+           "authority_score": eeat_analysis["authority_score"],
+           "trust_score": eeat_analysis["trust_score"],
+           "overall_eeat_score": eeat_analysis["overall_eeat_score"]
+       })
        
        # Анализируем качество контента
        content_quality = self._evaluate_content_quality(content_metrics, keyword_analysis)
@@ -72,6 +98,16 @@ class SEOAdvisor:
            self.industry
        )
        
+       # Получаем семантические рекомендации
+       semantic_recommendations = self.semantic_analyzer.generate_recommendations(semantic_analysis)
+       
+       # Объединяем с рекомендациями от E-E-A-T анализа
+       eeat_recommendations = eeat_analysis["recommendations"]
+       
+       # Добавляем семантические и E-E-A-T рекомендации
+       enhanced_recommendations["semantic_optimization"] = semantic_recommendations
+       enhanced_recommendations["eeat_improvement"] = eeat_recommendations
+       
        # Приоритизируем задачи
        priorities = self.suggester.prioritize_tasks(
            enhanced_recommendations,
@@ -89,7 +125,8 @@ class SEOAdvisor:
            content_quality=content_quality,
            recommendations=enhanced_recommendations,
            priorities=priorities,
-           industry=self.industry
+           industry=self.industry,
+           position_probabilities=prediction.get('probability', {})
        )
        
        # Сохраняем в историю
@@ -187,13 +224,17 @@ class SEOAdvisor:
    def _calculate_overall_quality(self, metrics: Dict[str, float]) -> float:
        """Расчет общего качества контента"""
        weights = {
-           'readability': 0.2,
-           'meta_score': 0.15,
-           'header_score': 0.15,
-           'multimedia_score': 0.15,
-           'linking_score': 0.15,
-           'semantic_depth': 0.1,
-           'topic_relevance': 0.1
+           'readability': 0.15,
+           'meta_score': 0.1,
+           'header_score': 0.1,
+           'multimedia_score': 0.1,
+           'linking_score': 0.1,
+           'semantic_depth': 0.07,
+           'topic_relevance': 0.1,
+           'semantic_density': 0.07,
+           'semantic_coverage': 0.06,
+           'topical_coherence': 0.05,
+           'overall_eeat_score': 0.1
        }
        
        weighted_sum = sum(
