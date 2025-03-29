@@ -1,3 +1,4 @@
+
 from typing import Dict, List, Optional
 from models.seo_advisor.improved_rank_predictor import ImprovedRankPredictor
 
@@ -43,10 +44,21 @@ class CalibratedRankPredictor(ImprovedRankPredictor):
             'news': 1.3,           # Средне-высокая
             'default': 1.2         # По умолчанию
         }
+        
+        # ДОБАВЛЕНО: Словарь отраслей YMYL
+        self.ymyl_industries = {
+            'finance': True,
+            'health': True,
+            'law': True,
+            'insurance': True,
+            'medical': True
+        }
+    
+    
     
     def predict_position(self, features: Dict[str, float], text: str = None, keywords: List[str] = None) -> Dict:
         """
-        Предсказание позиции с учетом конкурентности ниши
+        Предсказание позиции с учетом конкурентности ниши и E-E-A-T метрик
         
         Args:
             features: Словарь с метриками контента
@@ -65,16 +77,70 @@ class CalibratedRankPredictor(ImprovedRankPredictor):
             self.competition_factors['default']
         )
         
-        # Рассчитываем общий скор
+        # Рассчитываем общий скор (базовый контентный скор)
         total_score = sum(result['weighted_scores'].values())
         
-        # Применяем скорректированную формулу с учетом конкурентности
-        position = max(1, min(100, 50 * (1 - (total_score / competition_factor) * 1.2)))
+        # Более консервативные коэффициенты для E-E-A-T метрик
+        eeat_adjustment = 0.0
+        is_ymyl = self.ymyl_industries.get(self.industry, False)
+        
+        # Для диагностики будем отслеживать каждый компонент
+        eeat_components = {}
+        
+        if 'expertise_score' in features:
+            # Значение экспертности для YMYL и не-YMYL
+            eeat_multiplier = 0.5 if is_ymyl else 0.2
+            expertise_contribution = features['expertise_score'] * eeat_multiplier
+            eeat_adjustment += expertise_contribution
+            eeat_components['expertise'] = expertise_contribution
+            
+        if 'authority_score' in features:
+            # Значение авторитетности для YMYL и не-YMYL
+            eeat_multiplier = 0.5 if is_ymyl else 0.2
+            authority_contribution = features['authority_score'] * eeat_multiplier
+            eeat_adjustment += authority_contribution
+            eeat_components['authority'] = authority_contribution
+            
+        if 'trust_score' in features:
+            # Значение доверия для YMYL и не-YMYL
+            eeat_multiplier = 0.7 if is_ymyl else 0.3
+            trust_contribution = features['trust_score'] * eeat_multiplier
+            eeat_adjustment += trust_contribution
+            eeat_components['trust'] = trust_contribution
+            
+        if 'overall_eeat_score' in features:
+            # Используем общий E-E-A-T только если индивидуальные метрики не предоставлены
+            if not any(k in features for k in ['expertise_score', 'authority_score', 'trust_score']):
+                eeat_multiplier = 1.0 if is_ymyl else 0.4
+                overall_contribution = features['overall_eeat_score'] * eeat_multiplier
+                eeat_adjustment += overall_contribution
+                eeat_components['overall'] = overall_contribution
+        
+        # НОВЫЙ ПОДХОД: Линейная зависимость вместо экспоненциальной
+        # Чем выше eeat_adjustment, тем лучше позиция (ниже число)
+        
+        # Базовое значение позиции на основе общего скора
+        base_position = 50 * (1 - (total_score / competition_factor))
+        
+        # Корректировка базовой позиции на основе E-E-A-T
+        # Для YMYL отраслей E-E-A-T может улучшить позицию до 40 пунктов
+        # Для не-YMYL отраслей - до 20 пунктов
+        eeat_position_improvement = eeat_adjustment * (40 if is_ymyl else 20)
+        
+        # Позиция с учетом E-E-A-T
+        adjusted_position = max(1, base_position - eeat_position_improvement)
+        
+        # Финальная позиция не должна быть хуже 50
+        position = min(adjusted_position, 50)
         
         # Обновляем результат
         result['position'] = position
         result['competition_factor'] = competition_factor
         result['total_score'] = total_score
+        result['base_position'] = base_position
+        result['eeat_adjustment'] = eeat_adjustment
+        result['eeat_components'] = eeat_components
+        result['eeat_position_improvement'] = eeat_position_improvement
         
         # Добавляем вероятности попадания в топ
         result['probability'] = {
@@ -84,7 +150,6 @@ class CalibratedRankPredictor(ImprovedRankPredictor):
         }
         
         return result
-        
     def generate_recommendations(self, features: Dict[str, float]) -> Dict[str, List[str]]:
         """
         Генерация рекомендаций с учетом оптимизированных весов
@@ -104,6 +169,16 @@ class CalibratedRankPredictor(ImprovedRankPredictor):
             'semantic_depth',
             'header_structure_score'
         ]
+        
+        # ДОБАВЛЕНО: Для YMYL отраслей приоритизируем E-E-A-T рекомендации
+        is_ymyl = self.ymyl_industries.get(self.industry, False)
+        if is_ymyl:
+            if 'eeat_recommendations' in features and features['eeat_recommendations']:
+                if 'eeat' not in recommendations:
+                    recommendations['eeat'] = []
+                
+                for rec in features['eeat_recommendations']:
+                    recommendations['eeat'].append(f"ВЫСОКИЙ ПРИОРИТЕТ: {rec}")
         
         # Добавляем приоритет рекомендациям
         for feature in recommendations:

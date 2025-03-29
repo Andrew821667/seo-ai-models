@@ -85,12 +85,7 @@ class SEOAdvisor:
            'topic_relevance': content_metrics.get('topic_relevance', 0),
            'semantic_depth': content_metrics.get('semantic_depth', 0),
            'engagement_potential': content_metrics.get('engagement_potential', 0)
-       ,
-            "expertise_score": content_metrics.get("expertise_score", 0),
-            "authority_score": content_metrics.get("authority_score", 0),
-            "trust_score": content_metrics.get("trust_score", 0),
-            "overall_eeat_score": content_metrics.get("overall_eeat_score", 0)
-        }
+       }
        
        # Получаем предсказание и рекомендации
        prediction = self.rank_predictor.predict_position(prediction_features)
