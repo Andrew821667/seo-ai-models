@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO AI Models - Документация</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .container {
+            display: flex;
+        }
+        .sidebar {
+            width: 200px;
+            padding-right: 20px;
+        }
+        .content {
+            flex-grow: 1;
+        }
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .sidebar li {
+            margin-bottom: 10px;
+        }
+        .sidebar a {
+            text-decoration: none;
+            color: #3498db;
+        }
+        .sidebar a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h3>Содержание</h3>
+            <ul>
+                <li><a href="#introduction">Введение</a></li>
+                <li><a href="#installation">Установка</a></li>
+                <li><a href="#usage">Использование</a></li>
+                <li><a href="#api">API компоненты</a></li>
+            </ul>
+        </div>
+        <div class="content">
+            <h1>SEO AI Models</h1>
+            <p>Библиотека моделей и инструментов искусственного интеллекта для SEO-оптимизации контента.</p>
+            
+            <h2 id="introduction">Введение</h2>
+            <p>SEO AI Models предоставляет набор инструментов для анализа и оптимизации контента с использованием
+            методов машинного обучения и искусственного интеллекта.</p>
+            
+            <h3>Основные компоненты</h3>
+            <ul>
+                <li><strong>SEOAdvisor</strong>: Основной класс для анализа и оптимизации контента</li>
+                <li><strong>EEATAnalyzer</strong>: Анализатор E-E-A-T (Experience, Expertise, Authoritativeness, Trustworthiness)</li>
+                <li><strong>EnhancedEEATAnalyzer</strong>: Улучшенный анализатор E-E-A-T с использованием машинного обучения</li>
+                <li><strong>CalibratedRankPredictor</strong>: Предсказание позиций в поисковой выдаче</li>
+            </ul>
+            
+            <h2 id="installation">Установка</h2>
+            <h3>Базовая установка</h3>
+            <pre><code>pip install -e .</code></pre>
+            
+            <h3>Требования</h3>
+            <ul>
+                <li>Python 3.8+</li>
+                <li>Дополнительные зависимости указаны в setup.py</li>
+            </ul>
+            
+            <h2 id="usage">Примеры использования</h2>
+            <h3>Базовое использование</h3>
+            <pre><code>from seo_ai_models.models.seo_advisor import SEOAdvisor
+
+# Инициализация советника для определенной отрасли
+advisor = SEOAdvisor(industry='finance')
+
+# Анализ контента
+result = advisor.analyze_content(content, target_keywords)
+
+# Работа с отчетом
+print(f"Прогнозируемая позиция: {result.predicted_position}")
+print(f"E-E-A-T score: {result.content_metrics['overall_eeat_score']}")</code></pre>
+            
+            <h3>Расширенное использование E-E-A-T анализатора</h3>
+            <pre><code>from seo_ai_models.models.seo_advisor.analyzers.eeat import EnhancedEEATAnalyzer
+
+# Путь к модели
+model_path = "seo_ai_models/data/models/eeat/eeat_best_model.joblib"
+
+# Инициализация анализатора с моделью машинного обучения
+analyzer = EnhancedEEATAnalyzer(model_path=model_path)
+
+# Анализ контента для определенной отрасли
+result = analyzer.analyze(content, industry='finance')
+
+# Работа с результатами
+print(f"Expertise Score: {result['expertise_score']:.4f}")
+print(f"Authority Score: {result['authority_score']:.4f}")
+print(f"Trust Score: {result['trust_score']:.4f}")
+print(f"Overall E-E-A-T Score: {result['overall_eeat_score']:.4f}")</code></pre>
+            
+            <h2 id="api">API компоненты</h2>
+            <p>Подробная документация API генерируется автоматически с помощью Sphinx и доступна в локальной 
+            среде разработки с помощью следующих команд:</p>
+            <pre><code># Установка Sphinx и зависимостей
+pip install sphinx sphinx-rtd-theme
+
+# Генерация документации
+cd docs
+make html
+
+# Документация будет доступна в docs/build/html/index.html</code></pre>
+        </div>
+    </div>
+</body>
+</html>
