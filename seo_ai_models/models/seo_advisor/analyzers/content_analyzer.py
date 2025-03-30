@@ -1,6 +1,6 @@
 
 from typing import Dict, List
-from common.utils.text_processing import TextProcessor
+from seo_ai_models.common.utils.text_processing import TextProcessor
 
 class ContentAnalyzer:
     def __init__(self):
@@ -45,18 +45,18 @@ class ContentAnalyzer:
         keyword_stats = {
             'density': 0.0,
             'distribution': {},
-            'matches': {}
+            'frequency': {}
         }
         
         for keyword in target_keywords:
             count = normalized_content.count(keyword.lower())
             if word_count > 0:
                 density = count / word_count
-                keyword_stats['matches'][keyword] = count
+                keyword_stats['frequency'][keyword] = count
                 keyword_stats['distribution'][keyword] = density
         
         # Общая плотность ключевых слов
-        total_matches = sum(keyword_stats['matches'].values())
+        total_matches = sum(keyword_stats['frequency'].values())
         keyword_stats['density'] = total_matches / word_count if word_count > 0 else 0
         
         return keyword_stats
