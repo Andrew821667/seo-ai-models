@@ -1,4 +1,18 @@
-"""Основной класс SEO Advisor для анализа контента."""
+"""Основной класс SEO Advisor для анализа контента и оптимизации.
+
+Этот класс предоставляет комплексный анализ контента с точки зрения SEO,
+включая оценку качества контента, анализ ключевых слов, E-E-A-T метрики,
+и предсказание позиций в поисковой выдаче.
+
+Attributes:
+    industry (str): Отрасль контента для специфичного анализа.
+    rank_predictor (CalibratedRankPredictor): Предиктор ранжирования.
+    content_analyzer (ContentAnalyzer): Анализатор контента.
+    suggester (Suggester): Генератор рекомендаций.
+    semantic_analyzer (SemanticAnalyzer): Семантический анализатор.
+    eeat_analyzer (EEATAnalyzer): Анализатор E-E-A-T.
+    analysis_history (list): История предыдущих анализов.
+"""
 
 from typing import Dict, List, Optional, Union, Any
 from datetime import datetime
@@ -13,7 +27,16 @@ from .suggester.suggester import Suggester
 
 @dataclass
 class ContentQualityReport:
-   """Отчет о качестве контента"""
+   """Отчет о качестве контента.
+    
+    Dataclass для хранения результатов анализа качества контента.
+    
+    Attributes:
+        content_scores (Dict[str, float]): Оценки различных аспектов контента.
+        strengths (List[str]): Сильные стороны контента.
+        weaknesses (List[str]): Слабые стороны контента.
+        potential_improvements (List[str]): Рекомендации по улучшению.
+    """
    content_scores: Dict[str, float]
    strengths: List[str]
    weaknesses: List[str]
@@ -21,7 +44,22 @@ class ContentQualityReport:
 
 @dataclass
 class SEOAnalysisReport:
-   """Расширенный отчет по SEO анализу"""
+   """Расширенный отчет по SEO анализу.
+    
+    Dataclass для хранения результатов полного SEO анализа.
+    
+    Attributes:
+        timestamp (datetime): Время выполнения анализа.
+        content_metrics (Dict[str, float]): Метрики контента.
+        keyword_analysis (Dict[str, Union[float, Dict]]): Анализ ключевых слов.
+        predicted_position (float): Предсказанная позиция в выдаче.
+        feature_scores (Dict[str, float]): Оценки отдельных факторов.
+        content_quality (ContentQualityReport): Отчет о качестве контента.
+        recommendations (Dict[str, List[str]]): Рекомендации по категориям.
+        priorities (List[Dict[str, Union[str, float]]]): Задачи по приоритету.
+        industry (str): Отрасль контента.
+        position_probabilities (Optional[Dict[str, float]]): Вероятности позиций.
+    """
    timestamp: datetime
    content_metrics: Dict[str, float]
    keyword_analysis: Dict[str, Union[float, Dict]]
@@ -46,7 +84,18 @@ class SEOAdvisor:
        self.analysis_history = []
    
    def analyze_content(self, content: str, target_keywords: List[str]) -> SEOAnalysisReport:
-       """Комплексный анализ контента с оценкой качества"""
+       """Комплексный анализ контента с оценкой качества.
+       
+       Выполняет полный анализ контента, включая извлечение метрик,
+       семантический анализ, анализ E-E-A-T, и генерацию рекомендаций.
+       
+       Args:
+           content (str): Текстовое содержимое для анализа.
+           target_keywords (List[str]): Целевые ключевые слова.
+           
+       Returns:
+           SEOAnalysisReport: Полный отчет по SEO анализу.
+       """
        # Получаем расширенные метрики
        content_metrics = self.content_analyzer.analyze_text(content)
        keyword_analysis = self.content_analyzer.extract_keywords(content, target_keywords)

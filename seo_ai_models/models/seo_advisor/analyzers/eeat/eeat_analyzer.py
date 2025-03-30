@@ -1,11 +1,32 @@
-"""Анализатор E-E-A-T (Experience, Expertise, Authoritativeness, Trustworthiness)."""
+"""Анализатор E-E-A-T (Experience, Expertise, Authoritativeness, Trustworthiness).
+
+Анализирует контент на предмет соответствия критериям E-E-A-T (Experience,
+Expertise, Authoritativeness, Trustworthiness) для оценки качества контента
+с точки зрения Google.
+
+E-E-A-T - это набор критериев, используемый Google для оценки качества контента,
+особенно важный для YMYL (Your Money Your Life) тематик, таких как финансы,
+здоровье, право и другие области, где неточная информация может нанести вред
+пользователям.
+"""
 
 from typing import Dict, List, Optional, Union, Any
 import re
 from collections import Counter
 
 class EEATAnalyzer:
-    """Анализатор E-E-A-T (Experience, Expertise, Authoritativeness, Trustworthiness)"""
+    """Анализатор E-E-A-T (Experience, Expertise, Authoritativeness, Trustworthiness).
+    
+    Класс предоставляет методы для оценки контента по критериям E-E-A-T
+    на основе текстовых маркеров и структурного анализа.
+    
+    Attributes:
+        expertise_markers (List[str]): Маркеры экспертности и опыта.
+        authority_markers (List[str]): Маркеры авторитетности.
+        trust_markers (List[str]): Маркеры доверия.
+        special_trust_patterns (List[str]): Регулярные выражения для поиска
+            специальных маркеров доверия.
+    """
     
     def __init__(self):
         # Маркеры опыта и экспертизы
