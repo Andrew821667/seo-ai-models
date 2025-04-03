@@ -241,7 +241,7 @@ class SEOAdvisor:
            'position': report.predicted_position,
            'content_length': report.content_metrics['word_count'],
            'keyword_density': report.keyword_analysis['density'],
-           'overall_quality': report.content_quality.content_scores['overall_quality']
+           'overall_quality': report.content_quality.content_scores.get('overall_quality', 0.5)
        }
        
        self.analysis_history.append(history_record)
