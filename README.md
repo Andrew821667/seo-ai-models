@@ -1,138 +1,95 @@
 # SEO AI Models
 
-Набор алгоритмов и моделей искусственного интеллекта для SEO-анализа и оптимизации контента.
+Библиотека для анализа и оптимизации контента с использованием искусственного интеллекта и машинного обучения.
 
-## О проекте
+## Компоненты проекта
 
-SEO AI Models предоставляет инструменты для анализа и оптимизации контента с точки зрения SEO. Проект включает в себя несколько ключевых компонентов:
+### Основные компоненты
 
-- TextProcessor: Анализ и обработка текста, включая токенизацию, определение языка, извлечение заголовков и оценку читабельности.
-- ContentAnalyzer: Комплексный анализ контента с расчетом метрик, анализом ключевых слов и оценкой структуры.
-- EEATAnalyzer: Анализ Experience, Expertise, Authoritativeness, Trustworthiness контента в соответствии с рекомендациями Google.
-- EnhancedEEATAnalyzer: Расширенный анализатор E-E-A-T с поддержкой ML-моделей.
-- CalibratedRankPredictor: Предсказание позиций в выдаче на основе различных факторов.
-- SEOAdvisor: Интегрированный компонент, объединяющий все вышеперечисленное для полного SEO-анализа.
+SEOAdvisor - Основной класс для анализа контента и выдачи рекомендаций
+TextProcessor - Обработка текста и расчет метрик читабельности
+ContentAnalyzer - Анализ содержимого, ключевых слов и структуры контента
+EEATAnalyzer - Оценка E-E-A-T (Experience, Expertise, Authoritativeness, Trustworthiness)
+SemanticAnalyzer - Семантический анализ контента
+CalibratedRankPredictor - Предсказание позиций в поисковой выдаче
+Suggester - Генерация рекомендаций по улучшению контента
+
+### Компоненты парсинга и анализа
+
+WebCrawler - Сканирование сайтов и сбор URL
+ContentExtractor - Извлечение текста и структуры из HTML
+MetaExtractor - Анализ мета-тегов, заголовков и ссылок
+SERPAnalyzer - Анализ поисковой выдачи и конкурентов
+ParsingPipeline - Интеграция парсинг-компонентов в единый конвейер
 
 ## Установка
 
-### Требования
-
-- Python 3.8+
-- pip
-
-### Установка из исходного кода
-
-# Клонирование репозитория
-git clone https://github.com/Andrew821667/seo-ai-models.git
-cd seo-ai-models
-
-# Установка зависимостей
 pip install -r requirements.txt
 
-# Установка проекта в режиме разработки
-pip install -e .
+## Примеры использования
 
-## Использование
-
-### TextProcessor
-
-from seo_ai_models.common.utils.text_processing import TextProcessor
-
-processor = TextProcessor()
-
-# Определение языка
-lang = processor.detect_language("Это текст на русском языке")
-print(f"Определенный язык: {lang}")  # Вывод: "ru"
-
-# Токенизация текста
-tokens = processor.tokenize("Это пример текста для токенизации")
-print(tokens)
-
-# Извлечение заголовков из Markdown
-headers = processor.extract_headers("# Заголовок статьи\n## Подзаголовок")
-print(headers)
-
-### ContentAnalyzer
-
-from seo_ai_models.models.seo_advisor.analyzers.content_analyzer import ContentAnalyzer
-
-analyzer = ContentAnalyzer()
-
-# Анализ текста
-text = "# Заголовок статьи\n\nЭто пример текста для анализа содержимого."
-metrics = analyzer.analyze_text(text)
-print(metrics)
-
-# Анализ ключевых слов
-keywords = ["анализ", "текст", "содержимое"]
-keyword_metrics = analyzer.extract_keywords(text, keywords)
-print(keyword_metrics)
-
-### EEATAnalyzer
-
-from seo_ai_models.models.seo_advisor.analyzers.eeat.eeat_analyzer import EEATAnalyzer
-
-analyzer = EEATAnalyzer()
-
-# Анализ E-E-A-T
-text = "# Статья о здоровье\n\nПо данным исследований..."
-results = analyzer.analyze(text, industry="health")
-print(results)
-
-### SEOAdvisor
+### Анализ контента
 
 from seo_ai_models.models.seo_advisor.advisor import SEOAdvisor
 
-advisor = SEOAdvisor(industry="blog")
+advisor = SEOAdvisor()
+report = advisor.analyze_content("# Заголовок статьи\n\nЭто текст статьи...")
+print(report)
 
-# Комплексный анализ
-text = "# Заголовок статьи\n\nСодержимое статьи..."
-keywords = ["ключевое слово", "тема"]
-report = advisor.analyze_content(text, keywords)
-print(report.predicted_position)
-print(report.content_metrics)
-print(report.content_quality.strengths)
+### Парсинг и анализ сайта
 
-## Структура проекта
+from seo_ai_models.parsers.parsing_pipeline import ParsingPipeline
 
-seo_ai_models/
-├── common/                  # Общие компоненты
-│   ├── config/              # Конфигурации
-│   └── utils/               # Утилиты (включая TextProcessor)
-├── models/                  # Модели и алгоритмы
-│   ├── dim_reducer/         # Редуктор размерности
-│   ├── keyword_extractor/   # Извлечение ключевых слов
-│   └── seo_advisor/         # SEO-анализатор
-│       ├── analyzers/       # Анализаторы контента
-│       │   └── eeat/        # Анализаторы E-E-A-T
-│       ├── predictors/      # Предикторы ранжирования
-│       └── suggester/       # Генератор рекомендаций
-└── data/                    # Данные для моделей
-    └── models/              # Предобученные модели
+# Инициализация парсинг-конвейера
+pipeline = ParsingPipeline()
 
-## Тестирование
+# Анализ одной страницы
+page_analysis = pipeline.analyze_url("https://example.com")
 
-Проект включает модульные и интеграционные тесты. Для запуска тестов используйте:
+# Сканирование и анализ всего сайта
+site_analysis = pipeline.crawl_and_analyze_site("https://example.com", max_pages=10)
 
-# Установка зависимостей для тестирования
-pip install -r requirements.txt
+# Анализ ключевого слова
+keyword_analysis = pipeline.analyze_keyword("ключевое слово")
+
+# Сохранение результатов в файл
+pipeline.save_analysis_to_file(site_analysis, "site_analysis.json")
+
+### Использование отдельных парсинг-компонентов
+
+from seo_ai_models.parsers.crawlers.web_crawler import WebCrawler
+from seo_ai_models.parsers.extractors.content_extractor import ContentExtractor
+from seo_ai_models.parsers.extractors.meta_extractor import MetaExtractor
+from seo_ai_models.parsers.analyzers.serp_analyzer import SERPAnalyzer
+
+# Сканирование сайта
+crawler = WebCrawler(base_url="https://example.com", max_pages=20)
+crawl_results = crawler.crawl()
+
+# Извлечение контента из HTML
+content_extractor = ContentExtractor()
+with open("page.html", "r", encoding="utf-8") as f:
+    html_content = f.read()
+content_data = content_extractor.extract_content(html_content, "https://example.com")
+
+# Извлечение мета-информации
+meta_extractor = MetaExtractor()
+meta_data = meta_extractor.extract_meta_information(html_content, "https://example.com")
+
+# Анализ поисковой выдачи
+serp_analyzer = SERPAnalyzer()
+serp_results = serp_analyzer.analyze_top_results("запрос")
+
+### Демонстрационный скрипт
+
+В проекте есть демонстрационный скрипт, показывающий использование компонентов парсинга:
+
+python -m seo_ai_models.demo_parsing pipeline --mode site --url https://example.com --max-pages 5 --output analysis.json
+
+## Разработка и тестирование
 
 # Запуск всех тестов
-cd /path/to/seo-ai-models
 PYTHONPATH=/path/to/seo-ai-models pytest tests/
 
-# Запуск конкретного модульного теста
-pytest tests/unit/seo_advisor/analyzers/test_content_analyzer.py
-
-## Планы по развитию
-
-В ближайших планах:
-- Расширение документации с примерами и кейсами использования
-- Добавление поддержки многоязычного анализа
-- Интеграция с другими инструментами SEO
-- Разработка веб-интерфейса
-- Добавление визуализации результатов
-
-## Лицензия
-
-MIT
+# Запуск тестов для конкретного модуля
+PYTHONPATH=/path/to/seo-ai-models pytest tests/parsers/
