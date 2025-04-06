@@ -1,0 +1,157 @@
+    
+    def _extract_ajax_data(self, ajax_calls: List[Dict[str, Any]], json_responses: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Извлекает структурированные данные из AJAX-ответов.
+        
+        Args:
+            ajax_calls: Список AJAX-вызовов
+            json_responses: Словарь JSON-ответов
+            
+        Returns:
+            Dict[str, Any]: Структурированные данные
+        """
+        data = {
+            'api_endpoints': [],
+            'entities': {}
+        }
+        
+        # Анализ API-вызовов
+        if ajax_calls:
+            data['api_endpoints'] = [
+                {
+                    'url': call['url'],
+                    'method': call['method'],
+                    'status': call.get('response', {}).get('status')
+                }
+                for call in ajax_calls if call.get('response')
+            ]
+        
+        # Анализ структуры данных из ответов
+        for url, json_data in json_responses.items():
+            # Пытаемся определить тип данных и структуру
+            if isinstance(json_data, dict):
+                # Извлекаем верхнеуровневые ключи
+                keys = list(json_data.keys())
+                
+                # Определяем, содержит ли ответ данные о сущностях
+                if any(key in ['data', 'items', 'results', 'content', 'response'] for key in keys):
+                    for key in ['data', 'items', 'results', 'content', 'response']:
+                        if key in json_data and json_data[key]:
+                            # Извлекаем потенциальные сущности
+                            entity_data = json_data[key]
+                            
+                            if isinstance(entity_data, list) and entity_data:
+                                # Если это список сущностей
+                                entity_type = key
+                                entity_sample = entity_data[0] if entity_data else {}
+                                
+                                if isinstance(entity_sample, dict):
+                                    data['entities'][entity_type] = {
+                                        'fields': list(entity_sample.keys()),
+                                        'count': len(entity_data),
+                                        'sample': entity_sample
+                                    }
+        
+        return data
+    
+    def _is_excluded_element(self, element) -> bool:
+        """
+        Проверка, должен ли элемент быть исключен из извлечения.
+        
+        Args:
+            element: BeautifulSoup Tag для проверки
+            
+        Returns:
+            bool: True, если элемент должен быть исключен
+        """
+        if not hasattr(element, 'attrs'):
+            return False
+            
+        # Проверка классов
+        if element.get('class'):
+            for cls in element.get('class', []):
+                if any(excl.lower() in cls.lower() for excl in self.exclude_classes):
+                    return True
+                    
+        # Проверка идентификаторов
+        if element.get('id'):
+            element_id = element.get('id', '').lower()
+            if any(excl.lower() in element_id for excl in self.exclude_ids):
+                return True
+                
+        return False
+    
+    def _extract_content(self, html_content: str, url: str = None) -> Dict[str, Any]:
+        """
+        Извлекает структурированный контент из HTML.
+        
+        Args:
+            html_content: HTML-контент для парсинга
+            url: URL контента (для ссылки)
+            
+        Returns:
+            Dict: Информация об извлеченном контенте
+        """
+        soup = BeautifulSoup(html_content, 'html.parser')
+        
+        # Удаление элементов script и style
+        for script in soup(["script", "style", "noscript", "iframe"]):
+            script.decompose()
+            
+        # Извлечение основного текстового контента
+        all_text = soup.get_text(strip=True)
+        
+        # Извлечение заголовка
+        title = ""
+        title_tag = soup.find('title')
+        if title_tag:
+            title = title_tag.get_text(strip=True)
+            
+        # Извлечение заголовков
+        headings = {}
+        for i in range(1, 7):
+            heading_tags = soup.find_all(f'h{i}')
+            headings[f'h{i}'] = [h.get_text(strip=True) for h in heading_tags if not self._is_excluded_element(h)]
+            
+        # Извлечение параграфов
+        paragraphs = []
+        for p in soup.find_all('p'):
+            if not self._is_excluded_element(p):
+                text = p.get_text(strip=True)
+                if text:
+                    paragraphs.append(text)
+        
+        # Извлечение списков
+        lists = []
+        for list_tag in soup.find_all(['ul', 'ol']):
+            if not self._is_excluded_element(list_tag):
+                list_items = []
+                for li in list_tag.find_all('li'):
+                    text = li.get_text(strip=True)
+                    if text:
+                        list_items.append(text)
+                if list_items:
+                    lists.append({
+                        'type': list_tag.name,
+                        'items': list_items
+                    })
+                    
+        # Результат
+        result = {
+            'url': url,
+            'title': title,
+            'headings': headings,
+            'content': {
+                'all_text': all_text,
+                'paragraphs': paragraphs,
+                'lists': lists,
+            },
+            'metadata': {
+                'text_length': len(all_text),
+                'paragraph_count': len(paragraphs),
+                'list_count': len(lists),
+                'heading_counts': {key: len(values) for key, values in headings.items()},
+            }
+        }
+        
+        return result

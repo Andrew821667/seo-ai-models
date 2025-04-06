@@ -1,0 +1,139 @@
+"""
+Модуль для парсинга SPA-сайтов с поддержкой JavaScript и AJAX.
+Интегрирует все улучшения в единый пакет.
+"""
+
+import logging
+import asyncio
+import time
+import os
+import json
+import hashlib
+from typing import Dict, List, Optional, Any, Set, Tuple, Union
+
+from playwright.async_api import async_playwright
+from bs4 import BeautifulSoup
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+class SPAParser:
+    """
+    Универсальный парсер для SPA-сайтов с поддержкой JavaScript и AJAX.
+    """
+    
+    def __init__(
+        self,
+        headless: bool = True,
+        wait_for_load: int = 5000,  # мс ожидания после события load
+        wait_for_timeout: int = 30000,  # мс максимального ожидания для загрузки
+        browser_type: str = "chromium",  # 'chromium', 'firefox', or 'webkit'
+        user_agent: str = "SEOAIModels SPAParser/1.0",
+        viewport_width: int = 1366,
+        viewport_height: int = 768,
+        cache_dir: str = ".cache",
+        cache_enabled: bool = True,
+        cache_max_age: int = 86400,  # 24 часа в секундах
+        record_ajax: bool = True,
+        analyze_ajax: bool = True,
+        ajax_patterns: List[str] = None,
+        content_tags: List[str] = None,
+        block_tags: List[str] = None,
+        exclude_classes: List[str] = None,
+        exclude_ids: List[str] = None,
+        max_retries: int = 2
+    ):
+        """
+        Инициализация SPAParser.
+
+        Args:
+            headless: Запускать ли браузер в режиме headless
+            wait_for_load: Время ожидания в мс после события load
+            wait_for_timeout: Максимальное время ожидания в мс для загрузки страницы
+            browser_type: Тип браузера для использования ('chromium', 'firefox', 'webkit')
+            user_agent: User-Agent для запросов
+            viewport_width: Ширина области просмотра браузера
+            viewport_height: Высота области просмотра браузера
+            cache_dir: Директория для хранения кэша
+            cache_enabled: Включено ли кэширование
+            cache_max_age: Максимальный возраст кэша в секундах
+            record_ajax: Записывать ли AJAX-запросы
+            analyze_ajax: Анализировать ли AJAX-ответы
+            ajax_patterns: Паттерны URL для идентификации AJAX-запросов
+            content_tags: HTML-теги, которые обычно содержат основной контент
+            block_tags: Теги, которые представляют блочные элементы
+            exclude_classes: CSS-классы для исключения из извлечения
+            exclude_ids: HTML-идентификаторы для исключения из извлечения
+            max_retries: Максимальное количество повторных попыток при ошибке
+        """
+        self.headless = headless
+        self.wait_for_load = wait_for_load
+        self.wait_for_timeout = wait_for_timeout
+        self.browser_type = browser_type
+        self.user_agent = user_agent
+        self.viewport_width = viewport_width
+        self.viewport_height = viewport_height
+        self.cache_dir = cache_dir
+        self.cache_enabled = cache_enabled
+        self.cache_max_age = cache_max_age
+        self.record_ajax = record_ajax
+        self.analyze_ajax = analyze_ajax
+        self.max_retries = max_retries
+        
+        # Параметры для идентификации AJAX-запросов
+        self.ajax_patterns = ajax_patterns or [
+            '/api/', '/graphql', '/v1/', '/v2/', '/v3/', '/rest/',
+            'json', 'data.', '.php', 'ajax', 'xhr', 'action='
+        ]
+        
+        # Параметры для анализа контента
+        self.content_tags = content_tags or [
+            'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 
+            'ul', 'ol', 'li', 'table', 'article', 'section', 'main'
+        ]
+        
+        self.block_tags = block_tags or [
+            'article', 'section', 'div', 'main', 'header', 'footer',
+            'nav', 'aside', 'form', 'table'
+        ]
+        
+        self.exclude_classes = exclude_classes or [
+            'advertisement', 'ads', 'banner', 'menu', 'nav', 'sidebar',
+            'footer', 'comment', 'cookie', 'popup', 'modal'
+        ]
+        
+        self.exclude_ids = exclude_ids or [
+            'advertisement', 'ads', 'banner', 'menu', 'nav', 'sidebar',
+            'footer', 'comment', 'cookie', 'popup', 'modal'
+        ]
+        
+        # Создаем директорию кэша, если нужно
+        if self.cache_enabled and not os.path.exists(self.cache_dir):
+            os.makedirs(self.cache_dir, exist_ok=True)
+        
+        # Хранение последних AJAX-данных
+        self._last_ajax_data = None
+        
+        # Признаки для определения SPA
+        self.spa_framework_patterns = {
+            "React": [
+                'reactroot', 'react-root', 'data-reactroot', 'data-reactid',
+                'react.development.js', 'react.production.min.js', 'react-dom'
+            ],
+            "Angular": [
+                'ng-app', 'ng-controller', 'ng-model', 'ng-bind', 'ng-repeat',
+                'angular.js', 'angular.min.js', '_nghost', '_ngcontent',
+                'ng-version', '[ng'
+            ],
+            "Vue": [
+                'v-app', 'v-bind', 'v-model', 'v-if', 'v-for', 'v-on',
+                'vue.js', 'vue.min.js', 'data-v-', '[data-v-', 'vue-router',
+                'vuex'
+            ],
+            "Next.js": [
+                '__NEXT_DATA__', 'next/router', '_next/'
+            ],
+            "Nuxt.js": [
+                '__NUXT__', 'nuxt-link', '_nuxt/'
+            ]
+        }

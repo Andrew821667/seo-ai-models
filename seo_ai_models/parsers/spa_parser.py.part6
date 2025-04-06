@@ -1,0 +1,228 @@
+    
+    async def _render_page(self, url: str, retry_count: int = 0) -> Tuple[Optional[str], Optional[Dict[str, Any]], bool]:
+        """
+        Рендеринг страницы с JavaScript и перехватом AJAX.
+        
+        Args:
+            url: URL для рендеринга
+            retry_count: Текущее число повторных попыток
+            
+        Returns:
+            Tuple[Optional[str], Optional[Dict[str, Any]], bool]:
+                - HTML-контент (None при ошибке)
+                - AJAX-данные (None, если нет)
+                - Флаг, указывающий, является ли сайт SPA
+        """
+        logger.info(f"Рендеринг страницы ({retry_count+1}/{self.max_retries+1}): {url}")
+        
+        try:
+            async with async_playwright() as playwright:
+                # Выбор браузера
+                if self.browser_type == "firefox":
+                    browser_instance = playwright.firefox
+                elif self.browser_type == "webkit":
+                    browser_instance = playwright.webkit
+                else:
+                    browser_instance = playwright.chromium
+                    
+                # Запуск браузера
+                browser = await browser_instance.launch(headless=self.headless)
+                
+                try:
+                    context = await browser.new_context(
+                        user_agent=self.user_agent,
+                        viewport={'width': self.viewport_width, 'height': self.viewport_height}
+                    )
+                    
+                    page = await context.new_page()
+                    
+                    # Настройка перехвата AJAX
+                    ajax_calls = await self._setup_ajax_tracking(page)
+                    json_responses = {}
+                    
+                    try:
+                        # Используем load вместо networkidle для надежности
+                        await page.goto(url, wait_until='load', timeout=self.wait_for_timeout)
+                        
+                        # Дополнительное ожидание для JavaScript
+                        await page.wait_for_timeout(self.wait_for_load)
+                        
+                        # Выполнение дополнительных скриптов для раскрытия скрытого контента
+                        await page.evaluate('''() => {
+                            // Нажать на все кнопки "Показать больше" или похожие
+                            const showMoreButtons = Array.from(document.querySelectorAll('button, a')).filter(
+                                el => el.innerText && (
+                                    el.innerText.toLowerCase().includes('show more') || 
+                                    el.innerText.toLowerCase().includes('показать больше') ||
+                                    el.innerText.toLowerCase().includes('load more') ||
+                                    el.innerText.toLowerCase().includes('загрузить еще')
+                                )
+                            );
+                            showMoreButtons.forEach(button => button.click());
+                            
+                            // Раскрыть все свернутые элементы
+                            const expandableElements = Array.from(document.querySelectorAll('[aria-expanded="false"]'));
+                            expandableElements.forEach(el => {
+                                el.setAttribute('aria-expanded', 'true');
+                                el.click();
+                            });
+                            
+                            // Прокрутка для ленивой загрузки
+                            window.scrollTo(0, document.body.scrollHeight / 2);
+                            setTimeout(() => {
+                                window.scrollTo(0, document.body.scrollHeight);
+                            }, 500);
+                        }''')
+                        
+                        # Дополнительное ожидание после скриптов
+                        await page.wait_for_timeout(2000)
+                        
+                        # Получение HTML после всех манипуляций
+                        html_content = await page.content()
+                        
+                        # Анализ AJAX-данных
+                        ajax_data = None
+                        if self.record_ajax and ajax_calls:
+                            # Извлекаем JSON из ответов
+                            for call in ajax_calls:
+                                if call.get('response') and call['response'].get('json'):
+                                    json_responses[call['url']] = call['response']['json']
+                            
+                            # Анализируем данные AJAX
+                            ajax_data = {
+                                'api_calls': ajax_calls,
+                                'json_responses': json_responses,
+                                'structured_data': self._extract_ajax_data(ajax_calls, json_responses)
+                            }
+                        
+                        # Определяем, является ли сайт SPA
+                        is_spa = False
+                        try:
+                            spa_check = await page.evaluate('''() => {
+                                return {
+                                    spa: Boolean(window.history && window.history.pushState) ||
+                                         Boolean(document.querySelector('[ng-app],[data-reactroot],[id="app"],[id="root"]'))
+                                };
+                            }''')
+                            is_spa = spa_check.get('spa', False) or bool(ajax_calls)
+                        except Exception:
+                            is_spa = bool(ajax_calls)
+                        
+                        return html_content, ajax_data, is_spa
+                        
+                    except Exception as e:
+                        logger.error(f"Ошибка при рендеринге {url}: {str(e)}")
+                        
+                        # Пробуем повторно, если не достигнут лимит повторов
+                        if retry_count < self.max_retries:
+                            logger.info(f"Повторная попытка {retry_count+1}/{self.max_retries}")
+                            return await self._render_page(url, retry_count+1)
+                        
+                        return None, None, False
+                    
+                    finally:
+                        await page.close()
+                        await context.close()
+                
+                finally:
+                    await browser.close()
+        
+        except Exception as e:
+            logger.error(f"Критическая ошибка при рендеринге {url}: {str(e)}")
+            return None, None, False
+    
+    async def crawl_site(self, base_url: str, max_pages: int = 10, cache_enabled: bool = True) -> Dict[str, Any]:
+        """
+        Сканирует сайт, анализируя все страницы.
+        
+        Args:
+            base_url: Начальный URL для сканирования
+            max_pages: Максимальное количество страниц
+            cache_enabled: Использовать ли кэш
+            
+        Returns:
+            Dict[str, Any]: Результаты сканирования
+        """
+        result = {
+            "base_url": base_url,
+            "success": False,
+            "pages": {},
+            "error": None
+        }
+        
+        try:
+            # Сначала определяем тип сайта
+            logger.info(f"Определение типа сайта для {base_url}")
+            initial_result = await self.analyze_url(base_url, use_cache=cache_enabled)
+            
+            if not initial_result["success"]:
+                result["error"] = initial_result.get("error", "Failed to analyze base URL")
+                return result
+            
+            # Сохраняем информацию о типе сайта
+            result["site_type"] = initial_result["site_type"]
+            result["pages"][base_url] = initial_result
+            
+            # Проверяем наличие внутренних ссылок для сканирования
+            to_crawl = []
+            if "content" in initial_result and "internal_links" in initial_result["content"]:
+                to_crawl = initial_result["content"]["internal_links"][:max_pages-1]
+            
+            # Если нет внутренних ссылок, пробуем извлечь их из HTML
+            if not to_crawl and "content" in initial_result:
+                html_content = initial_result.get("html", "")
+                if html_content:
+                    soup = BeautifulSoup(html_content, 'html.parser')
+                    for a in soup.find_all('a', href=True):
+                        href = a['href']
+                        # Преобразуем относительные ссылки в абсолютные
+                        if href.startswith('/'):
+                            href = f"{base_url.rstrip('/')}{href}"
+                        # Проверяем, что ссылка на том же домене
+                        if base_url.split('/')[2] in href:
+                            to_crawl.append(href)
+                
+                # Ограничиваем количество страниц
+                to_crawl = list(set(to_crawl))[:max_pages-1]
+            
+            # Сканируем остальные страницы
+            for i, url in enumerate(to_crawl):
+                logger.info(f"Анализ страницы {i+2}/{max_pages}: {url}")
+                page_result = await self.analyze_url(url, use_cache=cache_enabled)
+                result["pages"][url] = page_result
+            
+            result["success"] = True
+            result["total_pages"] = len(result["pages"])
+            
+        except Exception as e:
+            logger.error(f"Ошибка при сканировании сайта {base_url}: {str(e)}")
+            result["error"] = str(e)
+            
+        return result
+    
+    def analyze_url_sync(self, url: str, use_cache: bool = True) -> Dict[str, Any]:
+        """
+        Синхронная обертка для analyze_url.
+        
+        Args:
+            url: URL для анализа
+            use_cache: Использовать ли кэш
+            
+        Returns:
+            Dict[str, Any]: Результаты анализа
+        """
+        return asyncio.run(self.analyze_url(url, use_cache))
+    
+    def crawl_site_sync(self, base_url: str, max_pages: int = 10, cache_enabled: bool = True) -> Dict[str, Any]:
+        """
+        Синхронная обертка для crawl_site.
+        
+        Args:
+            base_url: Начальный URL для сканирования
+            max_pages: Максимальное количество страниц
+            cache_enabled: Использовать ли кэш
+            
+        Returns:
+            Dict[str, Any]: Результаты сканирования
+        """
+        return asyncio.run(self.crawl_site(base_url, max_pages, cache_enabled))

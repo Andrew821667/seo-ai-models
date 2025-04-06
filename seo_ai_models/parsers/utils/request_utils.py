@@ -1,112 +1,201 @@
 """
-Утилиты для запросов в SEO AI Models парсерах.
+Request utilities для проекта SEO AI Models.
+Предоставляет функции для HTTP-запросов и управления сессиями.
 """
 
 import logging
 import time
-import random
-from typing import Dict, Optional, Tuple, Union
+import asyncio
+from typing import Dict, Optional, Any, Tuple, Union
 import requests
-from urllib3.util.retry import Retry
-from requests.adapters import HTTPAdapter
+from requests import Session
+from requests.exceptions import RequestException
+
+from playwright.async_api import async_playwright
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+DEFAULT_USER_AGENT = "SEOAIModels/1.0"
+DEFAULT_TIMEOUT = 30  # секунд
+
 def create_session(
-    retries: int = 3,
-    backoff_factor: float = 0.3,
-    status_forcelist: Tuple[int, ...] = (500, 502, 504),
-    user_agent: Optional[str] = None,
-    additional_headers: Optional[Dict[str, str]] = None
-) -> requests.Session:
+    user_agent: str = DEFAULT_USER_AGENT,
+    timeout: int = DEFAULT_TIMEOUT,
+    custom_headers: Optional[Dict[str, str]] = None
+) -> Session:
     """
-    Создание сессии requests с функциональностью повторных попыток.
+    Создание и настройка сессии requests для HTTP-запросов.
     
     Args:
-        retries: Количество повторных попыток для неудачных запросов
-        backoff_factor: Коэффициент задержки для повторных попыток
-        status_forcelist: HTTP-коды состояния для повторных попыток
-        user_agent: Строка User-Agent для использования
-        additional_headers: Дополнительные заголовки для добавления в сессию
+        user_agent: User-Agent для запросов
+        timeout: Таймаут в секундах
+        custom_headers: Дополнительные заголовки
         
     Returns:
-        requests.Session: Настроенная сессия
+        Session: Настроенная сессия requests
     """
     session = requests.Session()
     
-    retry = Retry(
-        total=retries,
-        read=retries,
-        connect=retries,
-        backoff_factor=backoff_factor,
-        status_forcelist=status_forcelist,
-    )
-    
-    adapter = HTTPAdapter(max_retries=retry)
-    session.mount('http://', adapter)
-    session.mount('https://', adapter)
-    
-    # Установка заголовков по умолчанию
-    default_headers = {
-        "User-Agent": user_agent or "SEOAIModels Bot/1.0",
+    headers = {
+        "User-Agent": user_agent,
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-        "Accept-Language": "ru-RU,ru;q=0.9,en-US;q=0.5",
-        "Connection": "keep-alive",
-        "Upgrade-Insecure-Requests": "1",
-        "Cache-Control": "max-age=0",
+        "Accept-Language": "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7",
     }
     
-    if additional_headers:
-        default_headers.update(additional_headers)
+    if custom_headers:
+        headers.update(custom_headers)
         
-    session.headers.update(default_headers)
+    session.headers.update(headers)
+    session.timeout = timeout
     
     return session
 
 def fetch_url(
     url: str,
-    session: Optional[requests.Session] = None,
-    timeout: Union[float, Tuple[float, float]] = (5, 15),
-    delay: Optional[float] = None,
-    verify_ssl: bool = True
-) -> Tuple[Optional[str], int, Dict[str, str]]:
+    session: Optional[Session] = None,
+    retry_count: int = 3,
+    retry_delay: float = 1.0,
+    timeout: int = DEFAULT_TIMEOUT,
+    allow_redirects: bool = True
+) -> Tuple[Optional[str], Optional[Dict[str, Any]], Optional[str]]:
     """
-    Получение содержимого URL с опциональной задержкой.
+    Получение содержимого URL с поддержкой повторных попыток.
     
     Args:
-        url: URL для получения
-        session: Сессия requests для использования
-        timeout: Таймаут запроса
-        delay: Задержка перед запросом (в секундах)
-        verify_ssl: Проверять ли SSL-сертификаты
+        url: URL для запроса
+        session: Сессия requests для повторного использования
+        retry_count: Количество повторных попыток при ошибке
+        retry_delay: Задержка в секундах между повторными попытками
+        timeout: Таймаут в секундах
+        allow_redirects: Разрешать ли перенаправления
         
     Returns:
-        Tuple из (content, status_code, headers)
+        Tuple[Optional[str], Optional[Dict[str, Any]], Optional[str]]:
+            - HTML-контент (None при ошибке)
+            - Заголовки ответа (None при ошибке)
+            - Сообщение об ошибке или None при успехе
     """
-    if delay:
-        # Добавление случайности в задержку
-        time.sleep(delay + random.uniform(0, delay * 0.25))
+    if session is None:
+        session = create_session(timeout=timeout)
         
-    # Использование предоставленной сессии или создание новой
-    use_session = session or requests.Session()
+    error_msg = None
     
+    for attempt in range(retry_count):
+        try:
+            response = session.get(
+                url, 
+                timeout=timeout,
+                allow_redirects=allow_redirects
+            )
+            
+            response.raise_for_status()
+            return response.text, dict(response.headers), None
+            
+        except RequestException as e:
+            error_msg = f"Attempt {attempt+1}/{retry_count} failed: {str(e)}"
+            logger.warning(error_msg)
+            
+            if attempt < retry_count - 1:
+                time.sleep(retry_delay)
+                
+    return None, None, error_msg
+
+async def fetch_url_with_javascript(
+    url: str,
+    headless: bool = True,
+    wait_for_idle: int = 2000,  # мс
+    wait_for_timeout: int = 30000,  # мс
+    browser_type: str = "chromium",
+    user_agent: str = DEFAULT_USER_AGENT
+) -> Tuple[Optional[str], Optional[Dict[str, Any]], Optional[str]]:
+    """
+    Асинхронное получение контента URL с выполнением JavaScript через Playwright.
+    
+    Args:
+        url: URL для запроса
+        headless: Запускать ли браузер без интерфейса
+        wait_for_idle: Время ожидания в мс после событий 'networkidle'
+        wait_for_timeout: Максимальное время ожидания в мс
+        browser_type: Тип браузера ('chromium', 'firefox', 'webkit')
+        user_agent: User-Agent для запросов
+        
+    Returns:
+        Tuple[Optional[str], Optional[Dict[str, Any]], Optional[str]]:
+            - HTML-контент после выполнения JavaScript (None при ошибке)
+            - Заголовки ответа (None при ошибке)
+            - Сообщение об ошибке или None при успехе
+    """
     try:
-        logger.info(f"Получение URL: {url}")
+        async with async_playwright() as p:
+            # Выбор браузера
+            if browser_type == "firefox":
+                browser_instance = p.firefox
+            elif browser_type == "webkit":
+                browser_instance = p.webkit
+            else:
+                browser_instance = p.chromium
+                
+            browser = await browser_instance.launch(headless=headless)
+            
+            try:
+                context = await browser.new_context(
+                    user_agent=user_agent,
+                    viewport={'width': 1366, 'height': 768},
+                )
+                
+                page = await context.new_page()
+                
+                response = await page.goto(url, wait_until="networkidle", timeout=wait_for_timeout)
+                
+                if not response:
+                    return None, None, "No response received"
+                    
+                await page.wait_for_timeout(wait_for_idle)
+                
+                # Извлечение заголовков
+                headers = {}
+                for header in await response.all_headers():
+                    headers[header[0]] = header[1]
+                
+                # Получение HTML после полной загрузки
+                content = await page.content()
+                
+                return content, headers, None
+                
+            finally:
+                await browser.close()
+                
+    except Exception as e:
+        error_msg = f"JavaScript rendering error: {str(e)}"
+        logger.error(error_msg)
+        return None, None, error_msg
+
+def fetch_url_with_javascript_sync(
+    url: str,
+    headless: bool = True,
+    wait_for_idle: int = 2000,
+    wait_for_timeout: int = 30000,
+    browser_type: str = "chromium",
+    user_agent: str = DEFAULT_USER_AGENT
+) -> Tuple[Optional[str], Optional[Dict[str, Any]], Optional[str]]:
+    """
+    Синхронная обертка для получения контента URL с выполнением JavaScript.
+    
+    Args:
+        url: URL для запроса
+        headless: Запускать ли браузер без интерфейса
+        wait_for_idle: Время ожидания в мс после событий 'networkidle'
+        wait_for_timeout: Максимальное время ожидания в мс
+        browser_type: Тип браузера ('chromium', 'firefox', 'webkit')
+        user_agent: User-Agent для запросов
         
-        response = use_session.get(
-            url,
-            timeout=timeout,
-            verify=verify_ssl
-        )
-        
-        return response.text, response.status_code, response.headers
-        
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Ошибка при получении {url}: {e}")
-        return None, 0, {}
-        
-    finally:
-        # Закрытие сессии, если мы создали ее
-        if session is None:
-            use_session.close()
+    Returns:
+        Tuple[Optional[str], Optional[Dict[str, Any]], Optional[str]]:
+            - HTML-контент после выполнения JavaScript (None при ошибке)
+            - Заголовки ответа (None при ошибке)
+            - Сообщение об ошибке или None при успехе
+    """
+    return asyncio.run(fetch_url_with_javascript(
+        url, headless, wait_for_idle, wait_for_timeout, browser_type, user_agent
+    ))

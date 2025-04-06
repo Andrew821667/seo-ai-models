@@ -1,0 +1,17 @@
+{
+  "is_spa": true,
+  "confidence": 0.95,
+  "detected_frameworks": [
+    "React",
+    "Next.js"
+  ],
+  "spa_indicators": [
+    "spa"
+  ],
+  "dynamic_features": [],
+  "script_stats": {
+    "total_scripts": 15,
+    "large_scripts": 2
+  },
+  "detection_method": "html_analysis"
+}
