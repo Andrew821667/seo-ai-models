@@ -6,7 +6,11 @@
 import argparse
 import json
 import sys
+import os
 from datetime import datetime
+
+# Добавляем родительскую директорию в путь поиска модулей
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from seo_ai_models.models.seo_advisor.analyzers.enhanced_content_analyzer import EnhancedContentAnalyzer
 from seo_ai_models.parsers.spa_parser import SPAParser
