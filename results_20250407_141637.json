@@ -1,0 +1,56 @@
+{
+  "url": "https://rifastore.ru/categories/macbook-pro-14-2024-m4",
+  "timestamp": "2025-04-07T14:16:37.612009",
+  "is_spa": true,
+  "content_metrics": {
+    "word_count": 2085,
+    "sentence_count": 7,
+    "avg_sentence_length": 297.85714285714283,
+    "readability": 0,
+    "flesch_reading_ease": 0.0,
+    "header_score": 0,
+    "headers_count": 0,
+    "structure_score": 0.3,
+    "has_introduction": false,
+    "has_conclusion": false,
+    "paragraphs_count": 1,
+    "main_topics": [
+      "macbook pro",
+      "раскладка kb",
+      "английская раскладка",
+      "part num",
+      "в сравнениеуже"
+    ],
+    "meta_score": 0.7,
+    "multimedia_score": 0.3,
+    "linking_score": 0.6,
+    "semantic_depth": 0.75,
+    "topic_relevance": 0.8,
+    "engagement_potential": 0.65,
+    "language": "ru",
+    "content_type": "text",
+    "complexity_score": 1.0,
+    "content_density": 0.9
+  },
+  "keyword_analysis": {
+    "density": 0.0,
+    "distribution": {
+      "example": 0.0,
+      "test": 0.0,
+      "sample": 0.0
+    },
+    "frequency": {
+      "example": 0,
+      "test": 0,
+      "sample": 0
+    },
+    "coverage": 0.0,
+    "prominence": {
+      "example": 0.0,
+      "test": 0.0,
+      "sample": 0.0
+    },
+    "prominence_avg": 0.0
+  },
+  "parsing_time": 16.21082377433777
+}

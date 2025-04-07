@@ -1,0 +1,56 @@
+{
+  "url": "https://example.com",
+  "timestamp": "2025-04-07T14:15:41.851310",
+  "is_spa": true,
+  "content_metrics": {
+    "word_count": 28,
+    "sentence_count": 2,
+    "avg_sentence_length": 14.0,
+    "readability": 0.23425000000000012,
+    "flesch_reading_ease": 23.42500000000001,
+    "header_score": 0,
+    "headers_count": 0,
+    "structure_score": 0.3,
+    "has_introduction": false,
+    "has_conclusion": false,
+    "paragraphs_count": 1,
+    "main_topics": [
+      "example domainexample",
+      "domainexample domainthis",
+      "domainthis domain",
+      "domain is",
+      "in illustrative"
+    ],
+    "meta_score": 0.7,
+    "multimedia_score": 0.3,
+    "linking_score": 0.6,
+    "semantic_depth": 0.5,
+    "topic_relevance": 0.8,
+    "engagement_potential": 0.65,
+    "language": "en",
+    "content_type": "text",
+    "complexity_score": 0.6162083333333332,
+    "content_density": 0.3
+  },
+  "keyword_analysis": {
+    "density": 0.10714285714285714,
+    "distribution": {
+      "example": 0.10714285714285714,
+      "test": 0.0,
+      "sample": 0.0
+    },
+    "frequency": {
+      "example": 3,
+      "test": 0,
+      "sample": 0
+    },
+    "coverage": 0.3333333333333333,
+    "prominence": {
+      "example": 0.65,
+      "test": 0.0,
+      "sample": 0.0
+    },
+    "prominence_avg": 0.21666666666666667
+  },
+  "parsing_time": 10.301389217376709
+}
