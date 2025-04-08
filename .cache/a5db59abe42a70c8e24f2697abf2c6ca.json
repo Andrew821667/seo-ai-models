@@ -1,0 +1,14 @@
+{
+  "is_spa": false,
+  "confidence": 0.05,
+  "detected_frameworks": [],
+  "spa_indicators": [
+    "spa"
+  ],
+  "dynamic_features": [],
+  "script_stats": {
+    "total_scripts": 1,
+    "large_scripts": 0
+  },
+  "detection_method": "html_analysis"
+}

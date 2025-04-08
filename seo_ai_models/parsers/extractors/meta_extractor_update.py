@@ -32,7 +32,7 @@ def update_meta_extractor(meta_extractor_class):
                 "error": error or "No HTML content received"
             }
             
-        return self.extract(html_content, url)
+        return self.extract_meta_information(html_content, url)
     
     # Добавляем метод в класс
     setattr(meta_extractor_class, 'extract_from_url', extract_from_url)

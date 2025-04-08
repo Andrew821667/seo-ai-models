@@ -1,0 +1,1044 @@
+{
+  "url": "https://developer.mozilla.org",
+  "success": true,
+  "content": {
+    "url": "https://developer.mozilla.org",
+    "domain": "developer.mozilla.org",
+    "path": "",
+    "title": "MDN Web Docs",
+    "headings": {
+      "h1": [
+        "Resources forDevelopers,by Developers"
+      ],
+      "h2": [
+        "Featured articles",
+        "Latest news",
+        "Recent contributions",
+        "MDN",
+        "Support",
+        "Our communities",
+        "Developers"
+      ],
+      "h3": [
+        "JavaScript Temporal is coming",
+        "CSS anchor positioning",
+        "Using the View Transition API",
+        "Temporal",
+        "Contributor Spotlight"
+      ],
+      "h4": [],
+      "h5": [],
+      "h6": []
+    },
+    "content": {
+      "all_text": "MDN Web DocsSkip to main contentSkip to searchMDN Web DocsOpen main menuReferencesReferencesOverview / Web TechnologyWeb technology reference for developersHTMLStructure of content on the webCSSCode used to describe document styleJavaScriptGeneral-purpose scripting languageHTTPProtocol for transmitting web resourcesWeb APIsInterfaces for building web applicationsWeb ExtensionsDeveloping extensions for web browsersAccessibilityBuild web projects usable for allWeb TechnologyWeb technology reference for developersLearnLearnOverview / MDN Learning AreaLearn web developmentMDN Learning AreaLearn web developmentHTMLLearn to structure web content with HTMLCSSLearn to style content using CSSJavaScriptLearn to run scripts in the browserAccessibilityLearn to make the web accessible to allPlusPlusOverviewA customized MDN experienceAI HelpGet real-time assistance and supportUpdatesAll browser compatibility updates at a glanceDocumentationLearn how to use MDN PlusFAQFrequently asked questions about MDN PlusCurriculumNewBlogToolsPlaygroundWrite, test and share your codeHTTP ObservatoryScan a website for freeAI HelpGet real-time assistance and supportSearch MDNClear search inputSearchThemeLog inSign up for freeResources forDevelopers,by DevelopersDocumenting web technologies, includingCSS,HTML, andJavaScript, since 2005.Search MDNClear search inputSearchMandalaÂ Â Â ////////////Â Â Â ////////////Â Â Â ////////////Â Â Â ////////////Â Â Â ////////////Â Â Â ////////////Â Â Â ////////////Â Â ++++++Â Â ++++++Â Â ++++++Â Â ++++++Â Â ++++++Â Â ++++++Â Â ++++++{{{{Â}}}}Â Â{{{{Â}}}}Â Â{{{{Â}}}}Â Â{{{{Â}}}}Â Â{{{{Â}}}}Â Â{{{{Â}}}}Â ÂÂ Â Â ../../ Â Â Â ../../ Â Â Â ../../ Â Â Â ../../ Â Â Â ../../ Â Â Â ../../ Â Â Â ../../<></><></><></><></><></><></><></><></><></><></><></><></><></><></><></><></>Featured articlesBlogJavaScript Temporal is comingA new way to handle dates and times is being added to JavaScript. Let's take a look at Temporal, what problems it solves, the current state, and what you'll find in the new documentation about it on MDN.CSSCSS anchor positioningThe CSS anchor positioning module defines features that allow you to tether elements together. Certain elements are defined as anchor elements; anchor-positioned elements can then have their size and position set based on the size and location of the anchor elements to which they are bound.Web APIsUsing the View Transition APIThis article explains the theory behind how the View Transition API works, how to create view transitions and customize the transition animations, and how to manipulate active view transitions. This covers view transitions for both DOM state updates in a single-page app (SPA), and navigating between documents in a multi-page app (MPA).JavaScriptTemporalThe Temporal object enables date and time management in various scenarios, including built-in time zone and calendar representation, wall-clock time conversions, arithmetics, formatting, and more. It is designed as a full replacement for the Date object.Latest newsMDN 2024 content projectsdeveloper.mozilla.org3 months agoA new learning experience on MDNdeveloper.mozilla.org4 months agoIntroducing the new MDN Community pagedeveloper.mozilla.org6 months agoRecent contributionszh-CN: create `webRequest.StreamFilter.ondata`mdn/translated-content11 hours agozh-CN: create `webRequest.StreamFilter.onstop`mdn/translated-content11 hours agozh-CN: create `webRequest.StreamFilter.resume()`mdn/translated-content11 hours agozh-CN: create `webRequest.StreamFilter`mdn/translated-content11 hours ago[zh-cn] translate \"Third-party cookies\" and \"State Partitioning\"mdn/translated-content10 hours agoBump lefthook from 1.11.6 to 1.11.7mdn/content9 hours agoUse uniform code block languagemdn/content9 hours agofix(css): A couple of broken cssxref macrosmdn/content9 hours agoFix typomdn/content9 hours agoFix broken link in examplemdn/content9 hours agoContributor SpotlightYash Raj BhartiMDN resonates with my passion to build a consistent and open web, where developers can learn and grow.Get involved âMandalaÂ Â Â ////////////Â Â Â ////////////Â Â Â ////////////Â Â Â ////////////Â Â Â ////////////Â Â Â ////////////Â Â Â ////////////Â Â ++++++Â Â ++++++Â Â ++++++Â Â ++++++Â Â ++++++Â Â ++++++Â Â ++++++{{{{Â}}}}Â Â{{{{Â}}}}Â Â{{{{Â}}}}Â Â{{{{Â}}}}Â Â{{{{Â}}}}Â Â{{{{Â}}}}Â ÂÂ Â Â ../../ Â Â Â ../../ Â Â Â ../../ Â Â Â ../../ Â Â Â ../../ Â Â Â ../../ Â Â Â ../../<></><></><></><></><></><></><></><></><></><></><></><></><></><></><></><></>MDN logoYour blueprint for a better internet.MDN on BlueskyMDN on MastodonMDN on X (formerly Twitter)MDN on GitHubMDN Blog RSS FeedMDNAboutBlogCareersAdvertise with usSupportProduct helpReport an issueOur communitiesMDN CommunityMDN ForumMDN ChatDevelopersWeb TechnologiesLearn Web DevelopmentMDN PlusHacks BlogWebsite Privacy NoticeCookiesLegalCommunity Participation GuidelinesVisitMozilla Corporationâsnot-for-profit parent, theMozilla Foundation.Portions of this content are Â©1998â2025by individual mozilla.org contributors. Content available undera Creative Commons license.",
+      "paragraphs": [
+        "A new way to handle dates and times is being added to JavaScript. Let's take a look at Temporal, what problems it solves, the current state, and what you'll find in the new documentation about it on MDN.",
+        "The CSS anchor positioning module defines features that allow you to tether elements together. Certain elements are defined as anchor elements; anchor-positioned elements can then have their size and position set based on the size and location of the anchor elements to which they are bound.",
+        "This article explains the theory behind how the View Transition API works, how to create view transitions and customize the transition animations, and how to manipulate active view transitions. This covers view transitions for both DOM state updates in a single-page app (SPA), and navigating between documents in a multi-page app (MPA).",
+        "The Temporal object enables date and time management in various scenarios, including built-in time zone and calendar representation, wall-clock time conversions, arithmetics, formatting, and more. It is designed as a full replacement for the Date object."
+      ],
+      "lists": [
+        {
+          "type": "ul",
+          "items": [
+            "Log in",
+            "Sign up for free"
+          ]
+        },
+        {
+          "type": "ul",
+          "items": [
+            "MDN 2024 content projectsdeveloper.mozilla.org3 months ago",
+            "A new learning experience on MDNdeveloper.mozilla.org4 months ago",
+            "Introducing the new MDN Community pagedeveloper.mozilla.org6 months ago"
+          ]
+        },
+        {
+          "type": "ul",
+          "items": [
+            "zh-CN: create `webRequest.StreamFilter.ondata`mdn/translated-content11 hours ago",
+            "zh-CN: create `webRequest.StreamFilter.onstop`mdn/translated-content11 hours ago",
+            "zh-CN: create `webRequest.StreamFilter.resume()`mdn/translated-content11 hours ago",
+            "zh-CN: create `webRequest.StreamFilter`mdn/translated-content11 hours ago",
+            "[zh-cn] translate \"Third-party cookies\" and \"State Partitioning\"mdn/translated-content10 hours ago",
+            "Bump lefthook from 1.11.6 to 1.11.7mdn/content9 hours ago",
+            "Use uniform code block languagemdn/content9 hours ago",
+            "fix(css): A couple of broken cssxref macrosmdn/content9 hours ago",
+            "Fix typomdn/content9 hours ago",
+            "Fix broken link in examplemdn/content9 hours ago"
+          ]
+        },
+        {
+          "type": "ul",
+          "items": [
+            "MDN on Bluesky",
+            "MDN on Mastodon",
+            "MDN on X (formerly Twitter)",
+            "MDN on GitHub",
+            "MDN Blog RSS Feed"
+          ]
+        }
+      ]
+    },
+    "metadata": {
+      "text_length": 5095,
+      "paragraph_count": 4,
+      "list_count": 4,
+      "heading_counts": {
+        "h1": 1,
+        "h2": 7,
+        "h3": 5,
+        "h4": 0,
+        "h5": 0,
+        "h6": 0
+      }
+    },
+    "structure": {
+      "tag": "div",
+      "text": "Featured articlesBlogJavaScript Temporal is comingA new way to handle dates and times is being added to JavaScript. Let's take a look at Temporal, what problems it solves, the current state, and what you'll find in the new documentation about it on MDN.CSSCSS anchor positioningThe CSS anchor positioning module defines features that allow you to tether elements together. Certain elements are defined as anchor elements; anchor-positioned elements can then have their size and position set based on the size and location of the anchor elements to which they are bound.Web APIsUsing the View Transition APIThis article explains the theory behind how the View Transition API works, how to create view transitions and customize the transition animations, and how to manipulate active view transitions. This covers view transitions for both DOM state updates in a single-page app (SPA), and navigating between documents in a multi-page app (MPA).JavaScriptTemporalThe Temporal object enables date and time management in various scenarios, including built-in time zone and calendar representation, wall-clock time conversions, arithmetics, formatting, and more. It is designed as a full replacement for the Date object.",
+      "attributes": {
+        "class": [
+          "featured-articles"
+        ]
+      },
+      "children": [
+        {
+          "tag": "h2",
+          "text": "Featured articles",
+          "attributes": {}
+        },
+        {
+          "tag": "div",
+          "text": "BlogJavaScript Temporal is comingA new way to handle dates and times is being added to JavaScript. Let's take a look at Temporal, what problems it solves, the current state, and what you'll find in the new documentation about it on MDN.CSSCSS anchor positioningThe CSS anchor positioning module defines features that allow you to tether elements together. Certain elements are defined as anchor elements; anchor-positioned elements can then have their size and position set based on the size and location of the anchor elements to which they are bound.Web APIsUsing the View Transition APIThis article explains the theory behind how the View Transition API works, how to create view transitions and customize the transition animations, and how to manipulate active view transitions. This covers view transitions for both DOM state updates in a single-page app (SPA), and navigating between documents in a multi-page app (MPA).JavaScriptTemporalThe Temporal object enables date and time management in various scenarios, including built-in time zone and calendar representation, wall-clock time conversions, arithmetics, formatting, and more. It is designed as a full replacement for the Date object.",
+          "attributes": {
+            "class": [
+              "tile-container"
+            ]
+          },
+          "children": [
+            {
+              "tag": "div",
+              "text": "BlogJavaScript Temporal is comingA new way to handle dates and times is being added to JavaScript. Let's take a look at Temporal, what problems it solves, the current state, and what you'll find in the new documentation about it on MDN.",
+              "attributes": {
+                "class": [
+                  "article-tile"
+                ]
+              },
+              "children": [
+                {
+                  "tag": "h3",
+                  "text": "JavaScript Temporal is coming",
+                  "attributes": {
+                    "class": [
+                      "tile-title"
+                    ]
+                  }
+                },
+                {
+                  "tag": "p",
+                  "text": "A new way to handle dates and times is being added to JavaScript. Let's take a look at Temporal, what problems it solves, the current state, and what you'll find in the new documentation about it on MDN.",
+                  "attributes": {}
+                }
+              ]
+            },
+            {
+              "tag": "div",
+              "text": "CSSCSS anchor positioningThe CSS anchor positioning module defines features that allow you to tether elements together. Certain elements are defined as anchor elements; anchor-positioned elements can then have their size and position set based on the size and location of the anchor elements to which they are bound.",
+              "attributes": {
+                "class": [
+                  "article-tile"
+                ]
+              },
+              "children": [
+                {
+                  "tag": "h3",
+                  "text": "CSS anchor positioning",
+                  "attributes": {
+                    "class": [
+                      "tile-title"
+                    ]
+                  }
+                },
+                {
+                  "tag": "p",
+                  "text": "The CSS anchor positioning module defines features that allow you to tether elements together. Certain elements are defined as anchor elements; anchor-positioned elements can then have their size and position set based on the size and location of the anchor elements to which they are bound.",
+                  "attributes": {}
+                }
+              ]
+            },
+            {
+              "tag": "div",
+              "text": "Web APIsUsing the View Transition APIThis article explains the theory behind how the View Transition API works, how to create view transitions and customize the transition animations, and how to manipulate active view transitions. This covers view transitions for both DOM state updates in a single-page app (SPA), and navigating between documents in a multi-page app (MPA).",
+              "attributes": {
+                "class": [
+                  "article-tile"
+                ]
+              },
+              "children": [
+                {
+                  "tag": "h3",
+                  "text": "Using the View Transition API",
+                  "attributes": {
+                    "class": [
+                      "tile-title"
+                    ]
+                  }
+                },
+                {
+                  "tag": "p",
+                  "text": "This article explains the theory behind how the View Transition API works, how to create view transitions and customize the transition animations, and how to manipulate active view transitions. This covers view transitions for both DOM state updates in a single-page app (SPA), and navigating between documents in a multi-page app (MPA).",
+                  "attributes": {}
+                }
+              ]
+            },
+            {
+              "tag": "div",
+              "text": "JavaScriptTemporalThe Temporal object enables date and time management in various scenarios, including built-in time zone and calendar representation, wall-clock time conversions, arithmetics, formatting, and more. It is designed as a full replacement for the Date object.",
+              "attributes": {
+                "class": [
+                  "article-tile"
+                ]
+              },
+              "children": [
+                {
+                  "tag": "h3",
+                  "text": "Temporal",
+                  "attributes": {
+                    "class": [
+                      "tile-title"
+                    ]
+                  }
+                },
+                {
+                  "tag": "p",
+                  "text": "The Temporal object enables date and time management in various scenarios, including built-in time zone and calendar representation, wall-clock time conversions, arithmetics, formatting, and more. It is designed as a full replacement for the Date object.",
+                  "attributes": {}
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "url": {
+      "full": "https://developer.mozilla.org",
+      "scheme": "https",
+      "domain": "developer.mozilla.org",
+      "path": "",
+      "query": "",
+      "fragment": ""
+    },
+    "meta_tags": {
+      "viewport": "width=device-width,initial-scale=1",
+      "theme-color": "#ffffff",
+      "description": "The MDN Web Docs site provides information about Open Web technologies including HTML, CSS, and APIs for both Web sites and progressive web apps.",
+      "og:url": "https://developer.mozilla.org/ru/",
+      "og:title": "MDN Web Docs",
+      "og:type": "website",
+      "og:locale": "en_US",
+      "og:description": "The MDN Web Docs site provides information about Open Web technologies including HTML, CSS, and APIs for both Web sites and progressive web apps.",
+      "og:image": "https://developer.mozilla.org/mdn-social-share.d893525a4fb5fb1f67a2.png",
+      "og:image:type": "image/png",
+      "og:image:height": "1080",
+      "og:image:width": "1920",
+      "og:image:alt": "The MDN Web Docs logo, featuring a blue accent color, displayed on a solid black background.",
+      "og:site_name": "MDN Web Docs",
+      "twitter:card": "summary_large_image",
+      "twitter:creator": "MozDevNet",
+      "title": "MDN Web Docs",
+      "canonical": "https://developer.mozilla.org/ru/"
+    },
+    "opengraph": {
+      "og:url": "https://developer.mozilla.org/ru/",
+      "og:title": "MDN Web Docs",
+      "og:type": "website",
+      "og:locale": "en_US",
+      "og:description": "The MDN Web Docs site provides information about Open Web technologies including HTML, CSS, and APIs for both Web sites and progressive web apps.",
+      "og:image": "https://developer.mozilla.org/mdn-social-share.d893525a4fb5fb1f67a2.png",
+      "og:image:type": "image/png",
+      "og:image:height": "1080",
+      "og:image:width": "1920",
+      "og:image:alt": "The MDN Web Docs logo, featuring a blue accent color, displayed on a solid black background.",
+      "og:site_name": "MDN Web Docs"
+    },
+    "twitter_card": {
+      "twitter:card": "summary_large_image",
+      "twitter:creator": "MozDevNet"
+    },
+    "structured_data": [],
+    "headers": {
+      "h1": [
+        "Resources for Developers, by Developers"
+      ],
+      "h2": [
+        "Featured articles",
+        "Latest news",
+        "Recent contributions",
+        "MDN",
+        "Support",
+        "Our communities",
+        "Developers"
+      ],
+      "h3": [
+        "JavaScript Temporal is coming",
+        "CSS anchor positioning",
+        "Using the View Transition API",
+        "Temporal",
+        "Contributor Spotlight"
+      ],
+      "h4": [],
+      "h5": [],
+      "h6": []
+    },
+    "links": {
+      "internal": [
+        {
+          "url": "https://developer.mozilla.org/ru/",
+          "text": "MDN Web Docs",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/docs/Web",
+          "text": "References",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/docs/Web",
+          "text": "Overview / Web TechnologyWeb technology reference for developers",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/docs/Web/HTML",
+          "text": "HTMLStructure of content on the web",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/docs/Web/CSS",
+          "text": "CSSCode used to describe document style",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/docs/Web/JavaScript",
+          "text": "JavaScriptGeneral-purpose scripting language",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/docs/Web/HTTP",
+          "text": "HTTPProtocol for transmitting web resources",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/docs/Web/API",
+          "text": "Web APIsInterfaces for building web applications",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/docs/Mozilla/Add-ons/WebExtensions",
+          "text": "Web ExtensionsDeveloping extensions for web browsers",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/docs/Web/Accessibility",
+          "text": "AccessibilityBuild web projects usable for all",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/docs/Web",
+          "text": "Web TechnologyWeb technology reference for developers",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/docs/Learn_web_development",
+          "text": "Learn",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/docs/Learn_web_development",
+          "text": "Overview / MDN Learning AreaLearn web development",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/docs/Learn_web_development",
+          "text": "MDN Learning AreaLearn web development",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/docs/Learn_web_development/Core/Structuring_content",
+          "text": "HTMLLearn to structure web content with HTML",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/docs/Learn_web_development/Core/Styling_basics",
+          "text": "CSSLearn to style content using CSS",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/docs/Learn_web_development/Core/Scripting",
+          "text": "JavaScriptLearn to run scripts in the browser",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/docs/Learn_web_development/Core/Accessibility",
+          "text": "AccessibilityLearn to make the web accessible to all",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/plus",
+          "text": "Plus",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/plus",
+          "text": "OverviewA customized MDN experience",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/plus/ai-help",
+          "text": "AI HelpGet real-time assistance and support",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/plus/updates",
+          "text": "UpdatesAll browser compatibility updates at a glance",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/en-US/plus/docs/features/overview",
+          "text": "DocumentationLearn how to use MDN Plus",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/en-US/plus/docs/faq",
+          "text": "FAQFrequently asked questions about MDN Plus",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/en-US/curriculum/",
+          "text": "Curriculum New",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/en-US/blog/",
+          "text": "Blog",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/play",
+          "text": "PlaygroundWrite, test and share your code",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/en-US/observatory",
+          "text": "HTTP ObservatoryScan a website for free",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/en-US/plus/ai-help",
+          "text": "AI HelpGet real-time assistance and support",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/users/fxa/login/authenticate/?next=%2Fru%2F",
+          "text": "Log in",
+          "rel": [
+            "nofollow"
+          ],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/users/fxa/login/authenticate/?next=%2Fru%2F",
+          "text": "Sign up for free",
+          "rel": [
+            "nofollow"
+          ],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/docs/Web/CSS",
+          "text": "CSS",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/docs/Web/HTML",
+          "text": "HTML",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/docs/Web/JavaScript",
+          "text": "JavaScript",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/en-US/blog/",
+          "text": "Blog",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/en-US/blog/javascript-temporal-is-coming/",
+          "text": "JavaScript Temporal is coming",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS",
+          "text": "CSS",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_anchor_positioning",
+          "text": "CSS anchor positioning",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API",
+          "text": "Web APIs",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API/Using",
+          "text": "Using the View Transition API",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
+          "text": "JavaScript",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Temporal",
+          "text": "Temporal",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/en-US/blog/mdn-2024-content-projects/",
+          "text": "MDN 2024 content projects",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/en-US/blog/",
+          "text": "developer.mozilla.org",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/en-US/blog/curriculum-learn-web-development/",
+          "text": "A new learning experience on MDN",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/en-US/blog/",
+          "text": "developer.mozilla.org",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/en-US/blog/new-community-page/",
+          "text": "Introducing the new MDN Community page",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/en-US/blog/",
+          "text": "developer.mozilla.org",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/community/spotlight/yash-raj-bharti",
+          "text": "Yash Raj Bharti",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/en-US/community",
+          "text": "Get involved â",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/",
+          "text": "MDN logo",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/en-US/blog/rss.xml",
+          "text": "MDN Blog RSS Feed",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/en-US/about",
+          "text": "About",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/en-US/blog/",
+          "text": "Blog",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/en-US/advertising",
+          "text": "Advertise with us",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/docs/MDN/Community/Issues",
+          "text": "Report an issue",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/en-US/community",
+          "text": "MDN Community",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/discord",
+          "text": "MDN Chat",
+          "rel": [
+            "noopener",
+            "noreferrer"
+          ],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/docs/Web",
+          "text": "Web Technologies",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/docs/Learn",
+          "text": "Learn Web Development",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/plus",
+          "text": "MDN Plus",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/docs/MDN/Writing_guidelines/Attrib_copyright_license",
+          "text": "a Creative Commons license",
+          "rel": [],
+          "title": ""
+        }
+      ],
+      "external": [
+        {
+          "url": "https://github.com/mdn/translated-content/pull/26380",
+          "text": "zh-CN: create `webRequest.StreamFilter.ondata`",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://github.com/mdn/translated-content",
+          "text": "mdn/translated-content",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://github.com/mdn/translated-content/pull/26383",
+          "text": "zh-CN: create `webRequest.StreamFilter.onstop`",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://github.com/mdn/translated-content",
+          "text": "mdn/translated-content",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://github.com/mdn/translated-content/pull/26384",
+          "text": "zh-CN: create `webRequest.StreamFilter.resume()`",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://github.com/mdn/translated-content",
+          "text": "mdn/translated-content",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://github.com/mdn/translated-content/pull/26387",
+          "text": "zh-CN: create `webRequest.StreamFilter`",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://github.com/mdn/translated-content",
+          "text": "mdn/translated-content",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://github.com/mdn/translated-content/pull/26546",
+          "text": "[zh-cn] translate \"Third-party cookies\" and \"State Partitioning\"",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://github.com/mdn/translated-content",
+          "text": "mdn/translated-content",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://github.com/mdn/content/pull/39024",
+          "text": "Bump lefthook from 1.11.6 to 1.11.7",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://github.com/mdn/content",
+          "text": "mdn/content",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://github.com/mdn/content/pull/38927",
+          "text": "Use uniform code block language",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://github.com/mdn/content",
+          "text": "mdn/content",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://github.com/mdn/content/pull/39018",
+          "text": "fix(css): A couple of broken cssxref macros",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://github.com/mdn/content",
+          "text": "mdn/content",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://github.com/mdn/content/pull/39017",
+          "text": "Fix typo",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://github.com/mdn/content",
+          "text": "mdn/content",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://github.com/mdn/content/pull/39015",
+          "text": "Fix broken link in example",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://github.com/mdn/content",
+          "text": "mdn/content",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://bsky.app/profile/developer.mozilla.org",
+          "text": "MDN on Bluesky",
+          "rel": [
+            "me",
+            "noopener",
+            "noreferrer"
+          ],
+          "title": ""
+        },
+        {
+          "url": "https://mastodon.social/@mdn",
+          "text": "MDN on Mastodon",
+          "rel": [
+            "me",
+            "noopener",
+            "noreferrer"
+          ],
+          "title": ""
+        },
+        {
+          "url": "https://github.com/mdn/",
+          "text": "MDN on GitHub",
+          "rel": [
+            "noopener",
+            "noreferrer"
+          ],
+          "title": ""
+        },
+        {
+          "url": "https://www.mozilla.org/en-US/careers/listings/?team=ProdOps",
+          "text": "Careers",
+          "rel": [
+            "noopener",
+            "noreferrer"
+          ],
+          "title": ""
+        },
+        {
+          "url": "https://support.mozilla.org/products/mdn-plus",
+          "text": "Product help",
+          "rel": [],
+          "title": ""
+        },
+        {
+          "url": "https://discourse.mozilla.org/c/mdn/236",
+          "text": "MDN Forum",
+          "rel": [
+            "noopener",
+            "noreferrer"
+          ],
+          "title": ""
+        },
+        {
+          "url": "https://hacks.mozilla.org/",
+          "text": "Hacks Blog",
+          "rel": [
+            "noopener",
+            "noreferrer"
+          ],
+          "title": ""
+        },
+        {
+          "url": "https://www.mozilla.org/",
+          "text": "",
+          "rel": [
+            "noopener",
+            "noreferrer"
+          ],
+          "title": ""
+        },
+        {
+          "url": "https://www.mozilla.org/privacy/websites/",
+          "text": "Website Privacy Notice",
+          "rel": [
+            "noopener",
+            "noreferrer"
+          ],
+          "title": ""
+        },
+        {
+          "url": "https://www.mozilla.org/privacy/websites/#cookies",
+          "text": "Cookies",
+          "rel": [
+            "noopener",
+            "noreferrer"
+          ],
+          "title": ""
+        },
+        {
+          "url": "https://www.mozilla.org/about/legal/terms/mozilla",
+          "text": "Legal",
+          "rel": [
+            "noopener",
+            "noreferrer"
+          ],
+          "title": ""
+        },
+        {
+          "url": "https://www.mozilla.org/about/governance/policies/participation/",
+          "text": "Community Participation Guidelines",
+          "rel": [
+            "noopener",
+            "noreferrer"
+          ],
+          "title": ""
+        },
+        {
+          "url": "https://www.mozilla.org",
+          "text": "Mozilla Corporationâs",
+          "rel": [
+            "noopener",
+            "noreferrer"
+          ],
+          "title": ""
+        },
+        {
+          "url": "https://foundation.mozilla.org/",
+          "text": "Mozilla Foundation",
+          "rel": [
+            "noopener",
+            "noreferrer"
+          ],
+          "title": ""
+        }
+      ],
+      "resources": [
+        {
+          "url": "https://developer.mozilla.org/favicon-48x48.bc390275e955dacb2e65.png",
+          "type": "link",
+          "alt": "",
+          "rel": [
+            "icon"
+          ]
+        },
+        {
+          "url": "https://developer.mozilla.org/apple-touch-icon.528534bba673c38049c2.png",
+          "type": "link",
+          "alt": "",
+          "rel": [
+            "apple-touch-icon"
+          ]
+        },
+        {
+          "url": "https://developer.mozilla.org/manifest.f42880861b394dd4dc9b.json",
+          "type": "link",
+          "alt": "",
+          "rel": [
+            "manifest"
+          ]
+        },
+        {
+          "url": "https://developer.mozilla.org/opensearch.xml",
+          "type": "link",
+          "alt": "",
+          "rel": [
+            "search"
+          ]
+        },
+        {
+          "url": "https://developer.mozilla.org/static/media/Inter.var.c2fe3cb2b7c746f7966a.woff2",
+          "type": "link",
+          "alt": "",
+          "rel": [
+            "preload"
+          ]
+        },
+        {
+          "url": "https://developer.mozilla.org/en-US/blog/rss.xml",
+          "type": "link",
+          "alt": "",
+          "rel": [
+            "alternate"
+          ]
+        },
+        {
+          "url": "https://developer.mozilla.org/ru/",
+          "type": "link",
+          "alt": "",
+          "rel": [
+            "canonical"
+          ]
+        },
+        {
+          "url": "https://developer.mozilla.org/static/js/gtag.js",
+          "type": "script",
+          "alt": "",
+          "rel": []
+        },
+        {
+          "url": "https://developer.mozilla.org/static/js/main.b3eeaeb5.js",
+          "type": "script",
+          "alt": "",
+          "rel": []
+        },
+        {
+          "url": "https://developer.mozilla.org/static/css/main.ba062787.css",
+          "type": "link",
+          "alt": "",
+          "rel": [
+            "stylesheet"
+          ]
+        },
+        {
+          "url": "https://developer.mozilla.org/static/media/mdn_contributor.14a24dcfda486f000754.png",
+          "type": "img",
+          "alt": "Tiled Mozilla Logo",
+          "rel": []
+        }
+      ],
+      "social": [
+        {
+          "url": "https://twitter.com/mozdevnet",
+          "text": "MDN on X (formerly Twitter)",
+          "rel": [
+            "noopener",
+            "noreferrer"
+          ],
+          "title": ""
+        }
+      ]
+    },
+    "statistics": {
+      "word_count": 705,
+      "internal_links": 62,
+      "external_links": 34,
+      "social_links": 1,
+      "resource_links": 11
+    }
+  },
+  "error": null,
+  "site_type": {
+    "is_spa": false,
+    "confidence": 0.1,
+    "detected_frameworks": [],
+    "spa_indicators": [
+      "spa"
+    ],
+    "dynamic_features": [],
+    "script_stats": {
+      "total_scripts": 4,
+      "large_scripts": 1
+    },
+    "detection_method": "html_analysis"
+  }
+}

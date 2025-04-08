@@ -74,8 +74,7 @@ class ParsingPipeline:
        # Получение контента
        html_content, status_code, headers = fetch_url(
            url, 
-           session=self.session,
-           delay=self.delay
+           session=self.session
        )
        
        if not html_content or status_code != 200:

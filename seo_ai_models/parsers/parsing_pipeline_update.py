@@ -67,7 +67,13 @@ def integrate_spa_support(pipeline_obj):
             return result
         else:
             # Используем оригинальный метод для обычных сайтов
-            return original_analyze_url(url, **kwargs)
+            if 'delay' in kwargs: kwargs.pop('delay')
+            print(f'DEBUG: kwargs = {kwargs}')
+            # Удаляем delay из kwargs, если он есть
+            kwargs_copy = kwargs.copy()
+            if 'delay' in kwargs_copy:
+                kwargs_copy.pop('delay')
+            return original_analyze_url(url, **kwargs_copy)
             
     # Функция для определения типа сайта
     def detect_site_type(pipeline, url):
@@ -80,7 +86,6 @@ def integrate_spa_support(pipeline_obj):
         adaptive_pipeline = AdaptiveParsingPipeline(
             user_agent=pipeline.user_agent,
             respect_robots=pipeline.respect_robots,
-            delay=pipeline.delay,
             max_pages=pipeline.max_pages,
             wait_for_idle=pipeline.wait_for_idle,
             wait_for_timeout=pipeline.wait_for_timeout,

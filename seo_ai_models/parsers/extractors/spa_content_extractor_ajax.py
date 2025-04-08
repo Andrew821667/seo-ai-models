@@ -4,6 +4,7 @@
 
 from seo_ai_models.parsers.extractors.spa_content_extractor import SPAContentExtractor
 from seo_ai_models.parsers.extractors.ajax_interceptor import AJAXInterceptor
+from playwright.async_api import async_playwright
 
 def update_spa_extractor_with_ajax(extractor_class):
     """
@@ -33,6 +34,7 @@ def update_spa_extractor_with_ajax(extractor_class):
             analyze_responses=analyze_responses,
             api_patterns=api_patterns
         )
+        self.playwright = None
     
     async def render_page_with_ajax(self, url):
         """
@@ -44,119 +46,115 @@ def update_spa_extractor_with_ajax(extractor_class):
         Returns:
             str: Отрендеренный HTML
         """
-        # Используем оригинальный метод с небольшой модификацией
-        async with self._get_browser() as browser:
-            context = await browser.new_context(viewport={'width': 1366, 'height': 768})
-            page = await context.new_page()
+        try:
+            # Инициализируем playwright
+            self.playwright = await async_playwright().start()
+            
+            # Получаем браузер
+            if self.browser_type == "firefox":
+                browser_instance = self.playwright.firefox
+            elif self.browser_type == "webkit":
+                browser_instance = self.playwright.webkit
+            else:
+                browser_instance = self.playwright.chromium
+                
+            browser = await browser_instance.launch(headless=self.headless)
             
             try:
-                # Устанавливаем перехват AJAX перед загрузкой страницы
+                # Создаем новый контекст и страницу
+                context = await browser.new_context(viewport={'width': 1366, 'height': 768})
+                page = await context.new_page()
+                
+                # Настраиваем перехват запросов на странице
                 await self.ajax_interceptor.setup_request_interception(page)
                 
-                # Загружаем страницу и выполняем стандартные действия
-                await page.goto(url, wait_until='networkidle', timeout=self.wait_for_timeout)
-                await page.wait_for_timeout(self.wait_for_idle)
-                
-                # Ждем селекторы
-                for selector in self.wait_for_selectors:
-                    try:
-                        await page.wait_for_selector(selector, timeout=1000)
-                        break
-                    except Exception:
-                        continue
-                
-                # Выполняем дополнительные скрипты
-                await page.evaluate('''() => {
-                    // Стандартный код для раскрытия контента
-                    const showMoreButtons = Array.from(document.querySelectorAll('button, a')).filter(
-                        el => el.innerText && (
-                            el.innerText.toLowerCase().includes('show more') || 
-                            el.innerText.toLowerCase().includes('показать больше') ||
-                            el.innerText.toLowerCase().includes('load more') ||
-                            el.innerText.toLowerCase().includes('загрузить еще')
-                        )
-                    );
-                    showMoreButtons.forEach(button => button.click());
+                try:
+                    # Ожидание загрузки страницы
+                    await page.goto(url, wait_until='networkidle', timeout=self.wait_for_timeout)
+                    await page.wait_for_timeout(self.wait_for_idle)
                     
-                    const expandableElements = Array.from(document.querySelectorAll('[aria-expanded="false"]'));
-                    expandableElements.forEach(el => {
-                        el.setAttribute('aria-expanded', 'true');
-                        el.click();
-                    });
-                }''')
-                
-                # Дополнительное время для обработки AJAX-запросов
-                await page.wait_for_timeout(2000)
-                
-                # Получаем окончательный HTML
-                html = await page.content()
-                
-                # Сохраняем AJAX-данные
-                self._last_ajax_data = {
-                    'api_calls': self.ajax_interceptor.get_api_calls(),
-                    'json_responses': self.ajax_interceptor.get_json_responses(),
-                    'structured_data': self.ajax_interceptor.extract_data_from_responses()
-                }
-                
-                return html
-                
-            except Exception as e:
-                self._last_error = str(e)
-                return None
-                
+                    # Получаем HTML после рендеринга
+                    html_content = await page.content()
+                    
+                    # Собираем данные AJAX
+                    api_calls = self.ajax_interceptor.get_api_calls()
+                    structured_data = self.ajax_interceptor.extract_data_from_responses()
+                    
+                    # Готовим результат
+                    result = {
+                        'html': html_content,
+                        'ajax_data': {
+                            'api_calls': api_calls,
+                            'structured_data': structured_data
+                        }
+                    }
+                    
+                    return result
+                    
+                except Exception as e:
+                    raise Exception(f"Error during page rendering: {str(e)}")
+                finally:
+                    await page.close()
+                    await context.close()
             finally:
-                await page.close()
-    
-    # Заменяем методы в классе
-    extractor_class.__init__ = __init_with_ajax
-    
-    # Не заменяем _render_page напрямую, а добавляем новый метод
-    extractor_class._render_page_with_ajax = render_page_with_ajax
-    
-    # Добавляем метод для получения данных AJAX
-    def get_ajax_data(self):
-        """
-        Получает данные, перехваченные из AJAX-запросов.
-        
-        Returns:
-            Dict: Данные AJAX или None
-        """
-        return getattr(self, '_last_ajax_data', None)
-    
-    extractor_class.get_ajax_data = get_ajax_data
-    
-    # Обновляем extract_content_from_url_async для использования AJAX
-    original_extract_async = extractor_class.extract_content_from_url_async
+                await browser.close()
+        finally:
+            if self.playwright:
+                await self.playwright.stop()
     
     async def extract_content_with_ajax_async(self, url):
         """
-        Извлекает контент с перехватом AJAX-запросов.
+        Извлекает контент и AJAX-данные из URL.
         
         Args:
-            url: URL для анализа
+            url: URL для извлечения
             
         Returns:
-            Dict: Результат с контентом и AJAX-данными
+            Dict: Контент и данные AJAX
         """
-        # Используем новый метод рендеринга с AJAX
-        html_content = await self._render_page_with_ajax(url)
-        
-        if not html_content:
+        try:
+            # Рендерим страницу с перехватом AJAX
+            result = await self.render_page_with_ajax(url)
+            
+            if not result or 'html' not in result:
+                return {
+                    'url': url,
+                    'error': 'Failed to render page with AJAX'
+                }
+            
+            # Извлекаем контент из HTML
+            content_data = self.extract_content(result['html'], url)
+            
+            # Добавляем AJAX-данные к результату
+            content_data['ajax_data'] = result.get('ajax_data', {})
+            
+            return content_data
+            
+        except Exception as e:
             return {
-                "url": url,
-                "error": getattr(self, '_last_error', "Failed to render page content")
+                'url': url,
+                'error': str(e)
             }
-        
-        # Получаем стандартный результат
-        result = self.extract_content(html_content, url)
-        
-        # Добавляем данные AJAX, если они есть
-        ajax_data = self.get_ajax_data()
-        if ajax_data:
-            result['ajax_data'] = ajax_data
-        
-        return result
     
-    extractor_class.extract_content_from_url_async = extract_content_with_ajax_async
+    def extract_content_with_ajax(self, url):
+        """
+        Синхронная обертка для извлечения контента и AJAX-данных.
+        
+        Args:
+            url: URL для извлечения
+            
+        Returns:
+            Dict: Контент и данные AJAX
+        """
+        import asyncio
+        return asyncio.run(self.extract_content_with_ajax_async(url))
     
-    return extractor_class
+    # Создаем новый класс с дополнительными методами
+    class SPAContentExtractorWithAJAX(extractor_class):
+        __init__ = __init_with_ajax
+        render_page_with_ajax = render_page_with_ajax
+        extract_content_with_ajax_async = extract_content_with_ajax_async
+        extract_content_with_ajax = extract_content_with_ajax
+        extract_content_from_url_with_ajax = extract_content_with_ajax
+    
+    return SPAContentExtractorWithAJAX

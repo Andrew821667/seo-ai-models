@@ -21,7 +21,7 @@ class SPAContentExtractor(ContentExtractor):
     Извлекает значимый контент из SPA-страниц с поддержкой JavaScript,
     включая текст, заголовки, параграфы и другие структурные элементы.
     """
-    
+
     def __init__(
         self,
         content_tags: List[str] = None,
@@ -49,7 +49,7 @@ class SPAContentExtractor(ContentExtractor):
             browser_type: Тип браузера для использования ('chromium', 'firefox', 'webkit')
         """
         super().__init__(content_tags, block_tags, exclude_classes, exclude_ids)
-        
+
         self.wait_for_idle = wait_for_idle
         self.wait_for_timeout = wait_for_timeout
         self.wait_for_selectors = wait_for_selectors or [
@@ -57,19 +57,54 @@ class SPAContentExtractor(ContentExtractor):
         ]
         self.headless = headless
         self.browser_type = browser_type
-        
+
+    async def _get_browser(self):
+        """
+        Создает и возвращает экземпляр браузера в формате асинхронного контекстного менеджера.
+
+        Returns:
+            Контекстный менеджер для браузера Playwright
+        """
+        class BrowserContextManager:
+            def __init__(self, extractor):
+                self.extractor = extractor
+                self.playwright = None
+                self.browser = None
+
+            async def __aenter__(self):
+                self.playwright = await async_playwright().start()
+                
+                # Выбор браузера в зависимости от настройки
+                if self.extractor.browser_type == "firefox":
+                    browser_instance = self.playwright.firefox
+                elif self.extractor.browser_type == "webkit":
+                    browser_instance = self.playwright.webkit
+                else:
+                    browser_instance = self.playwright.chromium  # По умолчанию
+                
+                self.browser = await browser_instance.launch(headless=self.extractor.headless)
+                return self.browser
+
+            async def __aexit__(self, exc_type, exc_val, exc_tb):
+                if self.browser:
+                    await self.browser.close()
+                if self.playwright:
+                    await self.playwright.__aexit__(exc_type, exc_val, exc_tb)
+                
+        return BrowserContextManager(self)
+
     async def _render_page(self, url: str) -> Optional[str]:
         """
         Рендеринг страницы с выполнением JavaScript и получение HTML.
-        
+
         Args:
             url: URL для рендеринга
-            
+
         Returns:
             Optional[str]: Отрендеренный HTML или None при ошибке
         """
         logger.info(f"Рендеринг страницы с JavaScript: {url}")
-        
+
         async with async_playwright() as p:
             # Выбор браузера в зависимости от настройки
             if self.browser_type == "firefox":
@@ -78,20 +113,20 @@ class SPAContentExtractor(ContentExtractor):
                 browser_instance = p.webkit
             else:
                 browser_instance = p.chromium  # По умолчанию
-                
+
             browser = await browser_instance.launch(headless=self.headless)
-            
+
             try:
                 context = await browser.new_context(viewport={'width': 1366, 'height': 768})
                 page = await context.new_page()
-                
+
                 try:
                     # Переход на страницу и ожидание загрузки
                     await page.goto(url, wait_until='networkidle', timeout=self.wait_for_timeout)
-                    
+
                     # Дополнительная задержка для полной загрузки динамического контента
                     await page.wait_for_timeout(self.wait_for_idle)
-                    
+
                     # Ожидание наличия ключевых селекторов контента (любого из списка)
                     for selector in self.wait_for_selectors:
                         try:
@@ -99,56 +134,56 @@ class SPAContentExtractor(ContentExtractor):
                             break  # Если найден хотя бы один селектор, выходим из цикла
                         except PlaywrightTimeoutError:
                             continue  # Если не найден, пробуем следующий селектор
-                    
+
                     # Получение полного HTML после рендеринга
                     html_content = await page.content()
-                    
+
                     # Выполнение дополнительных скриптов для раскрытия скрытого контента
-                    await page.evaluate('''() => {
+                    await page.evaluate("""() => {
                         // Нажать на все кнопки "Показать больше" или похожие
                         const showMoreButtons = Array.from(document.querySelectorAll('button, a')).filter(
                             el => el.innerText && (
-                                el.innerText.toLowerCase().includes('show more') || 
+                                el.innerText.toLowerCase().includes('show more') ||
                                 el.innerText.toLowerCase().includes('показать больше') ||
                                 el.innerText.toLowerCase().includes('load more') ||
                                 el.innerText.toLowerCase().includes('загрузить еще')
                             )
                         );
                         showMoreButtons.forEach(button => button.click());
-                        
+
                         // Раскрыть все свернутые элементы
                         const expandableElements = Array.from(document.querySelectorAll('[aria-expanded="false"]'));
                         expandableElements.forEach(el => {
                             el.setAttribute('aria-expanded', 'true');
                             el.click();
                         });
-                    }''')
-                    
+                    }""")
+
                     # Ожидание дополнительного контента после раскрытия
                     await page.wait_for_timeout(1000)
-                    
+
                     # Получение окончательного HTML после всех манипуляций
                     final_html = await page.content()
-                    
+
                     return final_html
-                    
+
                 except Exception as e:
                     logger.error(f"Ошибка при рендеринге {url}: {str(e)}")
                     return None
-                
+
                 finally:
                     await page.close()
-                    
+
             finally:
                 await browser.close()
-    
+
     async def extract_content_from_url_async(self, url: str) -> Dict[str, Any]:
         """
         Асинхронный метод извлечения структурированного контента из URL с поддержкой SPA.
-        
+
         Args:
             url: URL для анализа
-            
+
         Returns:
             Dict: Информация об извлеченном контенте
         """
@@ -159,23 +194,23 @@ class SPAContentExtractor(ContentExtractor):
                     "url": url,
                     "error": "Failed to render page content"
                 }
-                
+
             return self.extract_content(html_content, url)
-            
+
         except Exception as e:
             logger.error(f"Ошибка при извлечении контента из {url}: {str(e)}")
             return {
                 "url": url,
                 "error": str(e)
             }
-    
+
     def extract_content_from_url(self, url: str) -> Dict[str, Any]:
         """
         Синхронный метод извлечения структурированного контента из URL с поддержкой SPA.
-        
+
         Args:
             url: URL для анализа
-            
+
         Returns:
             Dict: Информация об извлеченном контенте
         """

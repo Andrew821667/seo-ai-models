@@ -98,7 +98,7 @@ class TestAdaptiveParsingPipeline(unittest.TestCase):
             max_pages=3
         )
     
-    @patch('seo_ai_models.parsers.utils.request_utils.fetch_url')
+    @patch('seo_ai_models.parsers.adaptive_parsing_pipeline.fetch_url')
     def test_detect_site_type_standard(self, mock_fetch_url):
         """Тест определения обычного сайта."""
         # Моделируем успешный ответ для стандартного сайта
@@ -125,8 +125,8 @@ class TestAdaptiveParsingPipeline(unittest.TestCase):
             # Проверяем результат
             self.assertFalse(result["is_spa"])
     
-    @patch('seo_ai_models.parsers.utils.request_utils.fetch_url')
-    @patch('seo_ai_models.parsers.utils.request_utils.fetch_url_with_javascript_sync')
+    @patch('seo_ai_models.parsers.adaptive_parsing_pipeline.fetch_url')
+    @patch('seo_ai_models.parsers.adaptive_parsing_pipeline.fetch_url_with_javascript_sync')
     def test_detect_site_type_spa(self, mock_js_fetch, mock_fetch_url):
         """Тест определения SPA-сайта."""
         # Моделируем ответ для SPA-сайта
