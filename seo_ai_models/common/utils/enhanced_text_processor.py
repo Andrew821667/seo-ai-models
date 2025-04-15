@@ -36,18 +36,54 @@ class EnhancedTextProcessor(TextProcessor):
             Dict[str, any]: Извлеченные метрики и данные
         """
         if not html_content:
-            return {
-                'text': '',
-                'paragraphs': [],
-                'word_count': 0,
-                'sentence_count': 0,
-                'avg_sentence_length': 0,
-                'headings': [],
-                'links': [],
-                'images': [],
-                'lists': [],
-                'tables': []
-            }
+            
+        # Извлекаем элементы из HTML
+        import re
+        elements = []
+        
+        # Простое извлечение заголовков
+        headers = re.findall(r'<h[1-6][^>]*>(.*?)</h[1-6]>', html_content, re.DOTALL | re.IGNORECASE)
+        for header in headers:
+            elements.append({
+                'type': 'header',
+                'content': header.strip()
+            })
+        
+        # Извлечение параграфов
+        paragraphs = re.findall(r'<p[^>]*>(.*?)</p>', html_content, re.DOTALL | re.IGNORECASE)
+        for paragraph in paragraphs:
+            elements.append({
+                'type': 'paragraph',
+                'content': paragraph.strip()
+            })
+        
+        # Извлечение ссылок
+        links = re.findall(r'<a[^>]*href=['"]([^'"]*)['"][^>]*>(.*?)</a>', html_content, re.DOTALL | re.IGNORECASE)
+        for url, text in links:
+            elements.append({
+                'type': 'link',
+                'url': url,
+                'content': text.strip()
+            })
+        
+        # Извлечение изображений
+        images = re.findall(r'<img[^>]*src=['"]([^'"]*)['"][^>]*>', html_content, re.IGNORECASE)
+        for src in images:
+            elements.append({
+                'type': 'image',
+                'src': src
+            })
+        
+        result = {
+            'text': processed_text,
+            'paragraphs': paragraphs,
+            'word_count': len(words),
+            'sentence_count': len(sentences),
+            'elements': elements  # Добавляем извлеченные элементы
+        }
+        
+        return result
+    
         
         # Используем BeautifulSoup для парсинга HTML
         soup = BeautifulSoup(html_content, 'html.parser')

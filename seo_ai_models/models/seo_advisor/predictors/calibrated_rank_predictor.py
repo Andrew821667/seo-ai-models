@@ -83,7 +83,63 @@ class CalibratedRankPredictor(ImprovedRankPredictor):
             'medical': True
         }
     
-    def predict_position(self, features: Dict[str, float], text: str = None, keywords: List[str] = None) -> Dict:
+    
+    def predict_position_from_text(self, content: str, keywords: List[str], industry: str = 'default') -> Dict:
+        """
+        Анализ текста и предсказание позиции с учетом конкурентности ниши и E-E-A-T метрик.
+        
+        Args:
+            content: Текстовое содержимое для анализа
+            keywords: Список ключевых слов
+            industry: Отрасль контента (по умолчанию 'default')
+            
+        Returns:
+            Dict: Результаты предсказания
+        """
+        # Создаем и заполняем структуру для факторов ранжирования
+        # Это упрощенная версия, в идеале нужен полный анализ контента
+        features = {
+            'keyword_density': 0.03,
+            'content_length': len(content.split()),
+            'readability_score': 50.0,
+            'meta_tags_score': 0.7,
+            'header_structure_score': 0.8,
+            'multimedia_score': 0.5,
+            'internal_linking_score': 0.6,
+            'expertise_score': 0.5,
+            'authority_score': 0.4,
+            'trust_score': 0.3,
+            'overall_eeat_score': 0.4
+        }
+        
+        # Вызываем оригинальный метод с подготовленными признаками
+        return self.predict_position(features, content, keywords)
+    
+    # Для совместимости с оригинальным кодом
+    def predict_position(self, arg1, arg2=None, arg3=None):
+        """
+        Перегрузка метода predict_position для поддержки разных сигнатур.
+        
+        Args:
+            arg1: Может быть Dict[str, float] (признаки) или str (текст)
+            arg2: Может быть str (текст) или List[str] (ключевые слова)
+            arg3: Может быть List[str] (ключевые слова) или str (отрасль)
+            
+        Returns:
+            Dict: Результаты предсказания
+        """
+        if isinstance(arg1, dict):
+            # Оригинальная сигнатура: predict_position(features, text, keywords)
+            return self._predict_position_original(arg1, arg2, arg3)
+        elif isinstance(arg1, str) and isinstance(arg2, list):
+            # Новая сигнатура: predict_position(text, keywords, industry)
+            industry = arg3 if arg3 else 'default'
+            return self.predict_position_from_text(arg1, arg2, industry)
+        else:
+            raise TypeError("Неподдерживаемые типы аргументов в predict_position")
+    
+    def _predict_position_original(self, features: Dict[str, float], text: str = None, keywords: List[str] = None) -> Dict:
+    
         """Предсказание позиции с учетом конкурентности ниши и E-E-A-T метрик.
         
         Args:

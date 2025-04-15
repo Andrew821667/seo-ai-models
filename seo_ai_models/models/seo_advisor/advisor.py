@@ -83,7 +83,58 @@ class SEOAdvisor:
        self.eeat_analyzer = EEATAnalyzer()
        self.analysis_history = []
    
-   def analyze_content(self, content: str, target_keywords: List[str]) -> SEOAnalysisReport:
+   
+    def _check_ymyl_content(self, content: str, keywords: List[str]) -> bool:
+        """
+        Определяет, относится ли контент к категории YMYL (Your Money or Your Life).
+        
+        Args:
+            content: Текстовое содержимое
+            keywords: Ключевые слова
+            
+        Returns:
+            bool: True, если контент относится к YMYL, иначе False
+        """
+        # Список ключевых слов, указывающих на YMYL-контент
+        ymyl_keywords = [
+            # Здоровье и медицина
+            'здоровье', 'болезнь', 'лечение', 'диагноз', 'медицина', 'симптом', 'доктор', 'врач',
+            'терапия', 'препарат', 'лекарство', 'диета', 'пациент', 'клиника', 'больница',
+            # Финансы
+            'деньги', 'финансы', 'инвестиции', 'кредит', 'ипотека', 'налог', 'бюджет', 'займ',
+            'страхование', 'банк', 'акции', 'пенсия', 'капитал', 'доход',
+            # Безопасность
+            'безопасность', 'защита', 'риск', 'угроза', 'мошенничество', 'юрист', 'адвокат',
+            'закон', 'право', 'суд', 'штраф', 'наказание'
+        ]
+        
+        # Приводим контент и ключевые слова к нижнему регистру
+        content_lower = content.lower()
+        keywords_lower = [k.lower() for k in keywords]
+        
+        # Проверяем, содержит ли контент YMYL-ключевые слова
+        for keyword in ymyl_keywords:
+            if keyword in content_lower:
+                return True
+        
+        # Проверяем, содержат ли целевые ключевые слова YMYL-термины
+        for keyword in keywords_lower:
+            if any(ymyl_kw in keyword for ymyl_kw in ymyl_keywords):
+                return True
+        
+        # Проверяем наличие специфических маркеров YMYL в тексте
+        ymyl_markers = [
+            "медицинск", "здоров", "финансов", "деньг", "инвестиц", "безопасност", 
+            "юридическ", "правов", "налог", "медицин"
+        ]
+        
+        for marker in ymyl_markers:
+            if marker in content_lower:
+                return True
+        
+        # По умолчанию считаем, что контент не относится к YMYL
+        return False
+    def analyze_content(self, content: str, target_keywords: List[str]) -> SEOAnalysisReport:
        """Комплексный анализ контента с оценкой качества.
        
        Выполняет полный анализ контента, включая извлечение метрик,
