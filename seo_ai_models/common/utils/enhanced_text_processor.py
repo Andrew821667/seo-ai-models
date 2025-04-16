@@ -58,8 +58,7 @@ class EnhancedTextProcessor(TextProcessor):
             })
         
         # Извлечение ссылок
-        links = re.findall(r'<a[^>]*href=['"]([^'"]*)['"][^>]*>(.*?)</a>', html_content, re.DOTALL | re.IGNORECASE)
-        for url, text in links:
+        links = re.findall(r'<a[^>]*href=['"]([^'"]*)['"][^>]*>(.*?)</a>', html_content, re.DOTALL | re.IGNORECASE)        for url, text in links:
             elements.append({
                 'type': 'link',
                 'url': url,
