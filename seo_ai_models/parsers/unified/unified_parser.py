@@ -1,7 +1,10 @@
 """
-Унифицированный парсер для проекта SEO AI Models.
-Объединяет функциональность всех парсеров и предоставляет единый интерфейс,
-совместимый с ядром системы.
+Усовершенствованный унифицированный парсер для проекта SEO AI Models.
+Объединяет все новые компоненты и обеспечивает расширенную функциональность:
+- Поддержка SPA-сайтов через Playwright
+- Многопоточный параллельный парсинг
+- Интеграция с API поисковых систем
+- Расширенный семантический анализ с NLP
 """
 
 import logging
@@ -20,10 +23,14 @@ from seo_ai_models.parsers.unified.parser_result import (
 )
 from seo_ai_models.common.utils.enhanced_text_processor import EnhancedTextProcessor
 
-# Обновленные импорты из новой структуры
+# Импортируем компоненты парсинга
 from seo_ai_models.parsers.unified.crawlers.web_crawler import WebCrawler
+from seo_ai_models.parsers.unified.crawlers.enhanced_spa_crawler import EnhancedSPACrawler
 from seo_ai_models.parsers.unified.extractors.content_extractor import ContentExtractor
 from seo_ai_models.parsers.unified.extractors.meta_extractor import MetaExtractor
+from seo_ai_models.parsers.unified.analyzers.search_api_integration import SearchAPIIntegration
+from seo_ai_models.parsers.unified.analyzers.enhanced_semantic_analyzer import EnhancedSemanticAnalyzer
+from seo_ai_models.parsers.unified.utils.parallel_parsing import ParallelParser
 from seo_ai_models.parsers.unified.utils.request_utils import fetch_url, fetch_url_with_javascript_sync
 
 # Настройка логирования
@@ -32,13 +39,13 @@ logger = logging.getLogger(__name__)
 
 class UnifiedParser(ParserInterface):
     """
-    Унифицированный парсер, объединяющий все возможности существующих парсеров.
-    Предоставляет интерфейс, совместимый с ядром системы SEO AI Models.
+    Унифицированный парсер, объединяющий все возможности парсинга в единый интерфейс.
+    Предоставляет расширенные возможности для анализа сайтов любого типа.
     """
     
     def __init__(
         self,
-        user_agent: str = "SEOAIModels UnifiedParser/1.0",
+        user_agent: str = "SEOAIModels UnifiedParser/2.0",
         respect_robots: bool = True,
         delay: float = 1.0,
         max_pages: int = 100,
@@ -47,7 +54,10 @@ class UnifiedParser(ParserInterface):
         auto_detect_spa: bool = True,
         force_spa_mode: bool = False,
         extract_readability: bool = True,
-        extract_semantic: bool = True
+        extract_semantic: bool = True,
+        parallel_parsing: bool = True,
+        max_workers: int = 5,
+        search_api_keys: Optional[List[str]] = None
     ):
         """
         Инициализация унифицированного парсера.
@@ -63,6 +73,9 @@ class UnifiedParser(ParserInterface):
             force_spa_mode: Всегда использовать режим SPA
             extract_readability: Извлекать метрики читаемости
             extract_semantic: Извлекать семантические метрики
+            parallel_parsing: Использовать многопоточный парсинг
+            max_workers: Максимальное количество потоков для параллельного парсинга
+            search_api_keys: API-ключи для поисковых систем
         """
         self.user_agent = user_agent
         self.respect_robots = respect_robots
@@ -73,27 +86,54 @@ class UnifiedParser(ParserInterface):
         self.force_spa_mode = force_spa_mode
         self.extract_readability = extract_readability
         self.extract_semantic = extract_semantic
+        self.parallel_parsing = parallel_parsing
+        self.max_workers = max_workers
         
         # Настройки SPA по умолчанию
         self.spa_settings = spa_settings or {
             "wait_for_idle": 2000,  # мс
             "wait_for_timeout": 10000,  # мс
             "headless": True,
-            "browser_type": "chromium"
+            "browser_type": "chromium",
+            "intercept_ajax": True
         }
         
-        # Инициализация текстового процессора
-        self.text_processor = EnhancedTextProcessor()
-        
         # Инициализация компонентов
-        self.content_extractor = ContentExtractor()
-        self.meta_extractor = MetaExtractor()
-        
-        logger.info("UnifiedParser initialized")
+        try:
+            # Инициализация текстового процессора
+            self.text_processor = EnhancedTextProcessor()
+            
+            # Базовые экстракторы
+            self.content_extractor = ContentExtractor()
+            self.meta_extractor = MetaExtractor()
+            
+            # Продвинутые компоненты
+            if extract_semantic:
+                self.semantic_analyzer = EnhancedSemanticAnalyzer()
+            
+            # Поисковый API
+            self.search_api = SearchAPIIntegration(
+                api_keys=search_api_keys,
+                api_provider="serpapi" if search_api_keys else "custom"
+            )
+            
+            # Параллельный парсер
+            if self.parallel_parsing:
+                self.parallel_parser = ParallelParser(
+                    max_workers=self.max_workers,
+                    rate_limit=self.delay,
+                    respect_robots=self.respect_robots
+                )
+                
+            logger.info("UnifiedParser initialized with all components")
+            
+        except Exception as e:
+            logger.error(f"Error initializing components: {str(e)}")
+            logger.warning("UnifiedParser will operate in limited mode")
     
     def detect_site_type(self, url: str) -> Dict[str, Any]:
         """
-        Определяет тип сайта (обычный или SPA) в упрощенном виде.
+        Определяет тип сайта (обычный или SPA).
         
         Args:
             url: URL для проверки
@@ -119,18 +159,73 @@ class UnifiedParser(ParserInterface):
             
         logger.info(f"Detecting site type for {url}")
         
-        # Упрощенная версия для отладки
-        is_spa = False
-        
-        # Определяем по URL (это упрощение)
-        if any(s in url for s in ["reactjs", "angular", "vuejs", "spa", "app."]):
-            is_spa = True
+        try:
+            # Сначала пробуем обычный запрос
+            html_content, status_code, error = fetch_url(url)
             
-        return {
-            "is_spa": is_spa,
-            "confidence": 0.7,
-            "detection_method": "url_pattern"
-        }
+            if error or not html_content:
+                logger.warning(f"Could not fetch {url} with standard method: {error}")
+                
+                # Если обычный запрос не сработал, попробуем с JavaScript рендерингом
+                html_content, status_code, error = fetch_url_with_javascript_sync(
+                    url, 
+                    headless=self.spa_settings.get("headless", True),
+                    wait_for_idle=self.spa_settings.get("wait_for_idle", 2000),
+                    wait_for_timeout=self.spa_settings.get("wait_for_timeout", 10000)
+                )
+                
+                if error or not html_content:
+                    logger.error(f"Could not fetch {url} with any method: {error}")
+                    return {
+                        "is_spa": False,
+                        "confidence": 0.0,
+                        "error": str(error)
+                    }
+                    
+                # Если JavaScript рендеринг сработал, а обычный запрос нет, скорее всего это SPA
+                return {
+                    "is_spa": True,
+                    "confidence": 0.9,
+                    "detection_method": "request_comparison"
+                }
+                
+            # Анализируем HTML на признаки SPA
+            # Проверяем наличие признаков SPA
+            spa_indicators = [
+                'ng-app',
+                'ng-controller',
+                'data-reactroot',
+                'react-app',
+                'vue-app',
+                'nuxt',
+                'ember-app',
+                'backbone',
+                '<script src="[^"]*angular\.js"></script>',
+                '<script src="[^"]*react\.js"></script>',
+                '<script src="[^"]*vue\.js"></script>'
+            ]
+            
+            spa_score = 0
+            for indicator in spa_indicators:
+                if re.search(indicator, html_content, re.IGNORECASE):
+                    spa_score += 1
+                    
+            confidence = min(1.0, spa_score / (len(spa_indicators) / 2))
+            is_spa = confidence > 0.3
+            
+            return {
+                "is_spa": is_spa,
+                "confidence": confidence,
+                "detection_method": "html_analysis"
+            }
+            
+        except Exception as e:
+            logger.error(f"Error detecting site type for {url}: {str(e)}")
+            return {
+                "is_spa": False,
+                "confidence": 0.0,
+                "error": str(e)
+            }
     
     def parse_url(self, url: str, **options) -> Dict[str, Any]:
         """
@@ -161,18 +256,20 @@ class UnifiedParser(ParserInterface):
                 is_spa = False
                 site_type_info = {"is_spa": False, "detection_method": "predefined"}
                 
-            # Загружаем HTML-контент
+            # Извлечение контента и метаданных
             if is_spa:
-                logger.info(f"Loading {url} as SPA")
+                logger.info(f"Parsing {url} as SPA")
+                # Используем SPA подход
                 html_content, status_code, error = fetch_url_with_javascript_sync(
-                    url,
+                    url, 
                     headless=self.spa_settings.get("headless", True),
                     wait_for_idle=self.spa_settings.get("wait_for_idle", 2000),
                     wait_for_timeout=self.spa_settings.get("wait_for_timeout", 10000),
                     user_agent=self.user_agent
                 )
             else:
-                logger.info(f"Loading {url} as standard site")
+                logger.info(f"Parsing {url} as standard site")
+                # Используем стандартный подход
                 html_content, status_code, error = fetch_url(url)
                 
             if not html_content or status_code != 200:
@@ -191,6 +288,20 @@ class UnifiedParser(ParserInterface):
             
             # Добавляем информацию о типе сайта
             page_data.html_stats["site_type"] = site_type_info
+            
+            # Добавляем семантический анализ, если требуется
+            if self.extract_semantic and hasattr(self, 'semantic_analyzer'):
+                text = page_data.content.full_text
+                semantic_analysis = self.semantic_analyzer.analyze_text(text)
+                
+                # Добавляем результаты семантического анализа в performance
+                page_data.performance["semantic_analysis"] = {
+                    "semantic_density": semantic_analysis.get("semantic_density", 0),
+                    "semantic_coverage": semantic_analysis.get("semantic_coverage", 0),
+                    "topical_coherence": semantic_analysis.get("topical_coherence", 0),
+                    "contextual_relevance": semantic_analysis.get("contextual_relevance", 0),
+                    "keywords": semantic_analysis.get("keywords", {})
+                }
             
             # Рассчитываем время обработки
             processing_time = time.time() - start_time
@@ -233,6 +344,20 @@ class UnifiedParser(ParserInterface):
             # Создаем структурированный результат
             page_data = self._create_page_data(url, html, content_data, meta_data)
             
+            # Добавляем семантический анализ, если требуется
+            if self.extract_semantic and hasattr(self, 'semantic_analyzer'):
+                text = page_data.content.full_text
+                semantic_analysis = self.semantic_analyzer.analyze_text(text)
+                
+                # Добавляем результаты семантического анализа
+                page_data.performance["semantic_analysis"] = {
+                    "semantic_density": semantic_analysis.get("semantic_density", 0),
+                    "semantic_coverage": semantic_analysis.get("semantic_coverage", 0),
+                    "topical_coherence": semantic_analysis.get("topical_coherence", 0),
+                    "contextual_relevance": semantic_analysis.get("contextual_relevance", 0),
+                    "keywords": semantic_analysis.get("keywords", {})
+                }
+            
             # Рассчитываем время обработки
             processing_time = time.time() - start_time
             
@@ -268,6 +393,7 @@ class UnifiedParser(ParserInterface):
             delay = options.get("delay", self.delay)
             respect_robots = options.get("respect_robots", self.respect_robots)
             user_agent = options.get("user_agent", self.user_agent)
+            use_parallel = options.get("parallel_parsing", self.parallel_parsing)
             
             # Определяем тип сайта
             force_spa = options.get("force_spa", self.force_spa_mode)
@@ -283,15 +409,31 @@ class UnifiedParser(ParserInterface):
                 is_spa = False
                 site_type_info = {"is_spa": False, "detection_method": "predefined"}
                 
-            # Выбираем подходящий краулер (сейчас только WebCrawler)
-            crawler = WebCrawler(
-                base_url=base_url,
-                max_pages=max_pages,
-                delay=delay,
-                respect_robots=respect_robots,
-                user_agent=user_agent
-            )
-            
+            # Выбираем подходящий краулер
+            if is_spa:
+                logger.info(f"Crawling {base_url} as SPA")
+                crawler = EnhancedSPACrawler(
+                    base_url=base_url,
+                    max_pages=max_pages,
+                    delay=delay,
+                    respect_robots=respect_robots,
+                    user_agent=user_agent,
+                    headless=self.spa_settings.get("headless", True),
+                    wait_for_idle=self.spa_settings.get("wait_for_idle", 2000),
+                    wait_for_timeout=self.spa_settings.get("wait_for_timeout", 10000),
+                    browser_type=self.spa_settings.get("browser_type", "chromium")
+                )
+            else:
+                logger.info(f"Crawling {base_url} as standard site")
+                crawler = WebCrawler(
+                    base_url=base_url,
+                    max_pages=max_pages,
+                    delay=delay,
+                    respect_robots=respect_robots,
+                    user_agent=user_agent
+                )
+                
+            # Выполняем сканирование
             crawl_result = crawler.crawl()
                 
             # Создаем структуру данных сайта
@@ -307,63 +449,33 @@ class UnifiedParser(ParserInterface):
                 }
             )
             
-            # Парсим каждый URL
-            for url in crawl_result.get("crawled_urls", []):
-                try:
-                    # Используем имеющийся метод для парсинга URL
+            # Парсим каждый URL (последовательно или параллельно)
+            crawled_urls = crawl_result.get("crawled_urls", [])
+            
+            if use_parallel and hasattr(self, 'parallel_parser'):
+                logger.info(f"Using parallel parsing for {len(crawled_urls)} URLs")
+                
+                # Функция для парсинга одного URL
+                def _parse_single_url(url, **kwargs):
                     page_result = self.parse_url(url, force_spa=is_spa, auto_detect=False)
-                    
-                    # Если успешно, добавляем в результаты
-                    if page_result.get("success", False) and "page_data" in page_result:
-                        # Преобразуем из словаря в объект
-                        page_data_dict = page_result["page_data"]
-                        
-                        # Создаем и добавляем объект PageData
-                        content = TextContent(
-                            full_text=page_data_dict["content"]["full_text"],
-                            paragraphs=page_data_dict["content"].get("paragraphs", []),
-                            sentences=page_data_dict["content"].get("sentences", []),
-                            word_count=page_data_dict["content"].get("word_count", 0),
-                            char_count=page_data_dict["content"].get("char_count", 0),
-                            keywords=page_data_dict["content"].get("keywords", {}),
-                            language=page_data_dict["content"].get("language")
-                        )
-                        
-                        structure = PageStructure(
-                            title=page_data_dict["structure"]["title"],
-                            headings=page_data_dict["structure"].get("headings", {}),
-                            links=page_data_dict["structure"].get("links", {"internal": [], "external": []}),
-                            images=page_data_dict["structure"].get("images", []),
-                            tables=page_data_dict["structure"].get("tables", []),
-                            lists=page_data_dict["structure"].get("lists", [])
-                        )
-                        
-                        metadata = MetaData(
-                            title=page_data_dict["metadata"].get("title", ""),
-                            description=page_data_dict["metadata"].get("description", ""),
-                            keywords=page_data_dict["metadata"].get("keywords", ""),
-                            canonical=page_data_dict["metadata"].get("canonical"),
-                            robots=page_data_dict["metadata"].get("robots"),
-                            og_tags=page_data_dict["metadata"].get("og_tags", {}),
-                            twitter_tags=page_data_dict["metadata"].get("twitter_tags", {}),
-                            schema_org=page_data_dict["metadata"].get("schema_org", []),
-                            additional_meta=page_data_dict["metadata"].get("additional_meta", {})
-                        )
-                        
-                        page_data = PageData(
-                            url=page_data_dict["url"],
-                            content=content,
-                            structure=structure,
-                            metadata=metadata,
-                            html_stats=page_data_dict.get("html_stats", {}),
-                            performance=page_data_dict.get("performance", {})
-                        )
-                        
-                        site_data.pages[url] = page_data
-                        
-                except Exception as e:
-                    logger.error(f"Error parsing crawled URL {url}: {str(e)}")
-                    continue
+                    return url, page_result
+                
+                # Параллельный парсинг
+                parallel_results = self.parallel_parser.parse_urls(
+                    crawled_urls,
+                    _parse_single_url
+                )
+                
+                # Обработка результатов
+                for url, page_result in parallel_results.get("results", {}).items():
+                    self._add_page_to_site_data(site_data, url, page_result)
+            else:
+                logger.info(f"Using sequential parsing for {len(crawled_urls)} URLs")
+                
+                # Последовательный парсинг
+                for url in crawled_urls:
+                    page_result = self.parse_url(url, force_spa=is_spa, auto_detect=False)
+                    self._add_page_to_site_data(site_data, url, page_result)
                     
             # Добавляем статистику и структуру сайта
             site_data.statistics = self._calculate_site_statistics(site_data.pages)
@@ -404,42 +516,40 @@ class UnifiedParser(ParserInterface):
             results_count = options.get("results_count", 10)
             analyze_content = options.get("analyze_content", True)
             
-            # Упрощенная имитация результатов поиска
-            search_results = []
-            related_queries = []
-            
-            # Генерируем имитацию результатов поиска
-            for i in range(1, min(11, results_count + 1)):
-                result = {
-                    "position": i,
-                    "title": f"Sample Result {i} for {query}",
-                    "url": f"http://example.com/result{i}",
-                    "snippet": f"Sample snippet containing the query '{query}' and other information for result {i}."
+            # Используем поисковый API, если доступен
+            if hasattr(self, 'search_api'):
+                logger.info(f"Using search API for query: {query}")
+                # Дополнительные параметры для поиска
+                search_params = {
+                    "country": options.get("country", "us"),
+                    "language": options.get("language", "en"),
+                    "results_count": results_count
                 }
-                search_results.append(result)
                 
-            # Генерируем имитацию связанных запросов
-            related_terms = ["guide", "tutorial", "examples", "best", "review", "vs", "alternative"]
-            for term in related_terms[:5]:
-                related_queries.append(f"{query} {term}")
+                # Получаем результаты через API
+                api_results = self.search_api.search(query, **search_params)
                 
-            # Создаем структуру данных поиска
-            search_data = SearchResultData(
-                query=query,
-                results=search_results,
-                related_queries=related_queries,
-                search_features={},
-                search_engine=search_engine,
-                timestamp=datetime.now()
-            )
+                # Формируем структуру поисковых данных
+                search_data = SearchResultData(
+                    query=query,
+                    results=api_results.get("results", []),
+                    related_queries=api_results.get("related_queries", []),
+                    search_features=api_results.get("search_features", {}),
+                    search_engine=search_engine,
+                    timestamp=datetime.now()
+                )
+            else:
+                # Используем базовую имитацию поисковых результатов
+                logger.info(f"Using simulated search results for: {query}")
+                search_data = self._generate_simulated_search_results(query, results_count)
             
             # Если нужно анализировать контент результатов
             if analyze_content:
                 # Ограничиваем количество результатов для анализа
-                analysis_limit = min(3, len(search_results))
+                analysis_limit = min(3, len(search_data.results))
                 
                 for i in range(analysis_limit):
-                    result = search_results[i]
+                    result = search_data.results[i]
                     url = result.get("url")
                     
                     if url:
@@ -449,7 +559,7 @@ class UnifiedParser(ParserInterface):
                             
                             # Добавляем подробную информацию к результату
                             if page_result.get("success", False) and "page_data" in page_result:
-                                search_results[i]["detailed_analysis"] = page_result["page_data"]
+                                search_data.results[i]["detailed_analysis"] = page_result["page_data"]
                                 
                         except Exception as e:
                             logger.error(f"Error analyzing search result {url}: {str(e)}")
@@ -489,34 +599,37 @@ class UnifiedParser(ParserInterface):
         
         # Разбиваем текст на предложения, если их нет
         sentences = content_data.get("content", {}).get("sentences", [])
+        if not sentences and full_text:
+            sentences = re.split(r'[.!?]+', full_text)
+            sentences = [s.strip() for s in sentences if s.strip()]
         
         # Подсчитываем слова и символы
         word_count = content_data.get("content", {}).get("word_count", 0)
+        if not word_count and full_text:
+            word_count = len(full_text.split())
+            
         char_count = content_data.get("content", {}).get("char_count", 0)
+        if not char_count and full_text:
+            char_count = len(full_text)
         
         # Извлекаем ключевые слова
         keywords = {}
-        if self.extract_semantic and full_text:
+        if self.extract_semantic and hasattr(self, 'text_processor'):
             try:
-                # В реальном использовании мы бы применили текстовый процессор
-                # Но для отладки используем упрощенный подход
-                words = full_text.lower().split()
-                word_freq = {}
-                for word in words:
-                    word = re.sub(r'[^\w\s]', '', word)
-                    if word and len(word) > 3:
-                        word_freq[word] = word_freq.get(word, 0) + 1
-                
-                # Берем топ-10 слов
-                sorted_words = sorted(word_freq.items(), key=lambda x: x[1], reverse=True)
-                for word, freq in sorted_words[:10]:
-                    keywords[word] = freq / max(word_freq.values())
-                
+                # Используем текстовый процессор для извлечения ключевых слов
+                processed_data = self.text_processor.process_html_content(html_content)
+                keywords = processed_data.get("keywords", {})
             except Exception as e:
                 logger.warning(f"Error extracting keywords: {str(e)}")
         
         # Определяем язык
-        language = "en"  # Упрощение для отладки
+        language = None
+        if full_text and hasattr(self, 'text_processor'):
+            try:
+                self.text_processor.detect_language(full_text)
+                language = self.text_processor.language
+            except Exception as e:
+                logger.warning(f"Error detecting language: {str(e)}")
         
         # Создаем объект TextContent
         text_content = TextContent(
@@ -533,14 +646,29 @@ class UnifiedParser(ParserInterface):
         title = content_data.get("title", "")
         headings = content_data.get("headings", {})
         
-        # Получаем ссылки и изображения
-        links = meta_data.get("links", {"internal": [], "external": []})
-        images = meta_data.get("images", [])
+        # Приведение headings к нужному формату
+        formatted_headings = {f"h{i}": [] for i in range(1, 7)}
+        for level, texts in headings.items():
+            if level.lower().startswith('h') and level[1:].isdigit():
+                formatted_headings[level.lower()] = texts
+        
+        # Извлечение ссылок
+        links = meta_data.get("links", {})
+        
+        # Извлечение изображений
+        images = []
+        for img in meta_data.get("images", []):
+            images.append({
+                "src": img.get("src", ""),
+                "alt": img.get("alt", ""),
+                "width": img.get("width", ""),
+                "height": img.get("height", "")
+            })
         
         # Создаем объект PageStructure
         page_structure = PageStructure(
             title=title,
-            headings=headings,
+            headings=formatted_headings,
             links=links,
             images=images,
             tables=[],  # Пока оставляем пустыми
@@ -552,8 +680,8 @@ class UnifiedParser(ParserInterface):
             title=meta_data.get("meta_tags", {}).get("title", ""),
             description=meta_data.get("meta_tags", {}).get("description", ""),
             keywords=meta_data.get("meta_tags", {}).get("keywords", ""),
-            canonical=meta_data.get("meta_tags", {}).get("canonical"),
-            robots=meta_data.get("meta_tags", {}).get("robots"),
+            canonical=meta_data.get("meta_tags", {}).get("canonical", None),
+            robots=meta_data.get("meta_tags", {}).get("robots", None),
             og_tags=meta_data.get("meta_tags", {}).get("og", {}),
             twitter_tags=meta_data.get("meta_tags", {}).get("twitter", {}),
             schema_org=meta_data.get("schema_org", []),
@@ -564,31 +692,19 @@ class UnifiedParser(ParserInterface):
         html_stats = {
             "html_size": len(html_content) if html_content else 0,
             "text_ratio": char_count / len(html_content) if html_content and len(html_content) > 0 else 0,
-            "headings_count": sum(len(texts) for texts in headings.values()),
+            "headings_count": sum(len(texts) for texts in formatted_headings.values()),
             "links_count": len(links.get("internal", [])) + len(links.get("external", [])),
             "images_count": len(images)
         }
         
         # Добавляем метрики читаемости, если нужно
         performance = {}
-        if self.extract_readability and full_text:
+        if self.extract_readability and hasattr(self, 'text_processor'):
             try:
-                # Упрощенная оценка читаемости
-                words = full_text.split()
-                sentences = content_data.get("content", {}).get("sentences", [])
-                
-                if sentences and words:
-                    avg_sentence_length = len(words) / len(sentences)
-                    avg_word_length = sum(len(word) for word in words) / len(words)
-                    
-                    # Очень упрощенный расчет легкости чтения
-                    readability = max(0, min(1, 1 - (avg_sentence_length / 30) - (avg_word_length / 10)))
-                    
-                    performance["readability"] = {
-                        "score": readability,
-                        "avg_sentence_length": avg_sentence_length,
-                        "avg_word_length": avg_word_length
-                    }
+                # Используем текстовый процессор для расчета читаемости
+                processed_data = self.text_processor.process_html_content(html_content)
+                readability = processed_data.get("readability", {})
+                performance["readability"] = readability
             except Exception as e:
                 logger.warning(f"Error calculating readability: {str(e)}")
         
@@ -603,6 +719,64 @@ class UnifiedParser(ParserInterface):
         )
         
         return page_data
+    
+    def _add_page_to_site_data(self, site_data: SiteData, url: str, page_result: Dict[str, Any]) -> None:
+        """
+        Добавляет данные страницы в данные сайта.
+        
+        Args:
+            site_data: Данные сайта
+            url: URL страницы
+            page_result: Результат парсинга страницы
+        """
+        if not page_result.get("success", False) or "page_data" not in page_result:
+            return
+            
+        # Преобразуем из словаря в объект
+        page_data_dict = page_result["page_data"]
+        
+        # Создаем и добавляем объект PageData
+        content = TextContent(
+            full_text=page_data_dict["content"]["full_text"],
+            paragraphs=page_data_dict["content"].get("paragraphs", []),
+            sentences=page_data_dict["content"].get("sentences", []),
+            word_count=page_data_dict["content"].get("word_count", 0),
+            char_count=page_data_dict["content"].get("char_count", 0),
+            keywords=page_data_dict["content"].get("keywords", {}),
+            language=page_data_dict["content"].get("language")
+        )
+        
+        structure = PageStructure(
+            title=page_data_dict["structure"]["title"],
+            headings=page_data_dict["structure"].get("headings", {}),
+            links=page_data_dict["structure"].get("links", {"internal": [], "external": []}),
+            images=page_data_dict["structure"].get("images", []),
+            tables=page_data_dict["structure"].get("tables", []),
+            lists=page_data_dict["structure"].get("lists", [])
+        )
+        
+        metadata = MetaData(
+            title=page_data_dict["metadata"].get("title", ""),
+            description=page_data_dict["metadata"].get("description", ""),
+            keywords=page_data_dict["metadata"].get("keywords", ""),
+            canonical=page_data_dict["metadata"].get("canonical"),
+            robots=page_data_dict["metadata"].get("robots"),
+            og_tags=page_data_dict["metadata"].get("og_tags", {}),
+            twitter_tags=page_data_dict["metadata"].get("twitter_tags", {}),
+            schema_org=page_data_dict["metadata"].get("schema_org", []),
+            additional_meta=page_data_dict["metadata"].get("additional_meta", {})
+        )
+        
+        page_data = PageData(
+            url=page_data_dict["url"],
+            content=content,
+            structure=structure,
+            metadata=metadata,
+            html_stats=page_data_dict.get("html_stats", {}),
+            performance=page_data_dict.get("performance", {})
+        )
+        
+        site_data.pages[url] = page_data
     
     def _calculate_site_statistics(self, pages: Dict[str, PageData]) -> Dict[str, Any]:
         """
@@ -630,7 +804,7 @@ class UnifiedParser(ParserInterface):
         
         for page in pages.values():
             for level, texts in page.structure.headings.items():
-                if level in headings_stats:
+                if level.startswith('h') and level[1:].isdigit():
                     headings_stats[level + "_count"] = headings_stats.get(level + "_count", 0) + len(texts)
                     headings_stats["total_headings"] += len(texts)
         
@@ -768,3 +942,45 @@ class UnifiedParser(ParserInterface):
                 current = child
         
         return root
+    
+    def _generate_simulated_search_results(self, query: str, results_count: int) -> SearchResultData:
+        """
+        Генерирует имитацию результатов поиска.
+        
+        Args:
+            query: Поисковый запрос
+            results_count: Количество результатов
+            
+        Returns:
+            SearchResultData: Имитация результатов поиска
+        """
+        results = []
+        
+        # Создаем заглушку результатов
+        for i in range(min(10, results_count)):
+            results.append({
+                "position": i + 1,
+                "title": f"Sample Result {i+1} for {query}",
+                "url": f"http://example.com/result{i+1}",
+                "snippet": f"Sample snippet containing the query '{query}' and other information for result {i+1}.",
+                "displayed_url": f"example.com/result{i+1}",
+                "timestamp": time.time()
+            })
+            
+        # Связанные запросы
+        related_terms = ["guide", "tutorial", "example", "best", "review", "vs", "alternative"]
+        related_queries = [f"{query} {term}" for term in related_terms[:min(7, len(related_terms))]]
+        
+        return SearchResultData(
+            query=query,
+            results=results,
+            related_queries=related_queries,
+            search_features={
+                "knowledge_panel": False,
+                "top_stories": False,
+                "local_pack": False,
+                "ads": False
+            },
+            search_engine="simulated",
+            timestamp=datetime.now()
+        )
