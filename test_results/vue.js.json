@@ -1,0 +1,605 @@
+{
+  "base_url": "https://vuejs.org/guide/introduction.html",
+  "crawled_urls": [
+    "https://vuejs.org/guide/introduction.html"
+  ],
+  "found_urls": [
+    "https://vuejs.org/guide/scaling-up/tooling",
+    "https://vuejs.org/guide/essentials/template-syntax",
+    "https://vuejs.org/sponsor/",
+    "https://vuejs.org/about/privacy",
+    "https://vuejs.org/developers/",
+    "https://vuejs.org/guide/scaling-up/state-management",
+    "https://vuejs.org/guide/best-practices/accessibility",
+    "https://vuejs.org/guide/best-practices/security",
+    "https://vuejs.org/about/community-guide",
+    "https://vuejs.org/guide/reusability/composables",
+    "https://vuejs.org/guide/typescript/overview",
+    "https://vuejs.org/ecosystem/themes",
+    "https://vuejs.org/guide/typescript/options-api",
+    "https://vuejs.org/about/faq",
+    "https://vuejs.org/guide/extras/render-function",
+    "https://vuejs.org/guide/introduction",
+    "https://vuejs.org/guide/built-ins/keep-alive",
+    "https://vuejs.org/guide/scaling-up/ssr",
+    "https://vuejs.org/guide/essentials/lifecycle",
+    "https://vuejs.org/guide/built-ins/transition-group",
+    "https://vuejs.org/api/",
+    "https://vuejs.org/guide/extras/web-components",
+    "https://vuejs.org/guide/essentials/component-basics",
+    "https://vuejs.org/guide/components/events",
+    "https://vuejs.org/examples/",
+    "https://vuejs.org/guide/built-ins/transition",
+    "https://vuejs.org/guide/typescript/composition-api",
+    "https://vuejs.org/guide/extras/ways-of-using-vue",
+    "https://vuejs.org/guide/components/props",
+    "https://vuejs.org/about/coc",
+    "https://vuejs.org/guide/scaling-up/routing",
+    "https://vuejs.org/guide/extras/rendering-mechanism",
+    "https://vuejs.org/guide/essentials/template-refs",
+    "https://vuejs.org/guide/quick-start",
+    "https://vuejs.org/guide/essentials/list",
+    "https://vuejs.org/glossary/",
+    "https://vuejs.org/guide/essentials/watchers",
+    "https://vuejs.org/",
+    "https://vuejs.org/about/releases",
+    "https://vuejs.org/guide/reusability/plugins",
+    "https://vuejs.org/partners/",
+    "https://vuejs.org/guide/built-ins/suspense",
+    "https://vuejs.org/guide/components/v-model",
+    "https://vuejs.org/tutorial/",
+    "https://vuejs.org/error-reference/",
+    "https://vuejs.org/guide/scaling-up/testing",
+    "https://vuejs.org/guide/essentials/application",
+    "https://vuejs.org/guide/essentials/event-handling",
+    "https://vuejs.org/guide/components/attrs",
+    "https://vuejs.org/about/team",
+    "https://vuejs.org/guide/components/async",
+    "https://vuejs.org/guide/built-ins/teleport",
+    "https://vuejs.org/guide/essentials/conditional",
+    "https://vuejs.org/guide/reusability/custom-directives",
+    "https://vuejs.org/guide/essentials/forms",
+    "https://vuejs.org/guide/best-practices/performance",
+    "https://vuejs.org/guide/essentials/reactivity-fundamentals",
+    "https://vuejs.org/guide/introduction.html",
+    "https://vuejs.org/guide/components/registration",
+    "https://vuejs.org/api/sfc-script-setup",
+    "https://vuejs.org/guide/essentials/class-and-style",
+    "https://vuejs.org/guide/extras/composition-api-faq",
+    "https://vuejs.org/ecosystem/newsletters",
+    "https://vuejs.org/guide/components/provide-inject",
+    "https://vuejs.org/guide/best-practices/production-deployment",
+    "https://vuejs.org/guide/scaling-up/sfc",
+    "https://vuejs.org/guide/extras/animation",
+    "https://vuejs.org/guide/components/slots",
+    "https://vuejs.org/guide/essentials/computed",
+    "https://vuejs.org/guide/extras/reactivity-in-depth"
+  ],
+  "failed_urls": [],
+  "intercepted_requests": {
+    "https://vuejs.org/guide/introduction.html": {
+      "method": "GET",
+      "url": "https://vuejs.org/guide/introduction.html",
+      "resource_type": "document",
+      "timestamp": 1744975336.5026646
+    },
+    "https://vuejs.org/assets/style.CgLa2KzM.css": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/style.CgLa2KzM.css",
+      "resource_type": "stylesheet",
+      "timestamp": 1744975336.7439957
+    },
+    "https://vuejs.org/vp-icons.css": {
+      "method": "GET",
+      "url": "https://vuejs.org/vp-icons.css",
+      "resource_type": "stylesheet",
+      "timestamp": 1744975336.7441485
+    },
+    "https://vuejs.org/assets/app.DvcY278P.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/app.DvcY278P.js",
+      "resource_type": "script",
+      "timestamp": 1744975336.7442913
+    },
+    "https://vuejs.org/assets/chunks/theme.DO_CQYZ3.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/chunks/theme.DO_CQYZ3.js",
+      "resource_type": "script",
+      "timestamp": 1744975336.7698202
+    },
+    "https://vuejs.org/assets/chunks/framework.DBIhuyHZ.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/chunks/framework.DBIhuyHZ.js",
+      "resource_type": "script",
+      "timestamp": 1744975336.770172
+    },
+    "https://vuejs.org/assets/guide_introduction.md.Cv66oPlq.lean.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/guide_introduction.md.Cv66oPlq.lean.js",
+      "resource_type": "script",
+      "timestamp": 1744975336.7712255
+    },
+    "https://vuejs.org/assets/inter-roman-latin.Di8DUHzh.woff2": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/inter-roman-latin.Di8DUHzh.woff2",
+      "resource_type": "font",
+      "timestamp": 1744975336.7716603
+    },
+    "https://storage.googleapis.com/vue-mastery.appspot.com/flamelink/media/vue-mastery-logo.png": {
+      "method": "GET",
+      "url": "https://storage.googleapis.com/vue-mastery.appspot.com/flamelink/media/vue-mastery-logo.png",
+      "resource_type": "image",
+      "timestamp": 1744975336.7727013
+    },
+    "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap": {
+      "method": "GET",
+      "url": "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
+      "resource_type": "stylesheet",
+      "timestamp": 1744975336.7728877
+    },
+    "https://cdn.usefathom.com/script.js": {
+      "method": "GET",
+      "url": "https://cdn.usefathom.com/script.js",
+      "resource_type": "script",
+      "timestamp": 1744975336.8590193
+    },
+    "https://vueschool.io/banner.js?affiliate=vuejs&type=top": {
+      "method": "GET",
+      "url": "https://vueschool.io/banner.js?affiliate=vuejs&type=top",
+      "resource_type": "script",
+      "timestamp": 1744975336.8857048
+    },
+    "https://storage.googleapis.com/vue-mastery.appspot.com/flamelink/media/vuemastery-graphical-link-96x56.png": {
+      "method": "GET",
+      "url": "https://storage.googleapis.com/vue-mastery.appspot.com/flamelink/media/vuemastery-graphical-link-96x56.png",
+      "resource_type": "image",
+      "timestamp": 1744975336.8857596
+    },
+    "https://vuejs.org/rom3.min.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/rom3.min.js",
+      "resource_type": "script",
+      "timestamp": 1744975336.8859165
+    },
+    "https://vuejs.org/assets/inter-roman-cyrillic.C5lxZ8CY.woff2": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/inter-roman-cyrillic.C5lxZ8CY.woff2",
+      "resource_type": "font",
+      "timestamp": 1744975336.9878597
+    },
+    "https://vuejs.org/assets/inter-roman-latin-ext.4ZJIpNVo.woff2": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/inter-roman-latin-ext.4ZJIpNVo.woff2",
+      "resource_type": "font",
+      "timestamp": 1744975336.987902
+    },
+    "https://fonts.gstatic.com/s/inter/v18/UcCo3FwrK3iLTcvsYwYL8g.woff2": {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/inter/v18/UcCo3FwrK3iLTcvsYwYL8g.woff2",
+      "resource_type": "font",
+      "timestamp": 1744975337.126957
+    },
+    "https://cdn.usefathom.com/?h=https%3A%2F%2Fvuejs.org&p=%2Fguide%2Fintroduction.html&r=&sid=XNOLWPLB&qs=%7B%7D&cid=23724696": {
+      "method": "GET",
+      "url": "https://cdn.usefathom.com/?h=https%3A%2F%2Fvuejs.org&p=%2Fguide%2Fintroduction.html&r=&sid=XNOLWPLB&qs=%7B%7D&cid=23724696",
+      "resource_type": "image",
+      "timestamp": 1744975337.4444466
+    },
+    "https://automation.vuejs.org/data.json": {
+      "method": "GET",
+      "url": "https://automation.vuejs.org/data.json",
+      "resource_type": "fetch",
+      "timestamp": 1744975337.566895
+    },
+    "https://cdn.carbonads.com/carbon.js?serve=CEBDT27Y&placement=vuejsorg": {
+      "method": "GET",
+      "url": "https://cdn.carbonads.com/carbon.js?serve=CEBDT27Y&placement=vuejsorg",
+      "resource_type": "script",
+      "timestamp": 1744975337.5814266
+    },
+    "https://automation.vuejs.org/images/monterail.svg": {
+      "method": "GET",
+      "url": "https://automation.vuejs.org/images/monterail.svg",
+      "resource_type": "image",
+      "timestamp": 1744975337.7884057
+    },
+    "https://automation.vuejs.org/images/bit.svg?v2": {
+      "method": "GET",
+      "url": "https://automation.vuejs.org/images/bit.svg?v2",
+      "resource_type": "image",
+      "timestamp": 1744975337.8960288
+    },
+    "https://automation.vuejs.org/images/vuemastery.avif": {
+      "method": "GET",
+      "url": "https://automation.vuejs.org/images/vuemastery.avif",
+      "resource_type": "image",
+      "timestamp": 1744975337.8961864
+    },
+    "https://automation.vuejs.org/images/vueschool.avif": {
+      "method": "GET",
+      "url": "https://automation.vuejs.org/images/vueschool.avif",
+      "resource_type": "image",
+      "timestamp": 1744975337.896287
+    },
+    "https://automation.vuejs.org/images/vehikl.avif": {
+      "method": "GET",
+      "url": "https://automation.vuejs.org/images/vehikl.avif",
+      "resource_type": "image",
+      "timestamp": 1744975337.8966687
+    },
+    "https://automation.vuejs.org/images/vue_js_amsterdam.avif": {
+      "method": "GET",
+      "url": "https://automation.vuejs.org/images/vue_js_amsterdam.avif",
+      "resource_type": "image",
+      "timestamp": 1744975337.915124
+    },
+    "https://automation.vuejs.org/images/storyblok.avif": {
+      "method": "GET",
+      "url": "https://automation.vuejs.org/images/storyblok.avif",
+      "resource_type": "image",
+      "timestamp": 1744975337.9161484
+    },
+    "https://automation.vuejs.org/images/chrome_frameworks_fund.avif": {
+      "method": "GET",
+      "url": "https://automation.vuejs.org/images/chrome_frameworks_fund.avif",
+      "resource_type": "image",
+      "timestamp": 1744975337.916358
+    },
+    "https://automation.vuejs.org/images/herodevs.avif": {
+      "method": "GET",
+      "url": "https://automation.vuejs.org/images/herodevs.avif",
+      "resource_type": "image",
+      "timestamp": 1744975337.918648
+    },
+    "https://automation.vuejs.org/images/javascript_certification.png?v2": {
+      "method": "GET",
+      "url": "https://automation.vuejs.org/images/javascript_certification.png?v2",
+      "resource_type": "image",
+      "timestamp": 1744975337.9187655
+    },
+    "https://srv.carbonads.net/ads/CEBDT27Y.json?segment=placement:vuejsorg": {
+      "method": "GET",
+      "url": "https://srv.carbonads.net/ads/CEBDT27Y.json?segment=placement:vuejsorg",
+      "resource_type": "fetch",
+      "timestamp": 1744975337.9227169
+    },
+    "https://vuejs.org/assets/index.md.Cyr_XE5T.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/index.md.Cyr_XE5T.js",
+      "resource_type": "other",
+      "timestamp": 1744975337.980165
+    },
+    "https://vuejs.org/assets/guide_introduction.md.Cv66oPlq.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/guide_introduction.md.Cv66oPlq.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.4908938
+    },
+    "https://vuejs.org/assets/tutorial_index.md.ClQWn5_y.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/tutorial_index.md.ClQWn5_y.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.4910576
+    },
+    "https://vuejs.org/assets/examples_index.md.YDbBstY2.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/examples_index.md.YDbBstY2.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.4911706
+    },
+    "https://vuejs.org/assets/guide_quick-start.md.BnDFX4ac.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/guide_quick-start.md.BnDFX4ac.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.4920757
+    },
+    "https://vuejs.org/assets/glossary_index.md.D_1e2Ip_.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/glossary_index.md.D_1e2Ip_.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.4922993
+    },
+    "https://vuejs.org/assets/error-reference_index.md.QZwppyaa.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/error-reference_index.md.QZwppyaa.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.4924347
+    },
+    "https://vuejs.org/assets/api_index.md.Wn6LuegE.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/api_index.md.Wn6LuegE.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.4925683
+    },
+    "https://vuejs.org/assets/partners_index.md.4C_EcGqU.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/partners_index.md.4C_EcGqU.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.4931772
+    },
+    "https://vuejs.org/assets/developers_index.md.BxpvsRY5.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/developers_index.md.BxpvsRY5.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.4932787
+    },
+    "https://vuejs.org/assets/ecosystem_themes.md.DInLqEU9.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/ecosystem_themes.md.DInLqEU9.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.4990606
+    },
+    "https://vuejs.org/assets/guide_scaling-up_tooling.md.NnDYj15G.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/guide_scaling-up_tooling.md.NnDYj15G.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.5059302
+    },
+    "https://vuejs.org/assets/about_faq.md.DIKdsVps.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/about_faq.md.DIKdsVps.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.5070453
+    },
+    "https://vuejs.org/assets/about_team.md.B13Q89Um.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/about_team.md.B13Q89Um.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.5074565
+    },
+    "https://vuejs.org/assets/about_releases.md.B-DRbFBy.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/about_releases.md.B-DRbFBy.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.50812
+    },
+    "https://vuejs.org/assets/about_community-guide.md.DTu_ijN8.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/about_community-guide.md.DTu_ijN8.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.508249
+    },
+    "https://vuejs.org/assets/about_coc.md.Cwgs8T6y.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/about_coc.md.Cwgs8T6y.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.5083551
+    },
+    "https://vuejs.org/assets/about_privacy.md.Bcd7x7zH.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/about_privacy.md.Bcd7x7zH.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.526104
+    },
+    "https://vuejs.org/assets/sponsor_index.md.DLCfNG67.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/sponsor_index.md.DLCfNG67.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.5262933
+    },
+    "https://vuejs.org/assets/guide_essentials_application.md.DRQQS7CM.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/guide_essentials_application.md.DRQQS7CM.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.526406
+    },
+    "https://vuejs.org/assets/guide_essentials_template-syntax.md.CtwCeshm.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/guide_essentials_template-syntax.md.CtwCeshm.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.5281763
+    },
+    "https://vuejs.org/assets/guide_essentials_reactivity-fundamentals.md.D_mKjKE-.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/guide_essentials_reactivity-fundamentals.md.D_mKjKE-.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.5283017
+    },
+    "https://vuejs.org/assets/guide_essentials_computed.md.DzH2EEMd.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/guide_essentials_computed.md.DzH2EEMd.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.5283997
+    },
+    "https://vuejs.org/assets/guide_essentials_class-and-style.md.CAOF833S.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/guide_essentials_class-and-style.md.CAOF833S.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.5371616
+    },
+    "https://vuejs.org/assets/guide_essentials_conditional.md.BVuEDCeD.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/guide_essentials_conditional.md.BVuEDCeD.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.5373735
+    },
+    "https://vuejs.org/assets/guide_essentials_list.md.BG4_AsWs.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/guide_essentials_list.md.BG4_AsWs.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.5374975
+    },
+    "https://vuejs.org/assets/guide_essentials_event-handling.md.Q0r5xcRc.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/guide_essentials_event-handling.md.Q0r5xcRc.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.5385098
+    },
+    "https://vuejs.org/assets/guide_essentials_forms.md.C_ka5iCe.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/guide_essentials_forms.md.C_ka5iCe.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.5386758
+    },
+    "https://vuejs.org/assets/guide_essentials_watchers.md.BYUWrGWc.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/guide_essentials_watchers.md.BYUWrGWc.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.538765
+    },
+    "https://vuejs.org/assets/guide_essentials_template-refs.md.CMNq2xdY.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/guide_essentials_template-refs.md.CMNq2xdY.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.5391095
+    },
+    "https://vuejs.org/assets/guide_essentials_component-basics.md.DxVz3-Ds.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/guide_essentials_component-basics.md.DxVz3-Ds.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.5395305
+    },
+    "https://vuejs.org/assets/guide_essentials_lifecycle.md.BrwNPrPS.js": {
+      "method": "GET",
+      "url": "https://vuejs.org/assets/guide_essentials_lifecycle.md.BrwNPrPS.js",
+      "resource_type": "other",
+      "timestamp": 1744975338.5404575
+    },
+    "https://srv.carbonads.net/static/30242/75dd292262b51c4fedced0ce4e76293bf16c44b5": {
+      "method": "GET",
+      "url": "https://srv.carbonads.net/static/30242/75dd292262b51c4fedced0ce4e76293bf16c44b5",
+      "resource_type": "image",
+      "timestamp": 1744975338.540584
+    },
+    "https://0w2ryziguf8cq3g6.test.resolver.perfops.net/": {
+      "method": "GET",
+      "url": "https://0w2ryziguf8cq3g6.test.resolver.perfops.net/",
+      "resource_type": "xhr",
+      "timestamp": 1744975340.9050257
+    },
+    "https://wkxopu2iiy3vp3p4.test.resolver.perfops.net/": {
+      "method": "GET",
+      "url": "https://wkxopu2iiy3vp3p4.test.resolver.perfops.net/",
+      "resource_type": "xhr",
+      "timestamp": 1744975340.9052367
+    },
+    "https://o020cww9m0h5c33y.test.resolver.perfops.net/": {
+      "method": "GET",
+      "url": "https://o020cww9m0h5c33y.test.resolver.perfops.net/",
+      "resource_type": "xhr",
+      "timestamp": 1744975340.9060082
+    },
+    "https://rum-cdn.perfops.net/providers": {
+      "method": "GET",
+      "url": "https://rum-cdn.perfops.net/providers",
+      "resource_type": "xhr",
+      "timestamp": 1744975341.002667
+    },
+    "https://perfopsrum-eip.akamaized.net/500b-bench.jpg?t=1744975341086": {
+      "method": "GET",
+      "url": "https://perfopsrum-eip.akamaized.net/500b-bench.jpg?t=1744975341086",
+      "resource_type": "xhr",
+      "timestamp": 1744975341.0919895
+    },
+    "https://ovh-cdn.perfops.io/500b-bench.jpg?t=1744975341176": {
+      "method": "GET",
+      "url": "https://ovh-cdn.perfops.io/500b-bench.jpg?t=1744975341176",
+      "resource_type": "xhr",
+      "timestamp": 1744975341.1860356
+    },
+    "https://cdn.jsdelivr.net/gh/jimaek/js-test@1.1/500b-bench.jpg?t=1744975341251": {
+      "method": "GET",
+      "url": "https://cdn.jsdelivr.net/gh/jimaek/js-test@1.1/500b-bench.jpg?t=1744975341251",
+      "resource_type": "xhr",
+      "timestamp": 1744975341.257077
+    },
+    "https://perfops.byte-test.com/500b-bench.jpg?t=1744975341288": {
+      "method": "GET",
+      "url": "https://perfops.byte-test.com/500b-bench.jpg?t=1744975341288",
+      "resource_type": "xhr",
+      "timestamp": 1744975341.2951252
+    },
+    "https://cpt96125.shopvoxpopulus.com/pics/500b-bench.jpg?t=1744975341575": {
+      "method": "GET",
+      "url": "https://cpt96125.shopvoxpopulus.com/pics/500b-bench.jpg?t=1744975341575",
+      "resource_type": "xhr",
+      "timestamp": 1744975341.581965
+    },
+    "https://test-perfops.idevops.suijinetworks.com/500b-bench.jpg?t=1744975341619": {
+      "method": "GET",
+      "url": "https://test-perfops.idevops.suijinetworks.com/500b-bench.jpg?t=1744975341619",
+      "resource_type": "xhr",
+      "timestamp": 1744975341.6259108
+    },
+    "https://test-perfops.wedos.delivery/500b-bench.jpg?t=1744975341811": {
+      "method": "GET",
+      "url": "https://test-perfops.wedos.delivery/500b-bench.jpg?t=1744975341811",
+      "resource_type": "xhr",
+      "timestamp": 1744975341.818648
+    },
+    "https://perfops.cloudflareperf.com/500b-cf-bench.jpg?t=1744975341912": {
+      "method": "GET",
+      "url": "https://perfops.cloudflareperf.com/500b-cf-bench.jpg?t=1744975341912",
+      "resource_type": "xhr",
+      "timestamp": 1744975341.9212203
+    },
+    "https://perf.qinglanbaseunicast.com/500b-bench.jpg?t=1744975341972": {
+      "method": "GET",
+      "url": "https://perf.qinglanbaseunicast.com/500b-bench.jpg?t=1744975341972",
+      "resource_type": "xhr",
+      "timestamp": 1744975341.9788237
+    }
+  },
+  "max_pages": 1,
+  "max_depth": 0,
+  "duration": 6.916065216064453,
+  "timestamp": 1744975342.4050035,
+  "websocket": {
+    "statistics": {
+      "total_messages": 0,
+      "incoming_messages": 0,
+      "outgoing_messages": 0,
+      "endpoint_count": 0,
+      "patterns_count": 0,
+      "protocol_stats": {},
+      "message_type_stats": {}
+    },
+    "connections": [],
+    "extracted_data": {}
+  },
+  "graphql": {
+    "statistics": {
+      "total_operations": 0,
+      "total_responses": 0,
+      "endpoint_count": 0,
+      "operation_types": [],
+      "operation_names": [],
+      "detected_clients": [],
+      "operations_by_type": {},
+      "operations_by_client": {},
+      "successful_responses": 0,
+      "error_responses": 0,
+      "schema_info": {
+        "fragments_count": 0,
+        "types_count": 0,
+        "root_fields_count": 0
+      }
+    },
+    "extracted_data": []
+  },
+  "routing": {
+    "statistics": {
+      "total_changes": 1,
+      "unique_routes": 1,
+      "route_patterns": 0,
+      "framework": null
+    },
+    "history": [
+      {
+        "from_url": "about:blank",
+        "to_url": "https://vuejs.org/guide/introduction.html",
+        "state_object": {},
+        "timestamp": 1744975336.4800737,
+        "datetime": "2025-04-18T11:22:16.480076",
+        "path": ""
+      }
+    ],
+    "unique_routes": [
+      {
+        "url": "https://vuejs.org/guide/introduction.html",
+        "path": "",
+        "route_info": null
+      }
+    ]
+  }
+}

@@ -1,0 +1,897 @@
+{
+  "base_url": "https://github.com/explore",
+  "crawled_urls": [
+    "https://github.com/explore"
+  ],
+  "found_urls": [
+    "https://github.com/jlowin",
+    "https://github.com/browserbase/stagehand/issues",
+    "https://github.com/topics/lnmp",
+    "https://github.com/topics/knowledge-graph",
+    "https://github.com/topics/cockpit",
+    "https://github.com/resources/articles/ai",
+    "https://github.com/topics/cooking",
+    "https://github.com/anduin2017/howtocook/pulls",
+    "https://github.com/topics/angular",
+    "https://github.com/all-hands-ai/openhands/issues",
+    "https://github.com/topics/wasm",
+    "https://github.com/topics/no-code-platform",
+    "https://github.com/linera-io",
+    "https://github.com/docmost/docmost/issues",
+    "https://github.com/poteto",
+    "https://github.com/topics/bug-tracker",
+    "https://github.com/solutions/industry/healthcare",
+    "https://github.com/marketplace/cloud-66-skycap",
+    "https://github.com/events",
+    "https://github.com/solutions/industry/government",
+    "https://github.com/anduin2017/howtocook/issues",
+    "https://github.com/anxcye/anx-reader/issues",
+    "https://github.com/nocobase/nocobase/issues",
+    "https://github.com/topics/workflows",
+    "https://github.com/jlowin/fastmcp/discussions",
+    "https://github.com/topics/generative-ai",
+    "https://github.com/login?return_to=%2fall-hands-ai%2fopenhands",
+    "https://github.com/topics/docker-ui",
+    "https://github.com/topics/langchain",
+    "https://github.com/solutions/use-case/devsecops",
+    "https://github.com/resources/articles/security",
+    "https://github.com/docmost/docmost/pulls",
+    "https://github.com/security/advanced-security",
+    "https://github.com/topics/server",
+    "https://github.com/topics/agent",
+    "https://github.com/docmost/docmost",
+    "https://github.com/login?return_to=%2f1panel-dev%2f1panel",
+    "https://github.com/opf/openproject/pulls",
+    "https://github.com/resources/articles/software-development",
+    "https://github.com/topics/openai",
+    "https://github.com/1panel-dev/1panel/pulls",
+    "https://github.com/browserbase/stagehand",
+    "https://github.com/solutions",
+    "https://github.com/anxcye/anx-reader/pulls",
+    "https://github.com/docmost/docmost/discussions",
+    "https://github.com/potpie-ai/potpie/issues",
+    "https://github.com/topics/recipes",
+    "https://github.com/login?return_to=https%3a%2f%2fgithub.com%2fexplore",
+    "https://github.com/all-hands-ai",
+    "https://github.com/cveproject/cvelistv5/issues",
+    "https://github.com/topics/airtable",
+    "https://github.com/features/code-search",
+    "https://github.com/topics/developer-tools",
+    "https://github.com/login?return_to=%2fcveproject%2fcvelistv5",
+    "https://github.com/features/codespaces",
+    "https://github.com/microsoft/bitnet/discussions",
+    "https://github.com/nocobase/nocobase/pulls",
+    "https://github.com/topics/admin-dashboard",
+    "https://github.com/solutions/industry/manufacturing",
+    "https://github.com/topics/dishes",
+    "https://github.com/topics/ebook-reader",
+    "https://github.com/opf",
+    "https://github.com/solutions/executive-insights",
+    "https://github.com/marketplace/gitinsights-io",
+    "https://github.com/anduin2017",
+    "https://github.com/trending/developers",
+    "https://github.com/premium-support",
+    "https://github.com/all-hands-ai/openhands/pulls",
+    "https://github.com/microsoft/bitnet/issues",
+    "https://github.com/enterprise/startups",
+    "https://github.com/solutions/use-case",
+    "https://github.com/login?return_to=%2fanduin2017%2fhowtocook",
+    "https://github.com/all-hands-ai/openhands",
+    "https://github.com/linera-io/linera-protocol",
+    "https://github.com/topics/timeline",
+    "https://github.com/topics/scrum",
+    "https://github.com/topics/linux",
+    "https://github.com/linera-io/linera-protocol/pulls",
+    "https://github.com/cveproject/cvelistv5/pulls",
+    "https://github.com/nirdiamant",
+    "https://github.com/topics/markdown",
+    "https://github.com/login?return_to=%2fnocobase%2fnocobase",
+    "https://github.com/topics/api",
+    "https://github.com/features/issues",
+    "https://github.com/login?return_to=%2fdocmost%2fdocmost",
+    "https://github.com/topics/llama-index",
+    "https://github.com/cveproject/cvelistv5",
+    "https://github.com/topics/dart",
+    "https://github.com/topics/playwright",
+    "https://github.com/1panel-dev/1panel/discussions",
+    "https://github.com/microsoft/bitnet",
+    "https://github.com/sponsors",
+    "https://github.com/topics/ifc",
+    "https://github.com/anduin2017/howtocook",
+    "https://github.com/topics/low-code-development-platform",
+    "https://github.com/nirdiamant/rag_techniques",
+    "https://github.com/topics/python",
+    "https://github.com/microsoft",
+    "https://github.com/security",
+    "https://github.com/topics/documentation",
+    "https://github.com/topics/model-context-protocol",
+    "https://github.com/topics/open-source",
+    "https://github.com/features/copilot",
+    "https://github.com/topics/project-planning",
+    "https://github.com/virattt/ai-hedge-fund/pulls",
+    "https://github.com/topics/flutter",
+    "https://github.com/browserbase",
+    "https://github.com/topics/blockchain",
+    "https://github.com/browserbase/stagehand/discussions",
+    "https://github.com/solutions/industry/financial-services",
+    "https://github.com/topics/rag",
+    "https://github.com/opf/openproject/issues",
+    "https://github.com/topics/cli",
+    "https://github.com/topics",
+    "https://github.com/trending",
+    "https://github.com/topics/knowledge-base",
+    "https://github.com/nirdiamant/rag_techniques/pulls",
+    "https://github.com/topics/fastmcp",
+    "https://github.com/topics/nocode",
+    "https://github.com/topics/gantt",
+    "https://github.com/topics/self-hosted",
+    "https://github.com/1panel-dev/1panel/issues",
+    "https://github.com/features/discussions",
+    "https://github.com/potpie-ai/potpie/pulls",
+    "https://github.com/topics/agents",
+    "https://github.com/topics/crm",
+    "https://github.com/nirdiamant/rag_techniques/issues",
+    "https://github.com/1panel-dev/1panel",
+    "https://github.com/topics/tutorials",
+    "https://github.com/topics/issue-tracker",
+    "https://github.com/nocobase",
+    "https://github.com/topics/opensource",
+    "https://github.com/potpie-ai",
+    "https://github.com/topics/wiki",
+    "https://github.com/collections/pixel-art-tools",
+    "https://github.com/login?return_to=%2fopf%2fopenproject",
+    "https://github.com/topics/ai-agents-framework",
+    "https://github.com/jlowin/fastmcp",
+    "https://github.com/topics/bcf",
+    "https://github.com/topics/1panel",
+    "https://github.com/topics/low-code-framework",
+    "https://github.com/topics/cookbook",
+    "https://github.com/resources/whitepapers",
+    "https://github.com/solutions/use-case/devops",
+    "https://github.com/readme",
+    "https://github.com/topics/puppeteer",
+    "https://github.com/features/copilot/copilot-business",
+    "https://github.com/docmost",
+    "https://github.com/topics/realtime-collaboration",
+    "https://github.com/topics/no-code-framework",
+    "https://github.com/topics/gpt",
+    "https://github.com/topics/chinese",
+    "https://github.com/topics/ruby",
+    "https://github.com/topics/lamp",
+    "https://github.com/topics/mcp-server",
+    "https://github.com/topics/llms",
+    "https://github.com/trim21",
+    "https://github.com/solutions/use-case/ci-cd",
+    "https://github.com/topics/low-code",
+    "https://github.com/login?return_to=%2fjlowin%2ffastmcp",
+    "https://github.com/opf/openproject",
+    "https://github.com/topics/anthropic",
+    "https://github.com/login?return_to=%2fpotpie-ai%2fpotpie",
+    "https://github.com/topics/app-builder",
+    "https://github.com/collections",
+    "https://github.com/topics/llm",
+    "https://github.com/topics/lowcode",
+    "https://github.com/topics/confluence",
+    "https://github.com/topics/ai",
+    "https://github.com/jlowin/fastmcp/issues",
+    "https://github.com/topics/roadmap",
+    "https://github.com/why-github",
+    "https://github.com/login?return_to=%2fbrowserbase%2fstagehand",
+    "https://github.com/topics/docker",
+    "https://github.com/1panel-dev",
+    "https://github.com/topics/claude",
+    "https://github.com/",
+    "https://github.com/topics/rust",
+    "https://github.com/topics/project-management",
+    "https://github.com/poteto/hiring-without-whiteboards",
+    "https://github.com/resources/articles/devops",
+    "https://github.com/login?return_to=%2fmicrosoft%2fbitnet",
+    "https://github.com/topics/boards",
+    "https://github.com/login?return_to=%2fanxcye%2fanx-reader",
+    "https://github.com/topics/artificial-intelligence",
+    "https://github.com/team",
+    "https://github.com/login?return_to=%2flinera-io%2flinera-protocol",
+    "https://github.com/topics/chatgpt",
+    "https://github.com/mattt",
+    "https://github.com/linera-io/linera-protocol/issues",
+    "https://github.com/topics/mcp-client",
+    "https://github.com/anduin2017/howtocook/discussions",
+    "https://github.com/login?return_to=%2fnirdiamant%2frag_techniques",
+    "https://github.com/solutions/industry",
+    "https://github.com/topics/openproject",
+    "https://github.com/pricing",
+    "https://github.com/topics/ai-agents",
+    "https://github.com/trim21/trim21",
+    "https://github.com/customer-stories",
+    "https://github.com/topics/internal-tools",
+    "https://github.com/anxcye",
+    "https://github.com/potpie-ai/potpie/discussions",
+    "https://github.com/topics/low-code-platform",
+    "https://github.com/topics/notion",
+    "https://github.com/topics/selenium",
+    "https://github.com/topics/salesforce",
+    "https://github.com/jlowin/fastmcp/pulls",
+    "https://github.com/features/code-review",
+    "https://github.com/cveproject",
+    "https://github.com/topics/webmin",
+    "https://github.com/topics/notion-alternative",
+    "https://github.com/topics/opeani",
+    "https://github.com/topics/ollama",
+    "https://github.com/sponsors/explore",
+    "https://github.com/features",
+    "https://github.com/enterprise",
+    "https://github.com/microsoft/bitnet/pulls",
+    "https://github.com/topics/mcp",
+    "https://github.com/browserbase/stagehand/pulls",
+    "https://github.com/nocobase/nocobase",
+    "https://github.com/topics/claude-ai",
+    "https://github.com/topics/kanban",
+    "https://github.com/virattt/ai-hedge-fund",
+    "https://github.com/anxcye/anx-reader",
+    "https://github.com/topics/internal-tool",
+    "https://github.com/signup?ref_cta=sign+up&ref_loc=header+logged+out&ref_page=%2fexplore&source=header",
+    "https://github.com/solutions/industry/nonprofits",
+    "https://github.com/topics/gantt-chart",
+    "https://github.com/virattt",
+    "https://github.com/topics/crud",
+    "https://github.com/login?return_to=%2fvirattt%2fai-hedge-fund",
+    "https://github.com/virattt/ai-hedge-fund/issues",
+    "https://github.com/resources/articles",
+    "https://github.com/features/actions",
+    "https://github.com/potpie-ai/potpie",
+    "https://github.com/topics/no-code",
+    "https://github.com/explore",
+    "https://github.com/topics/devtools"
+  ],
+  "failed_urls": [],
+  "intercepted_requests": {
+    "https://github.com/explore": {
+      "method": "GET",
+      "url": "https://github.com/explore",
+      "resource_type": "document",
+      "timestamp": 1744975328.1721501
+    },
+    "https://github.githubassets.com/assets/light-74231a1f3bbb.css": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/light-74231a1f3bbb.css",
+      "resource_type": "stylesheet",
+      "timestamp": 1744975329.0149717
+    },
+    "https://github.githubassets.com/assets/dark-8a995f0bacd4.css": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/dark-8a995f0bacd4.css",
+      "resource_type": "stylesheet",
+      "timestamp": 1744975329.0625565
+    },
+    "https://github.githubassets.com/assets/primer-primitives-225433424a87.css": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/primer-primitives-225433424a87.css",
+      "resource_type": "stylesheet",
+      "timestamp": 1744975329.2747958
+    },
+    "https://github.githubassets.com/assets/primer-cba26849680f.css": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/primer-cba26849680f.css",
+      "resource_type": "stylesheet",
+      "timestamp": 1744975329.2751167
+    },
+    "https://github.githubassets.com/assets/global-1c060317002f.css": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/global-1c060317002f.css",
+      "resource_type": "stylesheet",
+      "timestamp": 1744975329.2752676
+    },
+    "https://github.githubassets.com/assets/github-adc3415b2459.css": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/github-adc3415b2459.css",
+      "resource_type": "stylesheet",
+      "timestamp": 1744975329.2801
+    },
+    "https://github.githubassets.com/assets/site-62271ce87619.css": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/site-62271ce87619.css",
+      "resource_type": "stylesheet",
+      "timestamp": 1744975329.282512
+    },
+    "https://github.githubassets.com/assets/explore-742a7653565b.css": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/explore-742a7653565b.css",
+      "resource_type": "stylesheet",
+      "timestamp": 1744975329.2826264
+    },
+    "https://github.githubassets.com/assets/primer-react.f22dea1aa55879df6a44.module.css": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/primer-react.f22dea1aa55879df6a44.module.css",
+      "resource_type": "stylesheet",
+      "timestamp": 1744975329.2827165
+    },
+    "https://github.githubassets.com/assets/wp-runtime-1f5f5fcae15e.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/wp-runtime-1f5f5fcae15e.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2828066
+    },
+    "https://github.githubassets.com/assets/vendors-node_modules_oddbird_popover-polyfill_dist_popover-fn_js-81211bd82278.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/vendors-node_modules_oddbird_popover-polyfill_dist_popover-fn_js-81211bd82278.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2828903
+    },
+    "https://github.githubassets.com/assets/vendors-node_modules_github_mini-throttle_dist_index_js-node_modules_stacktrace-parser_dist_s-1d3d52-4be8ffe9a34a.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/vendors-node_modules_github_mini-throttle_dist_index_js-node_modules_stacktrace-parser_dist_s-1d3d52-4be8ffe9a34a.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2829874
+    },
+    "https://github.githubassets.com/assets/ui_packages_failbot_failbot_ts-ad4e497ef7dc.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/ui_packages_failbot_failbot_ts-ad4e497ef7dc.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.283129
+    },
+    "https://github.githubassets.com/assets/environment-1309ac7398f5.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/environment-1309ac7398f5.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.283353
+    },
+    "https://github.githubassets.com/assets/vendors-node_modules_primer_behaviors_dist_esm_index_mjs-0dbb79f97f8f.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/vendors-node_modules_primer_behaviors_dist_esm_index_mjs-0dbb79f97f8f.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.283463
+    },
+    "https://github.githubassets.com/assets/vendors-node_modules_github_selector-observer_dist_index_esm_js-f690fd9ae3d5.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/vendors-node_modules_github_selector-observer_dist_index_esm_js-f690fd9ae3d5.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2839513
+    },
+    "https://github.githubassets.com/assets/vendors-node_modules_github_relative-time-element_dist_index_js-62d275b7ddd9.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/vendors-node_modules_github_relative-time-element_dist_index_js-62d275b7ddd9.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2843344
+    },
+    "https://github.githubassets.com/assets/vendors-node_modules_github_auto-complete-element_dist_index_js-node_modules_github_catalyst_-8e9f78-a90ac05d2469.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/vendors-node_modules_github_auto-complete-element_dist_index_js-node_modules_github_catalyst_-8e9f78-a90ac05d2469.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2845855
+    },
+    "https://github.githubassets.com/assets/vendors-node_modules_github_text-expander-element_dist_index_js-78748950cb0c.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/vendors-node_modules_github_text-expander-element_dist_index_js-78748950cb0c.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2846763
+    },
+    "https://github.githubassets.com/assets/vendors-node_modules_github_filter-input-element_dist_index_js-node_modules_github_remote-inp-b5f1d7-a1760ffda83d.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/vendors-node_modules_github_filter-input-element_dist_index_js-node_modules_github_remote-inp-b5f1d7-a1760ffda83d.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.284762
+    },
+    "https://github.githubassets.com/assets/vendors-node_modules_github_markdown-toolbar-element_dist_index_js-ceef33f593fa.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/vendors-node_modules_github_markdown-toolbar-element_dist_index_js-ceef33f593fa.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2848508
+    },
+    "https://github.githubassets.com/assets/vendors-node_modules_github_file-attachment-element_dist_index_js-node_modules_primer_view-co-c44a69-08c257325fd3.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/vendors-node_modules_github_file-attachment-element_dist_index_js-node_modules_primer_view-co-c44a69-08c257325fd3.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2849405
+    },
+    "https://github.githubassets.com/assets/github-elements-c006416f1d14.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/github-elements-c006416f1d14.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.285035
+    },
+    "https://github.githubassets.com/assets/element-registry-c7475cff79ff.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/element-registry-c7475cff79ff.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2851229
+    },
+    "https://github.githubassets.com/assets/vendors-node_modules_braintree_browser-detection_dist_browser-detection_js-node_modules_githu-2906d7-2a07a295af40.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/vendors-node_modules_braintree_browser-detection_dist_browser-detection_js-node_modules_githu-2906d7-2a07a295af40.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.285204
+    },
+    "https://github.githubassets.com/assets/vendors-node_modules_lit-html_lit-html_js-be8cb88f481b.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/vendors-node_modules_lit-html_lit-html_js-be8cb88f481b.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.285287
+    },
+    "https://github.githubassets.com/assets/vendors-node_modules_morphdom_dist_morphdom-esm_js-0c08218c7d5f.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/vendors-node_modules_morphdom_dist_morphdom-esm_js-0c08218c7d5f.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.285371
+    },
+    "https://github.githubassets.com/assets/vendors-node_modules_github_turbo_dist_turbo_es2017-esm_js-a03ee12d659a.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/vendors-node_modules_github_turbo_dist_turbo_es2017-esm_js-a03ee12d659a.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2854548
+    },
+    "https://github.githubassets.com/assets/vendors-node_modules_github_remote-form_dist_index_js-node_modules_delegated-events_dist_inde-893f9f-b6294cf703b7.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/vendors-node_modules_github_remote-form_dist_index_js-node_modules_delegated-events_dist_inde-893f9f-b6294cf703b7.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2855556
+    },
+    "https://github.githubassets.com/assets/vendors-node_modules_color-convert_index_js-e3180fe3bcb3.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/vendors-node_modules_color-convert_index_js-e3180fe3bcb3.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2856424
+    },
+    "https://github.githubassets.com/assets/vendors-node_modules_github_quote-selection_dist_index_js-node_modules_github_session-resume_-054bff-311c04966bb2.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/vendors-node_modules_github_quote-selection_dist_index_js-node_modules_github_session-resume_-054bff-311c04966bb2.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2857256
+    },
+    "https://github.githubassets.com/assets/ui_packages_updatable-content_updatable-content_ts-62f3e9c52ece.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/ui_packages_updatable-content_updatable-content_ts-62f3e9c52ece.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2858112
+    },
+    "https://github.githubassets.com/assets/app_assets_modules_github_behaviors_task-list_ts-app_assets_modules_github_sso_ts-ui_packages-900dde-768abe60b1f8.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/app_assets_modules_github_behaviors_task-list_ts-app_assets_modules_github_sso_ts-ui_packages-900dde-768abe60b1f8.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2858999
+    },
+    "https://github.githubassets.com/assets/app_assets_modules_github_sticky-scroll-into-view_ts-3e000c5d31a9.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/app_assets_modules_github_sticky-scroll-into-view_ts-3e000c5d31a9.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2859895
+    },
+    "https://github.githubassets.com/assets/app_assets_modules_github_behaviors_ajax-error_ts-app_assets_modules_github_behaviors_include-d0d0a6-e7f74ee74d91.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/app_assets_modules_github_behaviors_ajax-error_ts-app_assets_modules_github_behaviors_include-d0d0a6-e7f74ee74d91.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.286073
+    },
+    "https://github.githubassets.com/assets/app_assets_modules_github_behaviors_commenting_edit_ts-app_assets_modules_github_behaviors_ht-83c235-4bcbbbfbe1d4.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/app_assets_modules_github_behaviors_commenting_edit_ts-app_assets_modules_github_behaviors_ht-83c235-4bcbbbfbe1d4.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2861533
+    },
+    "https://github.githubassets.com/assets/behaviors-2fc468514008.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/behaviors-2fc468514008.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2862346
+    },
+    "https://github.githubassets.com/assets/vendors-node_modules_delegated-events_dist_index_js-node_modules_github_catalyst_lib_index_js-f6223d90c7ba.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/vendors-node_modules_delegated-events_dist_index_js-node_modules_github_catalyst_lib_index_js-f6223d90c7ba.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2863173
+    },
+    "https://github.githubassets.com/assets/notifications-global-01e85cd1be94.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/notifications-global-01e85cd1be94.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2863967
+    },
+    "https://github.githubassets.com/assets/primer-react-332e3b3bc86a.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/primer-react-332e3b3bc86a.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.286475
+    },
+    "https://github.githubassets.com/assets/react-core-4c118154e199.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/react-core-4c118154e199.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.286584
+    },
+    "https://github.githubassets.com/assets/react-lib-80430c87778a.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/react-lib-80430c87778a.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2866683
+    },
+    "https://github.githubassets.com/assets/octicons-react-cf2f2ab8dab4.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/octicons-react-cf2f2ab8dab4.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2867496
+    },
+    "https://github.githubassets.com/assets/vendors-node_modules_emotion_is-prop-valid_dist_emotion-is-prop-valid_esm_js-node_modules_emo-b1c483-23083d170518.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/vendors-node_modules_emotion_is-prop-valid_dist_emotion-is-prop-valid_esm_js-node_modules_emo-b1c483-23083d170518.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2869408
+    },
+    "https://github.githubassets.com/assets/vendors-node_modules_github_catalyst_lib_index_js-node_modules_tanstack_react-query_build_mod-3b1f5d-85b60118c668.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/vendors-node_modules_github_catalyst_lib_index_js-node_modules_tanstack_react-query_build_mod-3b1f5d-85b60118c668.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2870536
+    },
+    "https://github.githubassets.com/assets/ui_packages_ui-commands_ui-commands_ts-2d52c8e72e64.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/ui_packages_ui-commands_ui-commands_ts-2d52c8e72e64.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2872553
+    },
+    "https://github.githubassets.com/assets/keyboard-shortcuts-dialog-8eef249f0ef9.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/keyboard-shortcuts-dialog-8eef249f0ef9.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2874334
+    },
+    "https://github.githubassets.com/assets/vendors-node_modules_github_remote-form_dist_index_js-node_modules_delegated-events_dist_inde-94fd67-4898d1bf4b51.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/vendors-node_modules_github_remote-form_dist_index_js-node_modules_delegated-events_dist_inde-94fd67-4898d1bf4b51.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2886503
+    },
+    "https://github.githubassets.com/assets/sessions-45d6658f8b6b.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/sessions-45d6658f8b6b.js",
+      "resource_type": "script",
+      "timestamp": 1744975329.2936127
+    },
+    "https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/collections/pixel-art-tools/pixel-art-tools.png": {
+      "method": "GET",
+      "url": "https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/collections/pixel-art-tools/pixel-art-tools.png",
+      "resource_type": "image",
+      "timestamp": 1744975329.293748
+    },
+    "https://avatars.githubusercontent.com/ml/491?s=400&v=4": {
+      "method": "GET",
+      "url": "https://avatars.githubusercontent.com/ml/491?s=400&v=4",
+      "resource_type": "image",
+      "timestamp": 1744975329.2950857
+    },
+    "https://avatars.githubusercontent.com/ml/16020?s=400&v=4": {
+      "method": "GET",
+      "url": "https://avatars.githubusercontent.com/ml/16020?s=400&v=4",
+      "resource_type": "image",
+      "timestamp": 1744975329.2951703
+    },
+    "https://avatars.githubusercontent.com/u/153965?s=100&v=4": {
+      "method": "GET",
+      "url": "https://avatars.githubusercontent.com/u/153965?s=100&v=4",
+      "resource_type": "image",
+      "timestamp": 1744975329.295252
+    },
+    "https://avatars.githubusercontent.com/u/1390709?s=100&v=4": {
+      "method": "GET",
+      "url": "https://avatars.githubusercontent.com/u/1390709?s=100&v=4",
+      "resource_type": "image",
+      "timestamp": 1744975329.2953115
+    },
+    "https://avatars.githubusercontent.com/u/13553903?s=100&v=4": {
+      "method": "GET",
+      "url": "https://avatars.githubusercontent.com/u/13553903?s=100&v=4",
+      "resource_type": "image",
+      "timestamp": 1744975329.2953563
+    },
+    "https://avatars.githubusercontent.com/u/7659?s=100&v=4": {
+      "method": "GET",
+      "url": "https://avatars.githubusercontent.com/u/7659?s=100&v=4",
+      "resource_type": "image",
+      "timestamp": 1744975329.2953844
+    },
+    "https://www.youtube.com/embed/videoseries?list=PL0lo9MOBetEFmtstItnKlhJJVmMghxc0P": {
+      "method": "GET",
+      "url": "https://www.youtube.com/embed/videoseries?list=PL0lo9MOBetEFmtstItnKlhJJVmMghxc0P",
+      "resource_type": "document",
+      "timestamp": 1744975329.4775515
+    },
+    "https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/markdown/markdown.png": {
+      "method": "GET",
+      "url": "https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/markdown/markdown.png",
+      "resource_type": "image",
+      "timestamp": 1744975329.5206864
+    },
+    "https://spotlights-feed.github.com/spotlights/git-merge-2025-cfp/git-merge-2025.png": {
+      "method": "GET",
+      "url": "https://spotlights-feed.github.com/spotlights/git-merge-2025-cfp/git-merge-2025.png",
+      "resource_type": "image",
+      "timestamp": 1744975329.5360813
+    },
+    "https://repository-images.githubusercontent.com/674295265/6b1fb268-b3a2-46f8-a8a1-8fab313df953": {
+      "method": "GET",
+      "url": "https://repository-images.githubusercontent.com/674295265/6b1fb268-b3a2-46f8-a8a1-8fab313df953",
+      "resource_type": "image",
+      "timestamp": 1744975329.5948145
+    },
+    "https://marketplace-screenshots.githubusercontent.com/491/cf0ff464-89b9-11e7-8990-e215c30d54db": {
+      "method": "GET",
+      "url": "https://marketplace-screenshots.githubusercontent.com/491/cf0ff464-89b9-11e7-8990-e215c30d54db",
+      "resource_type": "image",
+      "timestamp": 1744975329.5977652
+    },
+    "https://github.githubassets.com/assets/chunk-app_components_primer_experimental_select-panel-element_ts-385e39350a1e.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/chunk-app_components_primer_experimental_select-panel-element_ts-385e39350a1e.js",
+      "resource_type": "script",
+      "timestamp": 1744975330.0163062
+    },
+    "https://github.githubassets.com/assets/chunk-app_components_primer_experimental_toggle-switch-element_ts-670c71d392c6.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/chunk-app_components_primer_experimental_toggle-switch-element_ts-670c71d392c6.js",
+      "resource_type": "script",
+      "timestamp": 1744975330.0412261
+    },
+    "https://github.githubassets.com/assets/chunk-app_components_search_custom-scopes-element_ts-abc100eaa2cb.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/chunk-app_components_search_custom-scopes-element_ts-abc100eaa2cb.js",
+      "resource_type": "script",
+      "timestamp": 1744975330.0413465
+    },
+    "https://github.githubassets.com/assets/chunk-vendors-node_modules_github_mini-throttle_dist_index_js-node_modules_github_combobox-nav_dist-b7767a-9ad7d4eda3d9.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/chunk-vendors-node_modules_github_mini-throttle_dist_index_js-node_modules_github_combobox-nav_dist-b7767a-9ad7d4eda3d9.js",
+      "resource_type": "script",
+      "timestamp": 1744975330.0414507
+    },
+    "https://github.githubassets.com/assets/ui_packages_paths_index_ts-cae0c0a9df7d.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/ui_packages_paths_index_ts-cae0c0a9df7d.js",
+      "resource_type": "script",
+      "timestamp": 1744975330.041571
+    },
+    "https://github.githubassets.com/assets/ui_packages_query-builder-element_query-builder-element_ts-b492d6900d5e.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/ui_packages_query-builder-element_query-builder-element_ts-b492d6900d5e.js",
+      "resource_type": "script",
+      "timestamp": 1744975330.0416634
+    },
+    "https://github.githubassets.com/assets/app_assets_modules_github_blob-anchor_ts-ui_packages_code-nav_code-nav_ts-ui_packages_filter--8253c1-91468a3354f9.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/app_assets_modules_github_blob-anchor_ts-ui_packages_code-nav_code-nav_ts-ui_packages_filter--8253c1-91468a3354f9.js",
+      "resource_type": "script",
+      "timestamp": 1744975330.0417547
+    },
+    "https://github.githubassets.com/assets/chunk-ui_packages_hydro-analytics_hydro-analytics_ts-ui_packages_jump-to-element_model_ts-62afc8d5064b.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/chunk-ui_packages_hydro-analytics_hydro-analytics_ts-ui_packages_jump-to-element_model_ts-62afc8d5064b.js",
+      "resource_type": "script",
+      "timestamp": 1744975330.041885
+    },
+    "https://github.githubassets.com/assets/chunk-app_components_search_qbsearch-input-element_ts-28bda823935e.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/chunk-app_components_search_qbsearch-input-element_ts-28bda823935e.js",
+      "resource_type": "script",
+      "timestamp": 1744975330.0430167
+    },
+    "https://github.githubassets.com/assets/chunk-ui_packages_cookie-consent-link-element_element-entry_ts-8ca582ddd98a.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/chunk-ui_packages_cookie-consent-link-element_element-entry_ts-8ca582ddd98a.js",
+      "resource_type": "script",
+      "timestamp": 1744975330.0438697
+    },
+    "https://github.githubassets.com/assets/chunk-ui_packages_ghcc-consent-element_element-entry_ts-04338159da93.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/chunk-ui_packages_ghcc-consent-element_element-entry_ts-04338159da93.js",
+      "resource_type": "script",
+      "timestamp": 1744975330.0442789
+    },
+    "https://github.githubassets.com/assets/chunk-vendors-node_modules_github_mini-throttle_dist_index_js-node_modules_github_combobox-nav_dist-5f477b-eeb221e8a5a3.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/chunk-vendors-node_modules_github_mini-throttle_dist_index_js-node_modules_github_combobox-nav_dist-5f477b-eeb221e8a5a3.js",
+      "resource_type": "script",
+      "timestamp": 1744975330.0446727
+    },
+    "https://github.githubassets.com/assets/chunk-ui_packages_hydro-analytics_hydro-analytics_ts-ui_packages_query-builder-element_element-entry_ts-d081ade6e89b.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/chunk-ui_packages_hydro-analytics_hydro-analytics_ts-ui_packages_query-builder-element_element-entry_ts-d081ade6e89b.js",
+      "resource_type": "script",
+      "timestamp": 1744975330.0448015
+    },
+    "https://github.githubassets.com/assets/chunk-ui_packages_webauthn-get-element_element-entry_ts-c4e5a9b4f95a.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/chunk-ui_packages_webauthn-get-element_element-entry_ts-c4e5a9b4f95a.js",
+      "resource_type": "script",
+      "timestamp": 1744975330.0448987
+    },
+    "https://www.youtube.com/s/player/753b1819/www-player.css": {
+      "method": "GET",
+      "url": "https://www.youtube.com/s/player/753b1819/www-player.css",
+      "resource_type": "stylesheet",
+      "timestamp": 1744975330.0449867
+    },
+    "https://www.youtube.com/s/player/753b1819/player_ias.vflset/en_US/embed.js": {
+      "method": "GET",
+      "url": "https://www.youtube.com/s/player/753b1819/player_ias.vflset/en_US/embed.js",
+      "resource_type": "script",
+      "timestamp": 1744975330.0450513
+    },
+    "https://www.youtube.com/s/player/753b1819/www-embed-player.vflset/www-embed-player.js": {
+      "method": "GET",
+      "url": "https://www.youtube.com/s/player/753b1819/www-embed-player.vflset/www-embed-player.js",
+      "resource_type": "script",
+      "timestamp": 1744975330.0450962
+    },
+    "https://www.youtube.com/s/player/753b1819/player_ias.vflset/en_US/base.js": {
+      "method": "GET",
+      "url": "https://www.youtube.com/s/player/753b1819/player_ias.vflset/en_US/base.js",
+      "resource_type": "script",
+      "timestamp": 1744975330.0451262
+    },
+    "https://fonts.gstatic.com/s/roboto/v18/KFOmCnqEu92Fr1Mu4mxK.woff2": {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/roboto/v18/KFOmCnqEu92Fr1Mu4mxK.woff2",
+      "resource_type": "font",
+      "timestamp": 1744975330.1109278
+    },
+    "https://fonts.gstatic.com/s/roboto/v18/KFOlCnqEu92Fr1MmEU9fBBc4.woff2": {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/roboto/v18/KFOlCnqEu92Fr1MmEU9fBBc4.woff2",
+      "resource_type": "font",
+      "timestamp": 1744975330.1219172
+    },
+    "https://github.githubassets.com/assets/chunk-vendors-node_modules_consent-banner_dist_consent-banner_js-362ca569b596.js": {
+      "method": "GET",
+      "url": "https://github.githubassets.com/assets/chunk-vendors-node_modules_consent-banner_dist_consent-banner_js-362ca569b596.js",
+      "resource_type": "script",
+      "timestamp": 1744975330.244137
+    },
+    "https://googleads.g.doubleclick.net/pagead/id": {
+      "method": "GET",
+      "url": "https://googleads.g.doubleclick.net/pagead/id",
+      "resource_type": "xhr",
+      "timestamp": 1744975330.4243307
+    },
+    "https://static.doubleclick.net/instream/ad_status.js": {
+      "method": "GET",
+      "url": "https://static.doubleclick.net/instream/ad_status.js",
+      "resource_type": "script",
+      "timestamp": 1744975330.4279225
+    },
+    "https://www.youtube.com/s/player/753b1819/player_ias.vflset/en_US/remote.js": {
+      "method": "GET",
+      "url": "https://www.youtube.com/s/player/753b1819/player_ias.vflset/en_US/remote.js",
+      "resource_type": "script",
+      "timestamp": 1744975330.593836
+    },
+    "https://www.google.com/js/th/c1NvwzfGjgxLq3UtHce_pUilBM6IeGPgMvQ-wEvMVSk.js": {
+      "method": "GET",
+      "url": "https://www.google.com/js/th/c1NvwzfGjgxLq3UtHce_pUilBM6IeGPgMvQ-wEvMVSk.js",
+      "resource_type": "script",
+      "timestamp": 1744975330.5939143
+    },
+    "https://i.ytimg.com/vi/j7WID3q1yY0/sddefault.jpg": {
+      "method": "GET",
+      "url": "https://i.ytimg.com/vi/j7WID3q1yY0/sddefault.jpg",
+      "resource_type": "image",
+      "timestamp": 1744975330.59418
+    },
+    "https://jnn-pa.googleapis.com/$rpc/google.internal.waa.v1.Waa/Create": {
+      "method": "POST",
+      "url": "https://jnn-pa.googleapis.com/$rpc/google.internal.waa.v1.Waa/Create",
+      "resource_type": "xhr",
+      "timestamp": 1744975330.6106613
+    },
+    "https://yt3.ggpht.com/PKRBxhCiGa8Y0vPmHa1E2cdjpLhUq2Pl-gESwP7kk2plGgxLdsbjyTd9VjcJwBMiY0HQ8bvx5Q=s68-c-k-c0x00ffffff-no-rj": {
+      "method": "GET",
+      "url": "https://yt3.ggpht.com/PKRBxhCiGa8Y0vPmHa1E2cdjpLhUq2Pl-gESwP7kk2plGgxLdsbjyTd9VjcJwBMiY0HQ8bvx5Q=s68-c-k-c0x00ffffff-no-rj",
+      "resource_type": "image",
+      "timestamp": 1744975330.617286
+    },
+    "https://www.gstatic.com/cv/js/sender/v1/cast_sender.js": {
+      "method": "GET",
+      "url": "https://www.gstatic.com/cv/js/sender/v1/cast_sender.js",
+      "resource_type": "script",
+      "timestamp": 1744975330.688608
+    },
+    "https://jnn-pa.googleapis.com/$rpc/google.internal.waa.v1.Waa/GenerateIT": {
+      "method": "POST",
+      "url": "https://jnn-pa.googleapis.com/$rpc/google.internal.waa.v1.Waa/GenerateIT",
+      "resource_type": "xhr",
+      "timestamp": 1744975330.848329
+    },
+    "https://play.google.com/log?hasfast=true&authuser=0&format=json": {
+      "method": "POST",
+      "url": "https://play.google.com/log?hasfast=true&authuser=0&format=json",
+      "resource_type": "ping",
+      "timestamp": 1744975330.8947864
+    },
+    "https://collector.github.com/github/collect": {
+      "method": "POST",
+      "url": "https://collector.github.com/github/collect",
+      "resource_type": "ping",
+      "timestamp": 1744975330.9185083
+    },
+    "https://www.youtube.com/generate_204?7nm5lw": {
+      "method": "GET",
+      "url": "https://www.youtube.com/generate_204?7nm5lw",
+      "resource_type": "image",
+      "timestamp": 1744975331.0772617
+    },
+    "https://api.github.com/_private/browser/stats": {
+      "method": "POST",
+      "url": "https://api.github.com/_private/browser/stats",
+      "resource_type": "ping",
+      "timestamp": 1744975331.1920156
+    },
+    "https://www.youtube.com/youtubei/v1/log_event?alt=json": {
+      "method": "POST",
+      "url": "https://www.youtube.com/youtubei/v1/log_event?alt=json",
+      "resource_type": "xhr",
+      "timestamp": 1744975332.922639
+    }
+  },
+  "max_pages": 1,
+  "max_depth": 0,
+  "duration": 8.323866605758667,
+  "timestamp": 1744975335.483714,
+  "websocket": {
+    "statistics": {
+      "total_messages": 0,
+      "incoming_messages": 0,
+      "outgoing_messages": 0,
+      "endpoint_count": 0,
+      "patterns_count": 0,
+      "protocol_stats": {},
+      "message_type_stats": {}
+    },
+    "connections": [],
+    "extracted_data": {}
+  },
+  "graphql": {
+    "statistics": {
+      "total_operations": 0,
+      "total_responses": 0,
+      "endpoint_count": 1,
+      "operation_types": [],
+      "operation_names": [],
+      "detected_clients": [
+        "graphql_request"
+      ],
+      "operations_by_type": {},
+      "operations_by_client": {
+        "graphql_request": 0
+      },
+      "successful_responses": 0,
+      "error_responses": 0,
+      "schema_info": {
+        "fragments_count": 0,
+        "types_count": 0,
+        "root_fields_count": 0
+      }
+    },
+    "extracted_data": []
+  },
+  "routing": {
+    "statistics": {
+      "total_changes": 1,
+      "unique_routes": 1,
+      "route_patterns": 0,
+      "framework": null
+    },
+    "history": [
+      {
+        "from_url": "about:blank",
+        "to_url": "https://github.com/explore",
+        "state_object": {},
+        "timestamp": 1744975328.1489146,
+        "datetime": "2025-04-18T11:22:08.148916",
+        "path": ""
+      }
+    ],
+    "unique_routes": [
+      {
+        "url": "https://github.com/explore",
+        "path": "",
+        "route_info": null
+      }
+    ]
+  }
+}

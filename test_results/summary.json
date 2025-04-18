@@ -1,0 +1,100 @@
+[
+  {
+    "name": "React Router",
+    "url": "https://reactrouter.com/en/main/start/tutorial",
+    "expected": [
+      "client_routing"
+    ],
+    "duration": 9.682892084121704,
+    "detected": {
+      "websocket": false,
+      "graphql": false,
+      "client_routing": true
+    },
+    "technologies": [
+      {
+        "name": "React Router",
+        "type": "client_routing",
+        "confidence": 0.8
+      }
+    ],
+    "success": true,
+    "output_file": "/content/seo-ai-models/test_results/react_router.json",
+    "matches": [
+      "client_routing"
+    ],
+    "match_ratio": 1.0
+  },
+  {
+    "name": "GitHub",
+    "url": "https://github.com/explore",
+    "expected": [
+      "graphql"
+    ],
+    "duration": 8.325674295425415,
+    "detected": {
+      "websocket": false,
+      "graphql": false,
+      "client_routing": true
+    },
+    "technologies": [
+      {
+        "name": "graphql_request",
+        "type": "graphql_client"
+      }
+    ],
+    "success": true,
+    "output_file": "/content/seo-ai-models/test_results/github.json",
+    "matches": [],
+    "match_ratio": 0.0
+  },
+  {
+    "name": "Vue.js",
+    "url": "https://vuejs.org/guide/introduction.html",
+    "expected": [
+      "client_routing"
+    ],
+    "duration": 6.917607069015503,
+    "detected": {
+      "websocket": false,
+      "graphql": false,
+      "client_routing": true
+    },
+    "technologies": [],
+    "success": true,
+    "output_file": "/content/seo-ai-models/test_results/vue.js.json",
+    "matches": [
+      "client_routing"
+    ],
+    "match_ratio": 1.0
+  },
+  {
+    "name": "Facebook",
+    "url": "https://www.facebook.com/",
+    "expected": [
+      "websocket",
+      "graphql"
+    ],
+    "duration": 7.1492791175842285,
+    "detected": {
+      "websocket": false,
+      "graphql": false,
+      "client_routing": true
+    },
+    "technologies": [],
+    "success": true,
+    "output_file": "/content/seo-ai-models/test_results/facebook.json",
+    "matches": [],
+    "match_ratio": 0.0
+  },
+  {
+    "name": "Twitter/X",
+    "url": "https://twitter.com/explore",
+    "expected": [
+      "websocket",
+      "client_routing"
+    ],
+    "success": false,
+    "error": "[Errno 2] No such file or directory: '/content/seo-ai-models/test_results/twitter/x.json'"
+  }
+]

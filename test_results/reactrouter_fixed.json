@@ -1,0 +1,355 @@
+{
+  "base_url": "https://reactrouter.com/en/main/start/tutorial",
+  "crawled_urls": [
+    "https://reactrouter.com/6.28.0/utils/match-routes",
+    "https://reactrouter.com/en/main/start/tutorial",
+    "https://reactrouter.com/6.28.0/fetch/redirect"
+  ],
+  "found_urls": [
+    "https://reactrouter.com/6.28.0/utils/match-routes",
+    "https://reactrouter.com/6.28.0/fetch/redirect",
+    "https://reactrouter.com/6.28.0/router-components/hash-router",
+    "https://reactrouter.com/6.28.0/route/should-revalidate",
+    "https://reactrouter.com/6.28.0/guides/api-development-strategy",
+    "https://reactrouter.com/6.28.0/route/loader",
+    "https://reactrouter.com/6.28.0/hooks/use-route-loader-data",
+    "https://reactrouter.com/6.28.0/router-components/router",
+    "https://reactrouter.com/6.28.0/router-components/browser-router",
+    "https://reactrouter.com/6.28.0/route/lazy",
+    "https://reactrouter.com/6.28.0/components/nav-link",
+    "https://reactrouter.com/6.28.0/guides/data-libs",
+    "https://reactrouter.com/6.28.0/utils/match-path",
+    "https://reactrouter.com/6.28.0/upgrading/v5",
+    "https://reactrouter.com/6.28.0/upgrading/future",
+    "https://reactrouter.com/6.30.0",
+    "https://reactrouter.com/6.28.0/components/await",
+    "https://reactrouter.com/6.28.0/router-components/native-router",
+    "https://reactrouter.com/6.28.0/routers/picking-a-router",
+    "https://reactrouter.com/6.28.0/hooks/use-match",
+    "https://reactrouter.com/6.28.0/hooks/use-routes",
+    "https://reactrouter.com/6.28.0/hooks/use-before-unload",
+    "https://reactrouter.com/6.28.0/hooks/use-submit",
+    "https://reactrouter.com/6.28.0/utils/render-matches",
+    "https://reactrouter.com/home",
+    "https://reactrouter.com/6.28.0/hooks/use-in-router-context",
+    "https://reactrouter.com/6.28.0/upgrading/v6-data",
+    "https://reactrouter.com/6.28.0/utils/generate-path",
+    "https://reactrouter.com/6.28.0/utils/resolve-path",
+    "https://reactrouter.com/6.28.0/routers/create-memory-router",
+    "https://reactrouter.com/6.28.0/components/navigate",
+    "https://reactrouter.com/6.28.0/components/scroll-restoration",
+    "https://reactrouter.com/6.28.0/guides/ssr",
+    "https://reactrouter.com/6.28.0/guides/index-search-param",
+    "https://reactrouter.com/6.28.0/start/concepts",
+    "https://reactrouter.com/6.28.0/routers/router-provider",
+    "https://reactrouter.com/6.28.0/hooks/use-async-value",
+    "https://reactrouter.com/6.28.0/start/examples",
+    "https://reactrouter.com/6.28.0/components/link",
+    "https://reactrouter.com/6.28.0/hooks/use-location",
+    "https://reactrouter.com/6.28.0/hooks/use-matches",
+    "https://reactrouter.com/6.28.0/hooks/use-prompt",
+    "https://reactrouter.com/6.28.0/guides/contributing",
+    "https://reactrouter.com/6.28.0/utils/is-route-error-response",
+    "https://reactrouter.com/6.28.0/route/error-element",
+    "https://reactrouter.com/6.28.0/components/routes",
+    "https://reactrouter.com/6.28.0/routers/create-static-router",
+    "https://reactrouter.com/6.28.0/routers/static-router-provider",
+    "https://reactrouter.com/6.28.0/routers/create-static-handler",
+    "https://reactrouter.com/6.28.0/router-components/memory-router",
+    "https://reactrouter.com/6.28.0/guides/deferred",
+    "https://reactrouter.com/6.28.0/utils/create-search-params",
+    "https://reactrouter.com/6.28.0/hooks/use-fetchers",
+    "https://reactrouter.com/7.5.1/home",
+    "https://reactrouter.com/6.28.0/routers/create-hash-router",
+    "https://reactrouter.com/6.28.0/hooks/use-form-action",
+    "https://reactrouter.com/6.28.0/components/form",
+    "https://reactrouter.com/6.28.0/hooks/use-loader-data",
+    "https://reactrouter.com/6.28.0/fetch/replace",
+    "https://reactrouter.com/6.28.0/route/route",
+    "https://reactrouter.com/6.28.0/start/faq",
+    "https://reactrouter.com/6.28.0/start/tutorial",
+    "https://reactrouter.com/6.28.0/hooks/use-params",
+    "https://reactrouter.com/6.28.0/route/action",
+    "https://reactrouter.com/6.28.0/hooks/use-href",
+    "https://reactrouter.com/6.28.0/hooks/use-revalidator",
+    "https://reactrouter.com/6.28.0/route/hydrate-fallback-element",
+    "https://reactrouter.com/6.28.0/utils/create-routes-from-elements",
+    "https://reactrouter.com/6.28.0/start/changelog",
+    "https://reactrouter.com/6.28.0/utils/create-routes-from-children",
+    "https://reactrouter.com/6.28.0/hooks/use-fetcher",
+    "https://reactrouter.com/6.28.0/upgrading/reach",
+    "https://reactrouter.com/brand",
+    "https://reactrouter.com/6.28.0/router-components/static-router",
+    "https://reactrouter.com/6.28.0/hooks/use-search-params",
+    "https://reactrouter.com/6.28.0/components/route",
+    "https://reactrouter.com/6.28.0/start/overview",
+    "https://reactrouter.com/dev/",
+    "https://reactrouter.com/6.28.0/fetch/json",
+    "https://reactrouter.com/6.28.0/hooks/use-navigation-type",
+    "https://reactrouter.com/6.28.0/guides/form-data",
+    "https://reactrouter.com/6.28.0/fetch/redirectdocument",
+    "https://reactrouter.com/6.28.0/hooks/use-action-data",
+    "https://reactrouter.com/6.28.0/hooks/use-link-press-handler",
+    "https://reactrouter.com/6.28.0/hooks/use-link-click-handler",
+    "https://reactrouter.com/6.28.0/hooks/use-resolved-path",
+    "https://reactrouter.com/6.28.0/hooks/use-blocker",
+    "https://reactrouter.com/6.28.0/hooks/use-outlet",
+    "https://reactrouter.com/6.28.0/utils/location",
+    "https://reactrouter.com/6.28.0/hooks/use-navigation",
+    "https://reactrouter.com/6.28.0/hooks/use-async-error",
+    "https://reactrouter.com/6.28.0/hooks/use-route-error",
+    "https://reactrouter.com/6.28.0/hooks/use-search-params-rn",
+    "https://reactrouter.com/6.28.0/utils/defer",
+    "https://reactrouter.com/6.28.0/hooks/use-navigate",
+    "https://reactrouter.com/6.28.0/components/link-native",
+    "https://reactrouter.com/6.28.0/components/outlet",
+    "https://reactrouter.com/6.28.0/hooks/use-view-transition-state",
+    "https://reactrouter.com/6.28.0/routers/create-browser-router",
+    "https://reactrouter.com/6.28.0/hooks/use-outlet-context"
+  ],
+  "failed_urls": [],
+  "intercepted_requests": {
+    "https://reactrouter.com/en/main/start/tutorial": {
+      "method": "GET",
+      "url": "https://reactrouter.com/en/main/start/tutorial",
+      "resource_type": "document",
+      "timestamp": 1744975010.457571
+    },
+    "https://reactrouter.com/assets/icons-C24Z-wDY.svg": {
+      "method": "GET",
+      "url": "https://reactrouter.com/assets/icons-C24Z-wDY.svg",
+      "resource_type": "image",
+      "timestamp": 1744975010.6156316
+    },
+    "https://reactrouter.com/assets/entry.client-EIjTBG90.js": {
+      "method": "GET",
+      "url": "https://reactrouter.com/assets/entry.client-EIjTBG90.js",
+      "resource_type": "script",
+      "timestamp": 1744975010.647918
+    },
+    "https://reactrouter.com/assets/chunk-K6CSEXPM-BuWjMmfg.js": {
+      "method": "GET",
+      "url": "https://reactrouter.com/assets/chunk-K6CSEXPM-BuWjMmfg.js",
+      "resource_type": "script",
+      "timestamp": 1744975010.648015
+    },
+    "https://reactrouter.com/assets/index-D1lroltp.js": {
+      "method": "GET",
+      "url": "https://reactrouter.com/assets/index-D1lroltp.js",
+      "resource_type": "script",
+      "timestamp": 1744975010.6481078
+    },
+    "https://reactrouter.com/assets/index-Dr5Jjrgj.js": {
+      "method": "GET",
+      "url": "https://reactrouter.com/assets/index-Dr5Jjrgj.js",
+      "resource_type": "script",
+      "timestamp": 1744975010.648192
+    },
+    "https://reactrouter.com/assets/root-BLhpCFmJ.js": {
+      "method": "GET",
+      "url": "https://reactrouter.com/assets/root-BLhpCFmJ.js",
+      "resource_type": "script",
+      "timestamp": 1744975010.6482747
+    },
+    "https://reactrouter.com/assets/with-props-CXEPX46v.js": {
+      "method": "GET",
+      "url": "https://reactrouter.com/assets/with-props-CXEPX46v.js",
+      "resource_type": "script",
+      "timestamp": 1744975010.6483583
+    },
+    "https://reactrouter.com/assets/docsearch-Bu0r1GYn.js": {
+      "method": "GET",
+      "url": "https://reactrouter.com/assets/docsearch-Bu0r1GYn.js",
+      "resource_type": "script",
+      "timestamp": 1744975010.648444
+    },
+    "https://reactrouter.com/assets/icons-DMa-LqBU.js": {
+      "method": "GET",
+      "url": "https://reactrouter.com/assets/icons-DMa-LqBU.js",
+      "resource_type": "script",
+      "timestamp": 1744975010.648549
+    },
+    "https://reactrouter.com/assets/docs-layout-main-CXTY-0PP.js": {
+      "method": "GET",
+      "url": "https://reactrouter.com/assets/docs-layout-main-CXTY-0PP.js",
+      "resource_type": "script",
+      "timestamp": 1744975010.6486433
+    },
+    "https://reactrouter.com/assets/docs-layout-client-loader-CykSjZJD.js": {
+      "method": "GET",
+      "url": "https://reactrouter.com/assets/docs-layout-client-loader-CykSjZJD.js",
+      "resource_type": "script",
+      "timestamp": 1744975010.6487362
+    },
+    "https://reactrouter.com/assets/index-CICYlIhS.js": {
+      "method": "GET",
+      "url": "https://reactrouter.com/assets/index-CICYlIhS.js",
+      "resource_type": "script",
+      "timestamp": 1744975010.649765
+    },
+    "https://reactrouter.com/assets/docs-CVLUOSKK.js": {
+      "method": "GET",
+      "url": "https://reactrouter.com/assets/docs-CVLUOSKK.js",
+      "resource_type": "script",
+      "timestamp": 1744975010.6499348
+    },
+    "https://reactrouter.com/assets/doc-COydy2aW.js": {
+      "method": "GET",
+      "url": "https://reactrouter.com/assets/doc-COydy2aW.js",
+      "resource_type": "script",
+      "timestamp": 1744975010.6500728
+    },
+    "https://reactrouter.com/assets/meta-B4rLaiCJ.js": {
+      "method": "GET",
+      "url": "https://reactrouter.com/assets/meta-B4rLaiCJ.js",
+      "resource_type": "script",
+      "timestamp": 1744975010.650487
+    },
+    "https://reactrouter.com/assets/root-BWT05nXK.css": {
+      "method": "GET",
+      "url": "https://reactrouter.com/assets/root-BWT05nXK.css",
+      "resource_type": "stylesheet",
+      "timestamp": 1744975010.6506796
+    },
+    "https://reactrouter.com/assets/docs-BqdSI1ya.css": {
+      "method": "GET",
+      "url": "https://reactrouter.com/assets/docs-BqdSI1ya.css",
+      "resource_type": "stylesheet",
+      "timestamp": 1744975010.6508746
+    },
+    "https://reactrouter.com/_docs/tutorial/15.webp": {
+      "method": "GET",
+      "url": "https://reactrouter.com/_docs/tutorial/15.webp",
+      "resource_type": "image",
+      "timestamp": 1744975010.650921
+    },
+    "https://reactrouter.com/font/inter-roman-latin-var.woff2": {
+      "method": "GET",
+      "url": "https://reactrouter.com/font/inter-roman-latin-var.woff2",
+      "resource_type": "font",
+      "timestamp": 1744975011.0184848
+    },
+    "https://reactrouter.com/font/source-code-pro-roman-var.woff2": {
+      "method": "GET",
+      "url": "https://reactrouter.com/font/source-code-pro-roman-var.woff2",
+      "resource_type": "font",
+      "timestamp": 1744975011.0234337
+    },
+    "https://reactrouter.com/font/inter-italic-latin-var.woff2": {
+      "method": "GET",
+      "url": "https://reactrouter.com/font/inter-italic-latin-var.woff2",
+      "resource_type": "font",
+      "timestamp": 1744975011.0235124
+    },
+    "https://reactrouter.com/__manifest?p=%2F6.28.0%2Fcomponents%2Fawait&p=%2F6.28.0%2Fcomponents%2Fform&p=%2F6.28.0%2Fcomponents%2Flink&p=%2F6.28.0%2Fcomponents%2Flink-native&p=%2F6.28.0%2Fcomponents%2Fnav-link&p=%2F6.28.0%2Fcomponents%2Fnavigate&p=%2F6.28.0%2Fcomponents%2Foutlet&p=%2F6.28.0%2Fcomponents%2Froute&p=%2F6.28.0%2Fcomponents%2Froutes&p=%2F6.28.0%2Fcomponents%2Fscroll-restoration&p=%2F6.28.0%2Ffetch%2Fjson&p=%2F6.28.0%2Ffetch%2Fredirect&p=%2F6.28.0%2Ffetch%2FredirectDocument&p=%2F6.28.0%2Ffetch%2Freplace&p=%2F6.28.0%2Fguides%2Fapi-development-strategy&p=%2F6.28.0%2Fguides%2Fcontributing&p=%2F6.28.0%2Fguides%2Fdata-libs&p=%2F6.28.0%2Fguides%2Fdeferred&p=%2F6.28.0%2Fguides%2Fform-data&p=%2F6.28.0%2Fguides%2Findex-search-param&p=%2F6.28.0%2Fguides%2Fssr&p=%2F6.28.0%2Fhooks%2Fuse-action-data&p=%2F6.28.0%2Fhooks%2Fuse-async-error&p=%2F6.28.0%2Fhooks%2Fuse-async-value&p=%2F6.28.0%2Fhooks%2Fuse-before-unload&p=%2F6.28.0%2Fhooks%2Fuse-blocker&p=%2F6.28.0%2Fhooks%2Fuse-fetcher&p=%2F6.28.0%2Fhooks%2Fuse-fetchers&p=%2F6.28.0%2Fhooks%2Fuse-form-action&p=%2F6.28.0%2Fhooks%2Fuse-href&p=%2F6.28.0%2Fhooks%2Fuse-in-router-context&p=%2F6.28.0%2Fhooks%2Fuse-link-click-handler&p=%2F6.28.0%2Fhooks%2Fuse-link-press-handler&p=%2F6.28.0%2Fhooks%2Fuse-loader-data&p=%2F6.28.0%2Fhooks%2Fuse-location&p=%2F6.28.0%2Fhooks%2Fuse-match&p=%2F6.28.0%2Fhooks%2Fuse-matches&p=%2F6.28.0%2Fhooks%2Fuse-navigate&p=%2F6.28.0%2Fhooks%2Fuse-navigation&p=%2F6.28.0%2Fhooks%2Fuse-navigation-type&p=%2F6.28.0%2Fhooks%2Fuse-outlet&p=%2F6.28.0%2Fhooks%2Fuse-outlet-context&p=%2F6.28.0%2Fhooks%2Fuse-params&p=%2F6.28.0%2Fhooks%2Fuse-prompt&p=%2F6.28.0%2Fhooks%2Fuse-resolved-path&p=%2F6.28.0%2Fhooks%2Fuse-revalidator&p=%2F6.28.0%2Fhooks%2Fuse-route-error&p=%2F6.28.0%2Fhooks%2Fuse-route-loader-data&p=%2F6.28.0%2Fhooks%2Fuse-routes&p=%2F6.28.0%2Fhooks%2Fuse-search-params&p=%2F6.28.0%2Fhooks%2Fuse-search-params-rn&p=%2F6.28.0%2Fhooks%2Fuse-submit&p=%2F6.28.0%2Fhooks%2Fuse-view-transition-state&p=%2F6.28.0%2Froute%2Faction&p=%2F6.28.0%2Froute%2Ferror-element&p=%2F6.28.0%2Froute%2Fhydrate-fallback-element&p=%2F6.28.0%2Froute%2Flazy&p=%2F6.28.0%2Froute%2Floader&p=%2F6.28.0%2Froute%2Froute&p=%2F6.28.0%2Froute%2Fshould-revalidate&p=%2F6.28.0%2Frouter-components%2Fbrowser-router&p=%2F6.28.0%2Frouter-components%2Fhash-router&p=%2F6.28.0%2Frouter-components%2Fmemory-router&p=%2F6.28.0%2Frouter-components%2Fnative-router&p=%2F6.28.0%2Frouter-components%2Frouter&p=%2F6.28.0%2Frouter-components%2Fstatic-router&p=%2F6.28.0%2Frouters%2Fcreate-browser-router&p=%2F6.28.0%2Frouters%2Fcreate-hash-router&p=%2F6.28.0%2Frouters%2Fcreate-memory-router&p=%2F6.28.0%2Frouters%2Fcreate-static-handler&p=%2F6.28.0%2Frouters%2Fcreate-static-router&p=%2F6.28.0%2Frouters%2Fpicking-a-router&p=%2F6.28.0%2Frouters%2Frouter-provider&p=%2F6.28.0%2Frouters%2Fstatic-router-provider&p=%2F6.28.0%2Fstart%2Fchangelog&p=%2F6.28.0%2Fstart%2Fconcepts&p=%2F6.28.0%2Fstart%2Fexamples&p=%2F6.28.0%2Fstart%2Ffaq&p=%2F6.28.0%2Fstart%2Foverview&p=%2F6.28.0%2Fstart%2Ftutorial&p=%2F6.28.0%2Fupgrading%2Ffuture&p=%2F6.28.0%2Fupgrading%2Freach&p=%2F6.28.0%2Fupgrading%2Fv5&p=%2F6.28.0%2Fupgrading%2Fv6-data&p=%2F6.28.0%2Futils%2Fcreate-routes-from-children&p=%2F6.28.0%2Futils%2Fcreate-routes-from-elements&p=%2F6.28.0%2Futils%2Fcreate-search-params&p=%2F6.28.0%2Futils%2Fdefer&p=%2F6.28.0%2Futils%2Fgenerate-path&p=%2F6.28.0%2Futils%2Fis-route-error-response&p=%2F6.28.0%2Futils%2Flocation&p=%2F6.28.0%2Futils%2Fmatch-path&p=%2F6.28.0%2Futils%2Fmatch-routes&p=%2F6.28.0%2Futils%2Frender-matches&p=%2F6.28.0%2Futils%2Fresolve-path&p=%2F6.30.0&p=%2F7.5.1%2Fhome&p=%2Fbrand&p=%2Fcolor-scheme&p=%2Fdev%2F&p=%2Fhome&version=22c989a5": {
+      "method": "GET",
+      "url": "https://reactrouter.com/__manifest?p=%2F6.28.0%2Fcomponents%2Fawait&p=%2F6.28.0%2Fcomponents%2Fform&p=%2F6.28.0%2Fcomponents%2Flink&p=%2F6.28.0%2Fcomponents%2Flink-native&p=%2F6.28.0%2Fcomponents%2Fnav-link&p=%2F6.28.0%2Fcomponents%2Fnavigate&p=%2F6.28.0%2Fcomponents%2Foutlet&p=%2F6.28.0%2Fcomponents%2Froute&p=%2F6.28.0%2Fcomponents%2Froutes&p=%2F6.28.0%2Fcomponents%2Fscroll-restoration&p=%2F6.28.0%2Ffetch%2Fjson&p=%2F6.28.0%2Ffetch%2Fredirect&p=%2F6.28.0%2Ffetch%2FredirectDocument&p=%2F6.28.0%2Ffetch%2Freplace&p=%2F6.28.0%2Fguides%2Fapi-development-strategy&p=%2F6.28.0%2Fguides%2Fcontributing&p=%2F6.28.0%2Fguides%2Fdata-libs&p=%2F6.28.0%2Fguides%2Fdeferred&p=%2F6.28.0%2Fguides%2Fform-data&p=%2F6.28.0%2Fguides%2Findex-search-param&p=%2F6.28.0%2Fguides%2Fssr&p=%2F6.28.0%2Fhooks%2Fuse-action-data&p=%2F6.28.0%2Fhooks%2Fuse-async-error&p=%2F6.28.0%2Fhooks%2Fuse-async-value&p=%2F6.28.0%2Fhooks%2Fuse-before-unload&p=%2F6.28.0%2Fhooks%2Fuse-blocker&p=%2F6.28.0%2Fhooks%2Fuse-fetcher&p=%2F6.28.0%2Fhooks%2Fuse-fetchers&p=%2F6.28.0%2Fhooks%2Fuse-form-action&p=%2F6.28.0%2Fhooks%2Fuse-href&p=%2F6.28.0%2Fhooks%2Fuse-in-router-context&p=%2F6.28.0%2Fhooks%2Fuse-link-click-handler&p=%2F6.28.0%2Fhooks%2Fuse-link-press-handler&p=%2F6.28.0%2Fhooks%2Fuse-loader-data&p=%2F6.28.0%2Fhooks%2Fuse-location&p=%2F6.28.0%2Fhooks%2Fuse-match&p=%2F6.28.0%2Fhooks%2Fuse-matches&p=%2F6.28.0%2Fhooks%2Fuse-navigate&p=%2F6.28.0%2Fhooks%2Fuse-navigation&p=%2F6.28.0%2Fhooks%2Fuse-navigation-type&p=%2F6.28.0%2Fhooks%2Fuse-outlet&p=%2F6.28.0%2Fhooks%2Fuse-outlet-context&p=%2F6.28.0%2Fhooks%2Fuse-params&p=%2F6.28.0%2Fhooks%2Fuse-prompt&p=%2F6.28.0%2Fhooks%2Fuse-resolved-path&p=%2F6.28.0%2Fhooks%2Fuse-revalidator&p=%2F6.28.0%2Fhooks%2Fuse-route-error&p=%2F6.28.0%2Fhooks%2Fuse-route-loader-data&p=%2F6.28.0%2Fhooks%2Fuse-routes&p=%2F6.28.0%2Fhooks%2Fuse-search-params&p=%2F6.28.0%2Fhooks%2Fuse-search-params-rn&p=%2F6.28.0%2Fhooks%2Fuse-submit&p=%2F6.28.0%2Fhooks%2Fuse-view-transition-state&p=%2F6.28.0%2Froute%2Faction&p=%2F6.28.0%2Froute%2Ferror-element&p=%2F6.28.0%2Froute%2Fhydrate-fallback-element&p=%2F6.28.0%2Froute%2Flazy&p=%2F6.28.0%2Froute%2Floader&p=%2F6.28.0%2Froute%2Froute&p=%2F6.28.0%2Froute%2Fshould-revalidate&p=%2F6.28.0%2Frouter-components%2Fbrowser-router&p=%2F6.28.0%2Frouter-components%2Fhash-router&p=%2F6.28.0%2Frouter-components%2Fmemory-router&p=%2F6.28.0%2Frouter-components%2Fnative-router&p=%2F6.28.0%2Frouter-components%2Frouter&p=%2F6.28.0%2Frouter-components%2Fstatic-router&p=%2F6.28.0%2Frouters%2Fcreate-browser-router&p=%2F6.28.0%2Frouters%2Fcreate-hash-router&p=%2F6.28.0%2Frouters%2Fcreate-memory-router&p=%2F6.28.0%2Frouters%2Fcreate-static-handler&p=%2F6.28.0%2Frouters%2Fcreate-static-router&p=%2F6.28.0%2Frouters%2Fpicking-a-router&p=%2F6.28.0%2Frouters%2Frouter-provider&p=%2F6.28.0%2Frouters%2Fstatic-router-provider&p=%2F6.28.0%2Fstart%2Fchangelog&p=%2F6.28.0%2Fstart%2Fconcepts&p=%2F6.28.0%2Fstart%2Fexamples&p=%2F6.28.0%2Fstart%2Ffaq&p=%2F6.28.0%2Fstart%2Foverview&p=%2F6.28.0%2Fstart%2Ftutorial&p=%2F6.28.0%2Fupgrading%2Ffuture&p=%2F6.28.0%2Fupgrading%2Freach&p=%2F6.28.0%2Fupgrading%2Fv5&p=%2F6.28.0%2Fupgrading%2Fv6-data&p=%2F6.28.0%2Futils%2Fcreate-routes-from-children&p=%2F6.28.0%2Futils%2Fcreate-routes-from-elements&p=%2F6.28.0%2Futils%2Fcreate-search-params&p=%2F6.28.0%2Futils%2Fdefer&p=%2F6.28.0%2Futils%2Fgenerate-path&p=%2F6.28.0%2Futils%2Fis-route-error-response&p=%2F6.28.0%2Futils%2Flocation&p=%2F6.28.0%2Futils%2Fmatch-path&p=%2F6.28.0%2Futils%2Fmatch-routes&p=%2F6.28.0%2Futils%2Frender-matches&p=%2F6.28.0%2Futils%2Fresolve-path&p=%2F6.30.0&p=%2F7.5.1%2Fhome&p=%2Fbrand&p=%2Fcolor-scheme&p=%2Fdev%2F&p=%2Fhome&version=22c989a5",
+      "resource_type": "fetch",
+      "timestamp": 1744975012.0106072
+    },
+    "https://reactrouter.com/6.28.0/utils/match-routes": {
+      "method": "GET",
+      "url": "https://reactrouter.com/6.28.0/utils/match-routes",
+      "resource_type": "document",
+      "timestamp": 1744975017.971562
+    },
+    "https://reactrouter.com/6.28.0/fetch/redirect": {
+      "method": "GET",
+      "url": "https://reactrouter.com/6.28.0/fetch/redirect",
+      "resource_type": "document",
+      "timestamp": 1744975025.6470811
+    }
+  },
+  "max_pages": 3,
+  "max_depth": 2,
+  "duration": 23.360214471817017,
+  "timestamp": 1744975033.1778777,
+  "websocket": {
+    "statistics": {
+      "total_messages": 0,
+      "incoming_messages": 0,
+      "outgoing_messages": 0,
+      "endpoint_count": 0,
+      "patterns_count": 0,
+      "protocol_stats": {},
+      "message_type_stats": {}
+    },
+    "connections": [],
+    "extracted_data": {}
+  },
+  "graphql": {
+    "statistics": {
+      "total_operations": 0,
+      "total_responses": 0,
+      "endpoint_count": 0,
+      "operation_types": [],
+      "operation_names": [],
+      "detected_clients": [],
+      "operations_by_type": {},
+      "operations_by_client": {},
+      "successful_responses": 0,
+      "error_responses": 0,
+      "schema_info": {
+        "fragments_count": 0,
+        "types_count": 0,
+        "root_fields_count": 0
+      }
+    },
+    "extracted_data": []
+  },
+  "routing": {
+    "statistics": {
+      "total_changes": 3,
+      "unique_routes": 3,
+      "route_patterns": 0,
+      "framework": {
+        "name": "React Router",
+        "confidence": 0.8,
+        "detected_by": "html_pattern:react-router"
+      }
+    },
+    "history": [
+      {
+        "from_url": "about:blank",
+        "to_url": "https://reactrouter.com/en/main/start/tutorial",
+        "state_object": {},
+        "timestamp": 1744975010.4384441,
+        "datetime": "2025-04-18T11:16:50.438445",
+        "path": ""
+      },
+      {
+        "from_url": "https://reactrouter.com/en/main/start/tutorial",
+        "to_url": "https://reactrouter.com/6.28.0/utils/match-routes",
+        "state_object": {},
+        "timestamp": 1744975017.9524362,
+        "datetime": "2025-04-18T11:16:57.952438",
+        "path": ""
+      },
+      {
+        "from_url": "https://reactrouter.com/en/main/start/tutorial",
+        "to_url": "https://reactrouter.com/6.28.0/fetch/redirect",
+        "state_object": {},
+        "timestamp": 1744975025.636655,
+        "datetime": "2025-04-18T11:17:05.636657",
+        "path": ""
+      }
+    ],
+    "unique_routes": [
+      {
+        "url": "https://reactrouter.com/en/main/start/tutorial",
+        "path": "",
+        "route_info": null
+      },
+      {
+        "url": "https://reactrouter.com/6.28.0/utils/match-routes",
+        "path": "",
+        "route_info": null
+      },
+      {
+        "url": "https://reactrouter.com/6.28.0/fetch/redirect",
+        "path": "",
+        "route_info": null
+      }
+    ]
+  }
+}

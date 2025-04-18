@@ -1,0 +1,48 @@
+[
+  {
+    "name": "React Router",
+    "url": "https://reactrouter.com/en/main/start/tutorial",
+    "expected": [
+      "client_routing"
+    ],
+    "duration": 8.484766244888306,
+    "detected": {
+      "websocket": false,
+      "graphql": false,
+      "client_routing": true
+    },
+    "technologies": [
+      {
+        "name": "React Router",
+        "type": "client_routing",
+        "confidence": 0.8
+      }
+    ],
+    "success": true,
+    "output_file": "/content/seo-ai-models/test_results/react_router_fixed.json",
+    "matches": [
+      "client_routing"
+    ],
+    "match_ratio": 1.0
+  },
+  {
+    "name": "Vue.js",
+    "url": "https://vuejs.org/guide/introduction.html",
+    "expected": [
+      "client_routing"
+    ],
+    "duration": 4.901124954223633,
+    "detected": {
+      "websocket": false,
+      "graphql": false,
+      "client_routing": true
+    },
+    "technologies": [],
+    "success": true,
+    "output_file": "/content/seo-ai-models/test_results/vue.js_fixed.json",
+    "matches": [
+      "client_routing"
+    ],
+    "match_ratio": 1.0
+  }
+]
