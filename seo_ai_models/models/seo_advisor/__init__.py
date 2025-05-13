@@ -1,4 +1,11 @@
-"""SEO Advisor - основной модуль для SEO анализа и рекомендаций."""
+"""
+SEO Advisor package.
 
-# Основные классы доступны на уровне модуля
-from .advisor import SEOAdvisor
+Этот пакет содержит компоненты SEO Advisor для анализа и оптимизации контента.
+"""
+
+from seo_ai_models.models.seo_advisor.advisor import SEOAdvisor
+from seo_ai_models.models.seo_advisor.enhanced_advisor import EnhancedSEOAdvisor
+from seo_ai_models.models.seo_advisor.llm_integration_adapter import LLMEnhancedSEOAdvisor
+
+__all__ = ['SEOAdvisor', 'EnhancedSEOAdvisor', 'LLMEnhancedSEOAdvisor']
