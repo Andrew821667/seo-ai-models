@@ -428,3 +428,23 @@ class CreditManager:
             f"Обновлен план использования для пользователя {self.user_id}: "
             f"{old_tier.value} -> {new_tier.value}"
         )
+
+    def get_credits(self, credit_type: CreditType) -> float:
+        """
+        Получение доступных кредитов указанного типа. 
+        Этот метод добавлен для обратной совместимости с BudgetPlanner.
+        
+        Args:
+            credit_type: Тип кредитов
+            
+        Returns:
+            float: Количество доступных кредитов
+        """
+        # Преобразование credit_type в строку, если это enum
+        if isinstance(credit_type, CreditType):
+            type_value = credit_type.value
+        else:
+            type_value = credit_type
+            
+        credits_info = self.get_credits_info()
+        return credits_info.get(type_value, {}).get("available", 0.0)

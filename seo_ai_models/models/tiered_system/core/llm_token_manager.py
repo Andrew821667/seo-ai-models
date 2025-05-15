@@ -1,257 +1,361 @@
 """
-Менеджер токенов для LLM-сервисов.
-
-Модуль предоставляет функциональность для управления использованием токенов
-при работе с LLM API, оптимизации затрат и контроля лимитов в зависимости от плана.
+Менеджер токенов LLM для многоуровневой системы SEO AI Models.
 """
 
-import logging
-import time
-from datetime import datetime, timedelta
+from typing import Dict, List, Any, Optional, Union, Tuple
 from enum import Enum
-from typing import Dict, List, Any, Optional, Union
+import logging
+import json
+import os
+from datetime import datetime, timedelta
 
-# Импорты из tiered_system
 from seo_ai_models.models.tiered_system.core.feature_gating import TierPlan
 
-# Импорты из llm_integration
-try:
-    from seo_ai_models.models.llm_integration.service.cost_estimator import CostEstimator
-    from seo_ai_models.models.llm_integration.common.constants import LLM_PROVIDERS, LLM_MODELS
-except ImportError:
-    # Создаем заглушки, если модули не найдены
-    CostEstimator = object
-    LLM_PROVIDERS = {}
-    LLM_MODELS = {}
+logger = logging.getLogger(__name__)
 
+class LLMProvider(Enum):
+    """Провайдеры LLM."""
+    OPENAI = "openai"       # OpenAI (GPT)
+    ANTHROPIC = "anthropic" # Anthropic (Claude)
+    COHERE = "cohere"       # Cohere
+    YANDEX = "yandex"       # YandexGPT
+    SBER = "sber"           # SberAI (GigaChat)
+    LLAMA = "llama"         # Llama (Meta)
+    LOCAL = "local"         # Локальные модели
 
 class LLMTokenManager:
     """
-    Менеджер токенов для LLM-сервисов.
+    Менеджер токенов LLM для многоуровневой системы SEO AI Models.
     
-    Класс отвечает за управление использованием токенов при работе с LLM API,
-    оптимизацию затрат и контроль лимитов в зависимости от плана использования.
+    Этот класс отвечает за управление использованием токенов LLM, 
+    отслеживание лимитов и оптимизацию затрат.
     """
     
-    # Лимиты токенов для каждого плана (токенов в день)
-    TOKEN_LIMITS = {
-        'micro': 5000,       # 5K токенов в день
-        'basic': 50000,      # 50K токенов в день
-        'professional': 500000,  # 500K токенов в день
-        'enterprise': -1,    # Неограниченно
+    # Лимиты токенов по умолчанию для разных уровней
+    DEFAULT_TOKEN_LIMITS = {
+        TierPlan.MICRO.value: {
+            LLMProvider.OPENAI.value: 0,          # Нет доступа
+            LLMProvider.ANTHROPIC.value: 0,       # Нет доступа
+            LLMProvider.COHERE.value: 0,          # Нет доступа
+            LLMProvider.YANDEX.value: 5000,       # 5K токенов
+            LLMProvider.SBER.value: 5000,         # 5K токенов
+            LLMProvider.LLAMA.value: 10000,       # 10K токенов
+            LLMProvider.LOCAL.value: float('inf')  # Неограниченно
+        },
+        TierPlan.BASIC.value: {
+            LLMProvider.OPENAI.value: 0,          # Нет доступа
+            LLMProvider.ANTHROPIC.value: 0,       # Нет доступа
+            LLMProvider.COHERE.value: 10000,      # 10K токенов
+            LLMProvider.YANDEX.value: 20000,      # 20K токенов
+            LLMProvider.SBER.value: 20000,        # 20K токенов
+            LLMProvider.LLAMA.value: 50000,       # 50K токенов
+            LLMProvider.LOCAL.value: float('inf')  # Неограниченно
+        },
+        TierPlan.PROFESSIONAL.value: {
+            LLMProvider.OPENAI.value: 20000,      # 20K токенов
+            LLMProvider.ANTHROPIC.value: 20000,   # 20K токенов
+            LLMProvider.COHERE.value: 50000,      # 50K токенов
+            LLMProvider.YANDEX.value: 100000,     # 100K токенов
+            LLMProvider.SBER.value: 100000,       # 100K токенов
+            LLMProvider.LLAMA.value: 200000,      # 200K токенов
+            LLMProvider.LOCAL.value: float('inf')  # Неограниченно
+        },
+        TierPlan.ENTERPRISE.value: {
+            LLMProvider.OPENAI.value: 100000,     # 100K токенов
+            LLMProvider.ANTHROPIC.value: 100000,  # 100K токенов
+            LLMProvider.COHERE.value: 200000,     # 200K токенов
+            LLMProvider.YANDEX.value: 500000,     # 500K токенов
+            LLMProvider.SBER.value: 500000,       # 500K токенов
+            LLMProvider.LLAMA.value: 1000000,     # 1M токенов
+            LLMProvider.LOCAL.value: float('inf')  # Неограниченно
+        }
     }
     
-    # Лимиты запросов для каждого плана (запросов в день)
-    REQUEST_LIMITS = {
-        'micro': 10,         # 10 запросов в день
-        'basic': 100,        # 100 запросов в день
-        'professional': 1000,  # 1000 запросов в день
-        'enterprise': -1,    # Неограниченно
+    # Соотношение стоимости токенов для разных провайдеров (относительно OpenAI)
+    TOKEN_COST_RATIO = {
+        LLMProvider.OPENAI.value: 1.0,      # Базовый коэффициент
+        LLMProvider.ANTHROPIC.value: 1.2,   # На 20% дороже
+        LLMProvider.COHERE.value: 0.8,      # На 20% дешевле
+        LLMProvider.YANDEX.value: 0.5,      # На 50% дешевле
+        LLMProvider.SBER.value: 0.5,        # На 50% дешевле
+        LLMProvider.LLAMA.value: 0.3,       # На 70% дешевле
+        LLMProvider.LOCAL.value: 0.1        # На 90% дешевле
     }
     
-    def __init__(
-        self, 
-        tier: TierPlan,
-        api_keys: Optional[Dict[str, str]] = None,
-        **kwargs
-    ):
+    def __init__(self, 
+                 user_id: str, 
+                 tier: Union[TierPlan, str] = TierPlan.MICRO,
+                 token_limits: Optional[Dict[str, Dict[str, int]]] = None,
+                 data_dir: str = "data/llm_tokens"):
         """
-        Инициализирует менеджер токенов LLM.
+        Инициализация менеджера токенов LLM.
         
         Args:
-            tier: План использования
-            api_keys: API ключи для различных сервисов
-            **kwargs: Дополнительные параметры
+            user_id: ID пользователя
+            tier: Уровень подписки пользователя
+            token_limits: Пользовательские лимиты токенов
+            data_dir: Директория для хранения данных
         """
-        self.logger = logging.getLogger(__name__)
-        self.tier = tier
-        self.api_keys = api_keys or {}
+        self.user_id = user_id
         
-        # Инициализируем оценщик стоимости
-        self.cost_estimator = None
-        try:
-            self.cost_estimator = CostEstimator(api_keys=self.api_keys)
-        except Exception as e:
-            self.logger.warning(f"Не удалось инициализировать CostEstimator: {e}")
+        # Преобразование tier в строку, если это enum
+        if isinstance(tier, TierPlan):
+            self.tier = tier.value
+        else:
+            self.tier = tier.lower()
         
-        # Устанавливаем лимиты в зависимости от плана
-        self.token_limit = self.TOKEN_LIMITS[tier.value]
-        self.request_limit = self.REQUEST_LIMITS[tier.value]
+        # Лимиты токенов
+        self.token_limits = token_limits or self.DEFAULT_TOKEN_LIMITS
         
-        # Счетчики использования
-        self.tokens_used = 0
-        self.requests_used = 0
+        # Директория данных
+        self.data_dir = data_dir
+        os.makedirs(self.data_dir, exist_ok=True)
         
-        # Определяем период сброса (0:00 следующего дня)
-        self.reset_time = datetime.now().replace(
-            hour=0, minute=0, second=0, microsecond=0
-        ) + timedelta(days=1)
+        # Файл для хранения использования токенов
+        self.token_usage_file = os.path.join(self.data_dir, f"{user_id}_token_usage.json")
         
-        # Применяем дополнительные параметры
-        self.custom_token_limit = kwargs.get('custom_token_limit')
-        if self.custom_token_limit and self.tier != TierPlan.MICRO:
-            self.token_limit = self.custom_token_limit
-            self.logger.info(f"Установлен пользовательский лимит токенов: {self.token_limit}")
-            
-        self.logger.info(f"LLMTokenManager инициализирован для плана {tier.value}")
+        # Загрузка или создание записи использования токенов
+        self.token_usage = self._load_token_usage()
     
-    def check_tokens_available(self, content_length: int) -> bool:
-        """
-        Проверяет доступность токенов для анализа контента указанной длины.
-        
-        Args:
-            content_length: Длина контента в символах
-            
-        Returns:
-            True, если токенов достаточно
-        """
-        # Проверяем, нужно ли сбросить счетчики
-        self._check_reset_counters()
-        
-        # Для Enterprise плана всегда возвращаем True
-        if self.token_limit == -1:
-            return True
-        
-        # Примерная оценка количества токенов (приблизительно 4 символа на токен)
-        estimated_tokens = content_length // 4
-        
-        # Добавляем запас 20% для учета промптов и метаданных
-        total_estimated_tokens = int(estimated_tokens * 1.2)
-        
-        # Проверяем, достаточно ли токенов
-        return (self.tokens_used + total_estimated_tokens) <= self.token_limit
-    
-    def track_token_usage(
-        self, 
-        input_tokens: int, 
-        output_tokens: int, 
-        provider: str,
-        model: str
-    ) -> Dict[str, Any]:
-        """
-        Отслеживает использование токенов.
-        
-        Args:
-            input_tokens: Количество входных токенов
-            output_tokens: Количество выходных токенов
-            provider: Провайдер LLM
-            model: Модель LLM
-            
-        Returns:
-            Информация об использовании и стоимости
-        """
-        # Проверяем, нужно ли сбросить счетчики
-        self._check_reset_counters()
-        
-        # Обновляем счетчики
-        total_tokens = input_tokens + output_tokens
-        self.tokens_used += total_tokens
-        self.requests_used += 1
-        
-        # Оцениваем стоимость, если доступен cost_estimator
-        cost_info = {"cost": None, "currency": "USD"}
-        if self.cost_estimator:
+    def _load_token_usage(self) -> Dict:
+        """Загрузка или создание записи использования токенов."""
+        if os.path.exists(self.token_usage_file):
             try:
-                cost_info = self.cost_estimator.estimate_cost(
-                    input_tokens=input_tokens,
-                    output_tokens=output_tokens,
-                    provider=provider,
-                    model=model
-                )
-            except Exception as e:
-                self.logger.warning(f"Не удалось оценить стоимость: {e}")
-        
-        # Формируем информацию об использовании
-        usage_info = {
-            "input_tokens": input_tokens,
-            "output_tokens": output_tokens,
-            "total_tokens": total_tokens,
-            "cost": cost_info.get("cost"),
-            "currency": cost_info.get("currency"),
-            "tokens_remaining": self._get_tokens_remaining(),
-            "requests_remaining": self._get_requests_remaining(),
-            "reset_time": self.reset_time.isoformat(),
-        }
-        
-        # Логируем, если приближаемся к лимиту
-        if self.token_limit != -1:  # Если не безлимитный
-            usage_percent = (self.tokens_used / self.token_limit) * 100
-            if usage_percent >= 80:
-                self.logger.warning(
-                    f"Использовано {usage_percent:.1f}% лимита токенов"
-                )
-        
-        return usage_info
+                with open(self.token_usage_file, 'r') as f:
+                    return json.load(f)
+            except (json.JSONDecodeError, IOError) as e:
+                logger.error(f"Ошибка загрузки использования токенов: {e}")
+                return self._create_default_token_usage()
+        else:
+            return self._create_default_token_usage()
     
-    def _check_reset_counters(self) -> None:
-        """Проверяет, нужно ли сбросить счетчики использования."""
-        now = datetime.now()
-        if now >= self.reset_time:
-            # Сбрасываем счетчики
-            self.tokens_used = 0
-            self.requests_used = 0
-            
-            # Обновляем время сброса
-            self.reset_time = now.replace(
-                hour=0, minute=0, second=0, microsecond=0
-            ) + timedelta(days=1)
-            
-            self.logger.info("Счетчики использования токенов сброшены")
-    
-    def _get_tokens_remaining(self) -> Optional[int]:
-        """
-        Возвращает оставшееся количество токенов.
+    def _create_default_token_usage(self) -> Dict:
+        """Создание записи использования токенов по умолчанию."""
+        today = datetime.now().strftime('%Y-%m-%d')
         
-        Returns:
-            Количество оставшихся токенов или None для безлимитного плана
-        """
-        if self.token_limit == -1:
-            return None
-        return max(0, self.token_limit - self.tokens_used)
-    
-    def _get_requests_remaining(self) -> Optional[int]:
-        """
-        Возвращает оставшееся количество запросов.
-        
-        Returns:
-            Количество оставшихся запросов или None для безлимитного плана
-        """
-        if self.request_limit == -1:
-            return None
-        return max(0, self.request_limit - self.requests_used)
-    
-    def get_token_info(self) -> Dict[str, Any]:
-        """
-        Возвращает информацию о токенах и использовании.
-        
-        Returns:
-            Информация о токенах
-        """
         return {
-            "token_limit": self.token_limit,
-            "tokens_used": self.tokens_used,
-            "tokens_remaining": self._get_tokens_remaining(),
-            "request_limit": self.request_limit,
-            "requests_used": self.requests_used,
-            "requests_remaining": self._get_requests_remaining(),
-            "reset_time": self.reset_time.isoformat(),
+            "user_id": self.user_id,
+            "tier": self.tier,
+            "created_at": today,
+            "updated_at": today,
+            "total_usage": {provider.value: 0 for provider in LLMProvider},
+            "daily_usage": {
+                today: {provider.value: 0 for provider in LLMProvider}
+            },
+            "history": []
         }
     
-    def update_tier(self, new_tier: TierPlan) -> None:
+    def _save_token_usage(self) -> bool:
+        """Сохранение записи использования токенов."""
+        try:
+            with open(self.token_usage_file, 'w') as f:
+                json.dump(self.token_usage, f, indent=4)
+            return True
+        except IOError as e:
+            logger.error(f"Ошибка сохранения использования токенов: {e}")
+            return False
+    
+    def get_token_limit(self, provider: Union[LLMProvider, str]) -> int:
         """
-        Обновляет план использования.
+        Получение лимита токенов для указанного провайдера.
         
         Args:
-            new_tier: Новый план
-        """
-        self.tier = new_tier
-        
-        # Обновляем лимиты
-        self.token_limit = self.TOKEN_LIMITS[new_tier.value]
-        self.request_limit = self.REQUEST_LIMITS[new_tier.value]
-        
-        # Если установлен пользовательский лимит, используем его (кроме микро-плана)
-        if self.custom_token_limit and new_tier != TierPlan.MICRO:
-            self.token_limit = self.custom_token_limit
+            provider: Провайдер LLM
             
-        self.logger.info(f"LLMTokenManager обновлен до плана {new_tier.value}")
+        Returns:
+            int: Лимит токенов
+        """
+        # Преобразование provider в строку, если это enum
+        if isinstance(provider, LLMProvider):
+            provider = provider.value
+            
+        return self.token_limits.get(self.tier, {}).get(provider, 0)
+    
+    def get_token_usage(self, provider: Union[LLMProvider, str]) -> int:
+        """
+        Получение текущего использования токенов для указанного провайдера.
+        
+        Args:
+            provider: Провайдер LLM
+            
+        Returns:
+            int: Текущее использование токенов
+        """
+        # Преобразование provider в строку, если это enum
+        if isinstance(provider, LLMProvider):
+            provider = provider.value
+            
+        return self.token_usage["total_usage"].get(provider, 0)
+    
+    def get_daily_token_usage(self, provider: Union[LLMProvider, str], date: Optional[str] = None) -> int:
+        """
+        Получение дневного использования токенов для указанного провайдера.
+        
+        Args:
+            provider: Провайдер LLM
+            date: Дата в формате 'YYYY-MM-DD' (по умолчанию - сегодня)
+            
+        Returns:
+            int: Дневное использование токенов
+        """
+        # Преобразование provider в строку, если это enum
+        if isinstance(provider, LLMProvider):
+            provider = provider.value
+            
+        # Если дата не указана, используем сегодняшнюю
+        if date is None:
+            date = datetime.now().strftime('%Y-%m-%d')
+            
+        # Если записи для указанной даты нет, возвращаем 0
+        if date not in self.token_usage["daily_usage"]:
+            return 0
+            
+        return self.token_usage["daily_usage"][date].get(provider, 0)
+    
+    def record_token_usage(self, 
+                          provider: Union[LLMProvider, str], 
+                          tokens: int,
+                          operation: str = "analysis") -> bool:
+        """
+        Запись использования токенов.
+        
+        Args:
+            provider: Провайдер LLM
+            tokens: Количество использованных токенов
+            operation: Операция, для которой использовались токены
+            
+        Returns:
+            bool: True, если запись успешна, False в противном случае
+        """
+        # Преобразование provider в строку, если это enum
+        if isinstance(provider, LLMProvider):
+            provider = provider.value
+            
+        # Получение текущей даты
+        today = datetime.now().strftime('%Y-%m-%d')
+        
+        # Обновление общего использования
+        self.token_usage["total_usage"][provider] = self.token_usage["total_usage"].get(provider, 0) + tokens
+        
+        # Обновление дневного использования
+        if today not in self.token_usage["daily_usage"]:
+            self.token_usage["daily_usage"][today] = {p.value: 0 for p in LLMProvider}
+            
+        self.token_usage["daily_usage"][today][provider] = self.token_usage["daily_usage"][today].get(provider, 0) + tokens
+        
+        # Добавление записи в историю
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        self.token_usage["history"].append({
+            "timestamp": timestamp,
+            "provider": provider,
+            "tokens": tokens,
+            "operation": operation
+        })
+        
+        # Обновление времени обновления
+        self.token_usage["updated_at"] = today
+        
+        # Сохранение изменений
+        return self._save_token_usage()
+    
+    def check_token_availability(self, provider: Union[LLMProvider, str], tokens: int) -> bool:
+        """
+        Проверка доступности токенов для использования.
+        
+        Args:
+            provider: Провайдер LLM
+            tokens: Количество требуемых токенов
+            
+        Returns:
+            bool: True, если токены доступны, False в противном случае
+        """
+        # Преобразование provider в строку, если это enum
+        if isinstance(provider, LLMProvider):
+            provider = provider.value
+            
+        # Получение лимита токенов
+        limit = self.get_token_limit(provider)
+        
+        # Если лимит неограничен (infinity), возвращаем True
+        if limit == float('inf'):
+            return True
+            
+        # Получение текущего использования
+        usage = self.get_token_usage(provider)
+        
+        # Проверка, что использование с учетом новых токенов не превысит лимит
+        return usage + tokens <= limit
+    
+    def get_recommended_provider(self, tokens: int) -> Tuple[str, float]:
+        """
+        Получение рекомендуемого провайдера для использования токенов.
+        
+        Args:
+            tokens: Количество требуемых токенов
+            
+        Returns:
+            Tuple[str, float]: Провайдер и относительная стоимость
+        """
+        available_providers = []
+        
+        # Перебор всех провайдеров
+        for provider in LLMProvider:
+            # Проверка доступности токенов
+            if self.check_token_availability(provider, tokens):
+                # Расчет относительной стоимости
+                cost = tokens * self.TOKEN_COST_RATIO.get(provider.value, 1.0)
+                available_providers.append((provider.value, cost))
+        
+        # Если нет доступных провайдеров, возвращаем LOCAL с максимальной стоимостью
+        if not available_providers:
+            return (LLMProvider.LOCAL.value, tokens * self.TOKEN_COST_RATIO.get(LLMProvider.LOCAL.value, 0.1))
+            
+        # Сортировка по стоимости (возрастание)
+        available_providers.sort(key=lambda x: x[1])
+        
+        # Возврат провайдера с минимальной стоимостью
+        return available_providers[0]
+    
+    def reset_daily_usage(self) -> bool:
+        """Сброс дневного использования токенов."""
+        today = datetime.now().strftime('%Y-%m-%d')
+        self.token_usage["daily_usage"][today] = {provider.value: 0 for provider in LLMProvider}
+        return self._save_token_usage()
+    
+    def get_usage_statistics(self) -> Dict[str, Any]:
+        """
+        Получение статистики использования токенов.
+        
+        Returns:
+            Dict[str, Any]: Статистика использования токенов
+        """
+        # Получение текущей даты
+        today = datetime.now().strftime('%Y-%m-%d')
+        
+        # Расчет статистики за последние 7 дней
+        last_7_days = [(datetime.now() - timedelta(days=i)).strftime('%Y-%m-%d') for i in range(7)]
+        last_7_days_usage = {}
+        
+        for provider in LLMProvider:
+            provider_value = provider.value
+            last_7_days_usage[provider_value] = sum(
+                self.token_usage["daily_usage"].get(day, {}).get(provider_value, 0)
+                for day in last_7_days
+            )
+        
+        # Формирование статистики
+        statistics = {
+            "user_id": self.user_id,
+            "tier": self.tier,
+            "total_usage": self.token_usage["total_usage"],
+            "today_usage": self.token_usage["daily_usage"].get(today, {}),
+            "last_7_days_usage": last_7_days_usage,
+            "token_limits": self.token_limits.get(self.tier, {}),
+            "utilization_percentage": {
+                provider.value: (self.token_usage["total_usage"].get(provider.value, 0) / self.token_limits.get(self.tier, {}).get(provider.value, 1)) * 100
+                if self.token_limits.get(self.tier, {}).get(provider.value, 0) > 0 else 0
+                for provider in LLMProvider
+            }
+        }
+        
+        return statistics
