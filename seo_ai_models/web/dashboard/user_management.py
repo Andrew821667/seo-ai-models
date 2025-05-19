@@ -1,195 +1,156 @@
 
 """
-UserManagement - Модуль для управления пользователями и правами доступа.
-Предоставляет функциональность для регистрации, аутентификации и
-управления правами доступа пользователей в системе.
+UserManagement - Модуль для управления пользователями через панель управления.
+Обеспечивает функциональность аутентификации, авторизации и управления пользователями.
 """
 
 from typing import Dict, List, Optional, Any, Union
 import json
 import logging
+import os
+from pathlib import Path
+from datetime import datetime, timedelta
+import uuid
 import hashlib
 import secrets
-from datetime import datetime, timedelta
-from uuid import uuid4, UUID
-from enum import Enum
-from pathlib import Path
 
-
-class UserRole(Enum):
-    """Роли пользователей в системе."""
-    ADMIN = "admin"
-    MANAGER = "manager"
-    ANALYST = "analyst"
-    VIEWER = "viewer"
-    GUEST = "guest"
-
+logger = logging.getLogger(__name__)
 
 class User:
-    """Класс пользователя системы."""
+    """Класс, представляющий пользователя в системе."""
     
     def __init__(self,
+                 user_id: str,
                  username: str,
                  email: str,
                  password_hash: str,
-                 role: UserRole = UserRole.VIEWER,
                  first_name: str = "",
                  last_name: str = "",
-                 created_at: Optional[datetime] = None):
-        self.id = str(uuid4())
+                 role: str = "user",
+                 status: str = "active",
+                 created_at: Optional[datetime] = None,
+                 updated_at: Optional[datetime] = None,
+                 last_login: Optional[datetime] = None,
+                 settings: Optional[Dict[str, Any]] = None):
+        """
+        Инициализирует пользователя.
+        
+        Args:
+            user_id: Уникальный идентификатор пользователя
+            username: Имя пользователя
+            email: Email пользователя
+            password_hash: Хеш пароля
+            first_name: Имя
+            last_name: Фамилия
+            role: Роль пользователя (admin, manager, user)
+            status: Статус пользователя (active, inactive, blocked)
+            created_at: Время создания
+            updated_at: Время последнего обновления
+            last_login: Время последнего входа
+            settings: Настройки пользователя
+        """
+        self.user_id = user_id
         self.username = username
         self.email = email
         self.password_hash = password_hash
-        self.role = role
         self.first_name = first_name
         self.last_name = last_name
+        self.role = role
+        self.status = status
         self.created_at = created_at or datetime.now()
-        self.last_login = None
-        self.is_active = True
-        self.preferences = {}
-        self.access_projects = []
+        self.updated_at = updated_at or datetime.now()
+        self.last_login = last_login
+        self.settings = settings or {}
         
-    def to_dict(self, include_sensitive: bool = False) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         """Преобразует пользователя в словарь."""
-        result = {
-            "id": self.id,
+        return {
+            "user_id": self.user_id,
             "username": self.username,
             "email": self.email,
-            "role": self.role.value,
+            "password_hash": self.password_hash,
             "first_name": self.first_name,
             "last_name": self.last_name,
+            "role": self.role,
+            "status": self.status,
             "created_at": self.created_at.isoformat(),
+            "updated_at": self.updated_at.isoformat(),
             "last_login": self.last_login.isoformat() if self.last_login else None,
-            "is_active": self.is_active,
-            "preferences": self.preferences,
-            "access_projects": self.access_projects
+            "settings": self.settings
         }
-        
-        if include_sensitive:
-            result["password_hash"] = self.password_hash
-            
-        return result
     
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'User':
         """Создает пользователя из словаря."""
-        user = cls(
-            username=data.get("username", ""),
-            email=data.get("email", ""),
-            password_hash=data.get("password_hash", ""),
-            role=UserRole(data.get("role", "viewer")),
+        # Обрабатываем даты, которые приходят в виде строк
+        created_at = datetime.fromisoformat(data["created_at"]) if isinstance(data.get("created_at"), str) else data.get("created_at")
+        updated_at = datetime.fromisoformat(data["updated_at"]) if isinstance(data.get("updated_at"), str) else data.get("updated_at")
+        last_login = datetime.fromisoformat(data["last_login"]) if isinstance(data.get("last_login"), str) and data.get("last_login") else None
+        
+        return cls(
+            user_id=data["user_id"],
+            username=data["username"],
+            email=data["email"],
+            password_hash=data["password_hash"],
             first_name=data.get("first_name", ""),
-            last_name=data.get("last_name", "")
+            last_name=data.get("last_name", ""),
+            role=data.get("role", "user"),
+            status=data.get("status", "active"),
+            created_at=created_at,
+            updated_at=updated_at,
+            last_login=last_login,
+            settings=data.get("settings", {})
         )
-        
-        user.id = data.get("id", str(uuid4()))
-        user.created_at = datetime.fromisoformat(data.get("created_at", datetime.now().isoformat()))
-        user.last_login = datetime.fromisoformat(data.get("last_login")) if data.get("last_login") else None
-        user.is_active = data.get("is_active", True)
-        user.preferences = data.get("preferences", {})
-        user.access_projects = data.get("access_projects", [])
-        
-        return user
     
     def get_full_name(self) -> str:
         """Возвращает полное имя пользователя."""
-        if self.first_name and self.last_name:
-            return f"{self.first_name} {self.last_name}"
-        elif self.first_name:
-            return self.first_name
-        elif self.last_name:
-            return self.last_name
-        else:
-            return self.username
-
-
-class Permission:
-    """Класс разрешения для доступа к ресурсам."""
-    
-    def __init__(self,
-                 resource_type: str,
-                 resource_id: str,
-                 user_id: str,
-                 can_view: bool = True,
-                 can_edit: bool = False,
-                 can_delete: bool = False,
-                 can_share: bool = False,
-                 created_at: Optional[datetime] = None):
-        self.id = str(uuid4())
-        self.resource_type = resource_type
-        self.resource_id = resource_id
-        self.user_id = user_id
-        self.can_view = can_view
-        self.can_edit = can_edit
-        self.can_delete = can_delete
-        self.can_share = can_share
-        self.created_at = created_at or datetime.now()
-        self.updated_at = self.created_at
-        
-    def to_dict(self) -> Dict[str, Any]:
-        """Преобразует разрешение в словарь."""
-        return {
-            "id": self.id,
-            "resource_type": self.resource_type,
-            "resource_id": self.resource_id,
-            "user_id": self.user_id,
-            "can_view": self.can_view,
-            "can_edit": self.can_edit,
-            "can_delete": self.can_delete,
-            "can_share": self.can_share,
-            "created_at": self.created_at.isoformat(),
-            "updated_at": self.updated_at.isoformat()
-        }
-    
-    @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> 'Permission':
-        """Создает разрешение из словаря."""
-        permission = cls(
-            resource_type=data.get("resource_type", ""),
-            resource_id=data.get("resource_id", ""),
-            user_id=data.get("user_id", ""),
-            can_view=data.get("can_view", True),
-            can_edit=data.get("can_edit", False),
-            can_delete=data.get("can_delete", False),
-            can_share=data.get("can_share", False)
-        )
-        
-        permission.id = data.get("id", str(uuid4()))
-        permission.created_at = datetime.fromisoformat(data.get("created_at", datetime.now().isoformat()))
-        permission.updated_at = datetime.fromisoformat(data.get("updated_at", datetime.now().isoformat()))
-        
-        return permission
+        if self.first_name or self.last_name:
+            return f"{self.first_name} {self.last_name}".strip()
+        return self.username
 
 
 class Session:
-    """Класс пользовательской сессии."""
+    """Класс, представляющий сессию пользователя."""
     
     def __init__(self,
+                 session_id: str,
                  user_id: str,
                  token: str,
                  expires_at: datetime,
                  created_at: Optional[datetime] = None,
                  ip_address: Optional[str] = None,
-                 user_agent: Optional[str] = None):
-        self.id = str(uuid4())
+                 user_agent: Optional[str] = None,
+                 is_active: bool = True):
+        """
+        Инициализирует сессию.
+        
+        Args:
+            session_id: Уникальный идентификатор сессии
+            user_id: ID пользователя
+            token: Токен сессии
+            expires_at: Время истечения срока действия
+            created_at: Время создания
+            ip_address: IP-адрес
+            user_agent: User-Agent браузера
+            is_active: Активна ли сессия
+        """
+        self.session_id = session_id
         self.user_id = user_id
         self.token = token
         self.expires_at = expires_at
         self.created_at = created_at or datetime.now()
-        self.last_activity = self.created_at
         self.ip_address = ip_address
         self.user_agent = user_agent
-        self.is_active = True
+        self.is_active = is_active
         
     def to_dict(self) -> Dict[str, Any]:
         """Преобразует сессию в словарь."""
         return {
-            "id": self.id,
+            "session_id": self.session_id,
             "user_id": self.user_id,
             "token": self.token,
             "expires_at": self.expires_at.isoformat(),
             "created_at": self.created_at.isoformat(),
-            "last_activity": self.last_activity.isoformat(),
             "ip_address": self.ip_address,
             "user_agent": self.user_agent,
             "is_active": self.is_active
@@ -198,424 +159,641 @@ class Session:
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'Session':
         """Создает сессию из словаря."""
-        session = cls(
-            user_id=data.get("user_id", ""),
-            token=data.get("token", ""),
-            expires_at=datetime.fromisoformat(data.get("expires_at", datetime.now().isoformat())),
+        # Обрабатываем даты, которые приходят в виде строк
+        expires_at = datetime.fromisoformat(data["expires_at"]) if isinstance(data.get("expires_at"), str) else data.get("expires_at")
+        created_at = datetime.fromisoformat(data["created_at"]) if isinstance(data.get("created_at"), str) else data.get("created_at")
+        
+        return cls(
+            session_id=data["session_id"],
+            user_id=data["user_id"],
+            token=data["token"],
+            expires_at=expires_at,
+            created_at=created_at,
             ip_address=data.get("ip_address"),
-            user_agent=data.get("user_agent")
+            user_agent=data.get("user_agent"),
+            is_active=data.get("is_active", True)
         )
-        
-        session.id = data.get("id", str(uuid4()))
-        session.created_at = datetime.fromisoformat(data.get("created_at", datetime.now().isoformat()))
-        session.last_activity = datetime.fromisoformat(data.get("last_activity", datetime.now().isoformat()))
-        session.is_active = data.get("is_active", True)
-        
-        return session
     
     def is_expired(self) -> bool:
-        """Проверяет, истекла ли сессия."""
+        """Проверяет, истек ли срок действия сессии."""
         return datetime.now() > self.expires_at
 
 
-class UserManager:
-    """Менеджер пользователей для управления пользователями и сессиями."""
+class UserManagement:
+    """
+    Класс для управления пользователями.
+    """
     
-    def __init__(self, data_dir: Optional[str] = None):
-        self.data_dir = Path(data_dir) if data_dir else Path("./data/users")
-        self.data_dir.mkdir(parents=True, exist_ok=True)
-        self.users: Dict[str, User] = {}
-        self.users_by_username: Dict[str, str] = {}  # username -> user_id
-        self.users_by_email: Dict[str, str] = {}     # email -> user_id
-        self.permissions: Dict[str, Permission] = {}
-        self.sessions: Dict[str, Session] = {}       # token -> session
-        self.sessions_by_user: Dict[str, List[str]] = {}  # user_id -> [token]
+    def __init__(self, data_dir: Optional[str] = None, api_client=None):
+        """
+        Инициализирует управление пользователями.
         
-    def load_users(self):
-        """Загружает пользователей из файлов."""
-        users_dir = self.data_dir / "users"
-        if not users_dir.exists():
-            users_dir.mkdir(parents=True, exist_ok=True)
-            return
-            
-        for user_file in users_dir.glob("*.json"):
+        Args:
+            data_dir: Директория для хранения данных пользователей (для локального режима)
+            api_client: Клиент API для взаимодействия с бэкендом
+        """
+        self.data_dir = data_dir or os.path.join(os.path.expanduser("~"), ".seo_ai_models", "users")
+        self.api_client = api_client
+        self.users = {}
+        self.sessions = {}
+        
+        # Создаем директорию для данных, если она не существует
+        os.makedirs(self.data_dir, exist_ok=True)
+        
+        # Загружаем существующих пользователей и сессии
+        self._load_users()
+        self._load_sessions()
+        
+        # Создаем администратора по умолчанию, если нет пользователей
+        if not self.users:
+            self._create_default_admin()
+    
+    def _load_users(self):
+        """Загружает существующих пользователей из хранилища."""
+        users_dir = os.path.join(self.data_dir, "users")
+        
+        # Создаем директорию, если она не существует
+        os.makedirs(users_dir, exist_ok=True)
+        
+        # Загружаем пользователей
+        for user_file in Path(users_dir).glob("*.json"):
             try:
-                with open(user_file, 'r') as f:
+                with open(user_file, 'r', encoding='utf-8') as f:
                     user_data = json.load(f)
-                user = User.from_dict(user_data)
-                self.users[user.id] = user
-                self.users_by_username[user.username.lower()] = user.id
-                self.users_by_email[user.email.lower()] = user.id
+                    user = User.from_dict(user_data)
+                    self.users[user.user_id] = user
             except Exception as e:
-                logging.error(f"Failed to load user from {user_file}: {str(e)}")
-                
-    def load_permissions(self):
-        """Загружает разрешения из файлов."""
-        permissions_dir = self.data_dir / "permissions"
-        if not permissions_dir.exists():
-            permissions_dir.mkdir(parents=True, exist_ok=True)
-            return
-            
-        for perm_file in permissions_dir.glob("*.json"):
+                logger.error(f"Failed to load user from {user_file}: {str(e)}")
+    
+    def _load_sessions(self):
+        """Загружает существующие сессии из хранилища."""
+        sessions_dir = os.path.join(self.data_dir, "sessions")
+        
+        # Создаем директорию, если она не существует
+        os.makedirs(sessions_dir, exist_ok=True)
+        
+        # Загружаем сессии
+        for session_file in Path(sessions_dir).glob("*.json"):
             try:
-                with open(perm_file, 'r') as f:
-                    perm_data = json.load(f)
-                permission = Permission.from_dict(perm_data)
-                self.permissions[permission.id] = permission
-            except Exception as e:
-                logging.error(f"Failed to load permission from {perm_file}: {str(e)}")
-                
-    def load_sessions(self):
-        """Загружает сессии из файлов."""
-        sessions_dir = self.data_dir / "sessions"
-        if not sessions_dir.exists():
-            sessions_dir.mkdir(parents=True, exist_ok=True)
-            return
-            
-        for session_file in sessions_dir.glob("*.json"):
-            try:
-                with open(session_file, 'r') as f:
+                with open(session_file, 'r', encoding='utf-8') as f:
                     session_data = json.load(f)
-                session = Session.from_dict(session_data)
-                
-                # Пропускаем истекшие сессии
-                if session.is_expired():
-                    continue
+                    session = Session.from_dict(session_data)
                     
-                self.sessions[session.token] = session
-                if session.user_id not in self.sessions_by_user:
-                    self.sessions_by_user[session.user_id] = []
-                self.sessions_by_user[session.user_id].append(session.token)
+                    # Пропускаем истекшие сессии
+                    if session.is_expired():
+                        continue
+                    
+                    self.sessions[session.session_id] = session
             except Exception as e:
-                logging.error(f"Failed to load session from {session_file}: {str(e)}")
+                logger.error(f"Failed to load session from {session_file}: {str(e)}")
     
-    def _hash_password(self, password: str, salt: Optional[str] = None) -> tuple:
-        """Хеширует пароль с использованием соли."""
-        if not salt:
-            salt = secrets.token_hex(16)
+    def _create_default_admin(self):
+        """Создает администратора по умолчанию."""
+        # Генерируем уникальный ID для пользователя
+        user_id = str(uuid.uuid4())
         
-        hasher = hashlib.sha256()
-        hasher.update((password + salt).encode('utf-8'))
-        password_hash = hasher.hexdigest()
-        
-        return f"{salt}:{password_hash}", salt
-    
-    def _verify_password(self, password: str, password_hash: str) -> bool:
-        """Проверяет соответствие пароля хешу."""
-        if ":" not in password_hash:
-            return False
-            
-        salt, hash_value = password_hash.split(":", 1)
-        calculated_hash, _ = self._hash_password(password, salt)
-        _, calculated_hash_value = calculated_hash.split(":", 1)
-        
-        return hash_value == calculated_hash_value
-    
-    def create_user(self, username: str, email: str, password: str, **kwargs) -> Optional[User]:
-        """Создает нового пользователя."""
-        # Проверяем уникальность username и email
-        if username.lower() in self.users_by_username:
-            logging.error(f"Username {username} already exists")
-            return None
-            
-        if email.lower() in self.users_by_email:
-            logging.error(f"Email {email} already exists")
-            return None
-            
-        # Хешируем пароль
-        password_hash, _ = self._hash_password(password)
+        # Хешируем пароль по умолчанию
+        password_hash = self._hash_password("admin123")
         
         # Создаем пользователя
         user = User(
-            username=username,
-            email=email,
+            user_id=user_id,
+            username="admin",
+            email="admin@example.com",
             password_hash=password_hash,
-            **kwargs
+            first_name="Admin",
+            last_name="User",
+            role="admin"
         )
         
         # Сохраняем пользователя
-        self.users[user.id] = user
-        self.users_by_username[user.username.lower()] = user.id
-        self.users_by_email[user.email.lower()] = user.id
+        self.users[user_id] = user
         self._save_user(user)
         
-        return user
+        logger.info("Created default admin user")
     
-    def authenticate(self, username_or_email: str, password: str) -> Optional[User]:
-        """Аутентифицирует пользователя по логину/email и паролю."""
-        user_id = None
+    def _hash_password(self, password: str) -> str:
+        """
+        Хеширует пароль.
         
-        # Ищем пользователя по username или email
-        if "@" in username_or_email:
-            user_id = self.users_by_email.get(username_or_email.lower())
-        else:
-            user_id = self.users_by_username.get(username_or_email.lower())
+        Args:
+            password: Пароль
             
-        if not user_id or user_id not in self.users:
-            return None
-            
-        user = self.users[user_id]
-        
-        # Проверяем активность пользователя
-        if not user.is_active:
-            return None
-            
-        # Проверяем пароль
-        if not self._verify_password(password, user.password_hash):
-            return None
-            
-        # Обновляем время последнего входа
-        user.last_login = datetime.now()
-        self._save_user(user)
-        
-        return user
+        Returns:
+            str: Хеш пароля
+        """
+        # Для простоты используем SHA-256
+        # В реальном приложении лучше использовать bcrypt или Argon2
+        return hashlib.sha256(password.encode()).hexdigest()
     
-    def create_session(self, user_id: str, expires_in: int = 86400, **kwargs) -> Optional[Session]:
-        """Создает новую сессию для пользователя."""
-        if user_id not in self.users:
-            return None
-            
-        # Генерируем токен
-        token = secrets.token_urlsafe(32)
+    def _verify_password(self, password: str, password_hash: str) -> bool:
+        """
+        Проверяет пароль.
         
-        # Создаем сессию
-        session = Session(
-            user_id=user_id,
-            token=token,
-            expires_at=datetime.now() + timedelta(seconds=expires_in),
-            **kwargs
-        )
-        
-        # Сохраняем сессию
-        self.sessions[token] = session
-        if user_id not in self.sessions_by_user:
-            self.sessions_by_user[user_id] = []
-        self.sessions_by_user[user_id].append(token)
-        self._save_session(session)
-        
-        return session
-    
-    def validate_session(self, token: str) -> Optional[User]:
-        """Проверяет валидность сессии и возвращает пользователя."""
-        if token not in self.sessions:
-            return None
+        Args:
+            password: Пароль
+            password_hash: Хеш пароля
             
-        session = self.sessions[token]
-        
-        # Проверяем срок действия сессии
-        if session.is_expired() or not session.is_active:
-            self._invalidate_session(token)
-            return None
-            
-        # Проверяем существование пользователя
-        if session.user_id not in self.users:
-            self._invalidate_session(token)
-            return None
-            
-        user = self.users[session.user_id]
-        
-        # Проверяем активность пользователя
-        if not user.is_active:
-            self._invalidate_session(token)
-            return None
-            
-        # Обновляем время последней активности сессии
-        session.last_activity = datetime.now()
-        self._save_session(session)
-        
-        return user
-    
-    def _invalidate_session(self, token: str):
-        """Инвалидирует сессию."""
-        if token not in self.sessions:
-            return
-            
-        session = self.sessions[token]
-        session.is_active = False
-        
-        user_id = session.user_id
-        if user_id in self.sessions_by_user and token in self.sessions_by_user[user_id]:
-            self.sessions_by_user[user_id].remove(token)
-            
-        self._save_session(session)
-    
-    def create_permission(self, resource_type: str, resource_id: str, user_id: str, **kwargs) -> Optional[Permission]:
-        """Создает новое разрешение для пользователя."""
-        if user_id not in self.users:
-            return None
-            
-        # Создаем разрешение
-        permission = Permission(
-            resource_type=resource_type,
-            resource_id=resource_id,
-            user_id=user_id,
-            **kwargs
-        )
-        
-        # Сохраняем разрешение
-        self.permissions[permission.id] = permission
-        self._save_permission(permission)
-        
-        return permission
-    
-    def get_user_permissions(self, user_id: str, resource_type: Optional[str] = None) -> List[Permission]:
-        """Возвращает разрешения пользователя."""
-        if user_id not in self.users:
-            return []
-            
-        return [
-            perm for perm in self.permissions.values()
-            if perm.user_id == user_id and (resource_type is None or perm.resource_type == resource_type)
-        ]
-    
-    def has_permission(self, user_id: str, resource_type: str, resource_id: str, 
-                       view: bool = False, edit: bool = False, delete: bool = False, share: bool = False) -> bool:
-        """Проверяет наличие разрешений у пользователя."""
-        if user_id not in self.users:
-            return False
-            
-        # Администраторы имеют полный доступ
-        user = self.users[user_id]
-        if user.role == UserRole.ADMIN:
-            return True
-            
-        for perm in self.permissions.values():
-            if perm.user_id == user_id and perm.resource_type == resource_type and perm.resource_id == resource_id:
-                if view and not perm.can_view:
-                    return False
-                if edit and not perm.can_edit:
-                    return False
-                if delete and not perm.can_delete:
-                    return False
-                if share and not perm.can_share:
-                    return False
-                return True
-                
-        return False
+        Returns:
+            bool: True, если пароль верный, иначе False
+        """
+        return self._hash_password(password) == password_hash
     
     def _save_user(self, user: User):
-        """Сохраняет пользователя в файл."""
-        users_dir = self.data_dir / "users"
-        users_dir.mkdir(parents=True, exist_ok=True)
+        """
+        Сохраняет пользователя в хранилище.
         
-        file_path = users_dir / f"{user.id}.json"
-        with open(file_path, 'w') as f:
-            json.dump(user.to_dict(include_sensitive=True), f, indent=2)
-    
-    def _save_permission(self, permission: Permission):
-        """Сохраняет разрешение в файл."""
-        permissions_dir = self.data_dir / "permissions"
-        permissions_dir.mkdir(parents=True, exist_ok=True)
+        Args:
+            user: Пользователь для сохранения
+        """
+        users_dir = os.path.join(self.data_dir, "users")
+        os.makedirs(users_dir, exist_ok=True)
         
-        file_path = permissions_dir / f"{permission.id}.json"
-        with open(file_path, 'w') as f:
-            json.dump(permission.to_dict(), f, indent=2)
+        user_file = os.path.join(users_dir, f"{user.user_id}.json")
+        
+        with open(user_file, 'w', encoding='utf-8') as f:
+            json.dump(user.to_dict(), f, indent=2, ensure_ascii=False)
     
     def _save_session(self, session: Session):
-        """Сохраняет сессию в файл."""
-        sessions_dir = self.data_dir / "sessions"
-        sessions_dir.mkdir(parents=True, exist_ok=True)
+        """
+        Сохраняет сессию в хранилище.
         
-        file_path = sessions_dir / f"{session.id}.json"
-        with open(file_path, 'w') as f:
-            json.dump(session.to_dict(), f, indent=2)
+        Args:
+            session: Сессия для сохранения
+        """
+        sessions_dir = os.path.join(self.data_dir, "sessions")
+        os.makedirs(sessions_dir, exist_ok=True)
+        
+        session_file = os.path.join(sessions_dir, f"{session.session_id}.json")
+        
+        with open(session_file, 'w', encoding='utf-8') as f:
+            json.dump(session.to_dict(), f, indent=2, ensure_ascii=False)
     
-    def get_user_by_id(self, user_id: str) -> Optional[User]:
-        """Возвращает пользователя по ID."""
+    def create_user(self, username: str, email: str, password: str,
+                  first_name: str = "", last_name: str = "",
+                  role: str = "user") -> User:
+        """
+        Создает нового пользователя.
+        
+        Args:
+            username: Имя пользователя
+            email: Email пользователя
+            password: Пароль
+            first_name: Имя
+            last_name: Фамилия
+            role: Роль пользователя
+            
+        Returns:
+            User: Созданный пользователь
+        """
+        # Проверяем уникальность имени пользователя и email
+        for user in self.users.values():
+            if user.username == username:
+                raise ValueError(f"User with username '{username}' already exists")
+            if user.email == email:
+                raise ValueError(f"User with email '{email}' already exists")
+        
+        # Генерируем уникальный ID для пользователя
+        user_id = str(uuid.uuid4())
+        
+        # Хешируем пароль
+        password_hash = self._hash_password(password)
+        
+        # Создаем пользователя
+        user = User(
+            user_id=user_id,
+            username=username,
+            email=email,
+            password_hash=password_hash,
+            first_name=first_name,
+            last_name=last_name,
+            role=role
+        )
+        
+        # Сохраняем пользователя
+        self.users[user_id] = user
+        self._save_user(user)
+        
+        return user
+    
+    def get_user(self, user_id: str) -> Optional[User]:
+        """
+        Получает пользователя по ID.
+        
+        Args:
+            user_id: ID пользователя
+            
+        Returns:
+            Optional[User]: Пользователь, если найден, иначе None
+        """
         return self.users.get(user_id)
     
     def get_user_by_username(self, username: str) -> Optional[User]:
-        """Возвращает пользователя по имени пользователя."""
-        user_id = self.users_by_username.get(username.lower())
-        if user_id:
-            return self.users.get(user_id)
+        """
+        Получает пользователя по имени пользователя.
+        
+        Args:
+            username: Имя пользователя
+            
+        Returns:
+            Optional[User]: Пользователь, если найден, иначе None
+        """
+        for user in self.users.values():
+            if user.username == username:
+                return user
         return None
     
     def get_user_by_email(self, email: str) -> Optional[User]:
-        """Возвращает пользователя по email."""
-        user_id = self.users_by_email.get(email.lower())
-        if user_id:
-            return self.users.get(user_id)
+        """
+        Получает пользователя по email.
+        
+        Args:
+            email: Email пользователя
+            
+        Returns:
+            Optional[User]: Пользователь, если найден, иначе None
+        """
+        for user in self.users.values():
+            if user.email == email:
+                return user
         return None
     
-    def update_user(self, user_id: str, **kwargs) -> Optional[User]:
-        """Обновляет данные пользователя."""
-        if user_id not in self.users:
-            return None
-            
-        user = self.users[user_id]
+    def get_users(self, role: Optional[str] = None,
+                 status: Optional[str] = None) -> List[User]:
+        """
+        Получает список пользователей с возможностью фильтрации.
         
-        # Проверяем изменение username
-        if "username" in kwargs and kwargs["username"].lower() != user.username.lower():
-            new_username = kwargs["username"].lower()
-            if new_username in self.users_by_username:
-                logging.error(f"Username {kwargs['username']} already exists")
-                return None
-            del self.users_by_username[user.username.lower()]
-            self.users_by_username[new_username] = user_id
+        Args:
+            role: Фильтр по роли
+            status: Фильтр по статусу
             
-        # Проверяем изменение email
-        if "email" in kwargs and kwargs["email"].lower() != user.email.lower():
-            new_email = kwargs["email"].lower()
-            if new_email in self.users_by_email:
-                logging.error(f"Email {kwargs['email']} already exists")
-                return None
-            del self.users_by_email[user.email.lower()]
-            self.users_by_email[new_email] = user_id
+        Returns:
+            List[User]: Список пользователей
+        """
+        result = []
+        
+        for user in self.users.values():
+            if role and user.role != role:
+                continue
+            if status and user.status != status:
+                continue
+            result.append(user)
+        
+        return result
+    
+    def update_user(self, user_id: str,
+                  username: Optional[str] = None,
+                  email: Optional[str] = None,
+                  first_name: Optional[str] = None,
+                  last_name: Optional[str] = None,
+                  role: Optional[str] = None,
+                  status: Optional[str] = None,
+                  settings: Optional[Dict[str, Any]] = None) -> Optional[User]:
+        """
+        Обновляет пользователя.
+        
+        Args:
+            user_id: ID пользователя
+            username: Новое имя пользователя
+            email: Новый email
+            first_name: Новое имя
+            last_name: Новая фамилия
+            role: Новая роль
+            status: Новый статус
+            settings: Новые настройки
             
-        # Проверяем изменение пароля
-        if "password" in kwargs:
-            password_hash, _ = self._hash_password(kwargs["password"])
-            kwargs["password_hash"] = password_hash
-            del kwargs["password"]
-            
-        # Обновляем данные пользователя
-        for key, value in kwargs.items():
-            if hasattr(user, key):
-                setattr(user, key, value)
-                
+        Returns:
+            Optional[User]: Обновленный пользователь, если найден, иначе None
+        """
+        user = self.get_user(user_id)
+        if not user:
+            return None
+        
+        # Проверяем уникальность имени пользователя и email
+        if username and username != user.username:
+            for other_user in self.users.values():
+                if other_user.user_id != user_id and other_user.username == username:
+                    raise ValueError(f"User with username '{username}' already exists")
+            user.username = username
+        
+        if email and email != user.email:
+            for other_user in self.users.values():
+                if other_user.user_id != user_id and other_user.email == email:
+                    raise ValueError(f"User with email '{email}' already exists")
+            user.email = email
+        
+        if first_name:
+            user.first_name = first_name
+        if last_name:
+            user.last_name = last_name
+        if role:
+            user.role = role
+        if status:
+            user.status = status
+        if settings:
+            user.settings.update(settings)
+        
+        user.updated_at = datetime.now()
+        
+        # Сохраняем пользователя
         self._save_user(user)
+        
         return user
     
     def delete_user(self, user_id: str) -> bool:
-        """Удаляет пользователя."""
-        if user_id not in self.users:
-            return False
-            
-        user = self.users[user_id]
+        """
+        Удаляет пользователя.
         
-        # Удаляем пользователя из индексов
-        del self.users_by_username[user.username.lower()]
-        del self.users_by_email[user.email.lower()]
+        Args:
+            user_id: ID пользователя
+            
+        Returns:
+            bool: True, если пользователь успешно удален, иначе False
+        """
+        user = self.get_user(user_id)
+        if not user:
+            return False
+        
+        # Помечаем пользователя как неактивного
+        user.status = "inactive"
+        user.updated_at = datetime.now()
+        
+        # Сохраняем пользователя
+        self._save_user(user)
         
         # Удаляем сессии пользователя
-        if user_id in self.sessions_by_user:
-            for token in self.sessions_by_user[user_id]:
-                self._invalidate_session(token)
-            del self.sessions_by_user[user_id]
-            
-        # Удаляем разрешения пользователя
-        permissions_to_delete = [perm.id for perm in self.permissions.values() if perm.user_id == user_id]
-        for perm_id in permissions_to_delete:
-            del self.permissions[perm_id]
-            perm_file = self.data_dir / "permissions" / f"{perm_id}.json"
-            if perm_file.exists():
-                perm_file.unlink()
-                
-        # Удаляем пользователя
-        del self.users[user_id]
-        user_file = self.data_dir / "users" / f"{user_id}.json"
-        if user_file.exists():
-            user_file.unlink()
-            
+        for session_id, session in list(self.sessions.items()):
+            if session.user_id == user_id:
+                session.is_active = False
+                self._save_session(session)
+                del self.sessions[session_id]
+        
         return True
-
-
-# Функция для создания экземпляра UserManager
-def create_user_manager(data_dir: Optional[str] = None) -> UserManager:
-    """Создает экземпляр менеджера пользователей."""
-    manager = UserManager(data_dir)
-    manager.load_users()
-    manager.load_permissions()
-    manager.load_sessions()
-    return manager
+    
+    def change_password(self, user_id: str, current_password: str,
+                      new_password: str) -> bool:
+        """
+        Изменяет пароль пользователя.
+        
+        Args:
+            user_id: ID пользователя
+            current_password: Текущий пароль
+            new_password: Новый пароль
+            
+        Returns:
+            bool: True, если пароль успешно изменен, иначе False
+        """
+        user = self.get_user(user_id)
+        if not user:
+            return False
+        
+        # Проверяем текущий пароль
+        if not self._verify_password(current_password, user.password_hash):
+            return False
+        
+        # Обновляем пароль
+        user.password_hash = self._hash_password(new_password)
+        user.updated_at = datetime.now()
+        
+        # Сохраняем пользователя
+        self._save_user(user)
+        
+        return True
+    
+    def reset_password(self, user_id: str, new_password: str) -> bool:
+        """
+        Сбрасывает пароль пользователя (для администратора).
+        
+        Args:
+            user_id: ID пользователя
+            new_password: Новый пароль
+            
+        Returns:
+            bool: True, если пароль успешно сброшен, иначе False
+        """
+        user = self.get_user(user_id)
+        if not user:
+            return False
+        
+        # Обновляем пароль
+        user.password_hash = self._hash_password(new_password)
+        user.updated_at = datetime.now()
+        
+        # Сохраняем пользователя
+        self._save_user(user)
+        
+        return True
+    
+    def login(self, username: str, password: str,
+            ip_address: Optional[str] = None,
+            user_agent: Optional[str] = None,
+            session_duration: int = 86400) -> Optional[Session]:
+        """
+        Выполняет вход пользователя.
+        
+        Args:
+            username: Имя пользователя или email
+            password: Пароль
+            ip_address: IP-адрес
+            user_agent: User-Agent браузера
+            session_duration: Продолжительность сессии в секундах (по умолчанию 24 часа)
+            
+        Returns:
+            Optional[Session]: Сессия, если вход выполнен успешно, иначе None
+        """
+        # Ищем пользователя по имени пользователя или email
+        user = self.get_user_by_username(username)
+        if not user:
+            user = self.get_user_by_email(username)
+        
+        if not user:
+            return None
+        
+        # Проверяем пароль
+        if not self._verify_password(password, user.password_hash):
+            return None
+        
+        # Проверяем статус пользователя
+        if user.status != "active":
+            return None
+        
+        # Генерируем уникальный ID для сессии
+        session_id = str(uuid.uuid4())
+        
+        # Генерируем токен
+        token = secrets.token_hex(32)
+        
+        # Устанавливаем время истечения срока действия
+        expires_at = datetime.now() + timedelta(seconds=session_duration)
+        
+        # Создаем сессию
+        session = Session(
+            session_id=session_id,
+            user_id=user.user_id,
+            token=token,
+            expires_at=expires_at,
+            ip_address=ip_address,
+            user_agent=user_agent
+        )
+        
+        # Обновляем время последнего входа пользователя
+        user.last_login = datetime.now()
+        user.updated_at = datetime.now()
+        
+        # Сохраняем сессию и пользователя
+        self.sessions[session_id] = session
+        self._save_session(session)
+        self._save_user(user)
+        
+        return session
+    
+    def logout(self, session_id: str) -> bool:
+        """
+        Выполняет выход пользователя.
+        
+        Args:
+            session_id: ID сессии
+            
+        Returns:
+            bool: True, если выход выполнен успешно, иначе False
+        """
+        session = self.sessions.get(session_id)
+        if not session:
+            return False
+        
+        # Деактивируем сессию
+        session.is_active = False
+        
+        # Сохраняем сессию
+        self._save_session(session)
+        
+        # Удаляем сессию из списка активных
+        del self.sessions[session_id]
+        
+        return True
+    
+    def validate_token(self, token: str) -> Optional[Session]:
+        """
+        Проверяет токен сессии.
+        
+        Args:
+            token: Токен сессии
+            
+        Returns:
+            Optional[Session]: Сессия, если токен действителен, иначе None
+        """
+        for session in self.sessions.values():
+            if session.token == token and session.is_active:
+                # Проверяем срок действия
+                if session.is_expired():
+                    # Деактивируем сессию
+                    session.is_active = False
+                    self._save_session(session)
+                    return None
+                
+                return session
+        
+        return None
+    
+    def get_user_by_token(self, token: str) -> Optional[User]:
+        """
+        Получает пользователя по токену сессии.
+        
+        Args:
+            token: Токен сессии
+            
+        Returns:
+            Optional[User]: Пользователь, если токен действителен, иначе None
+        """
+        session = self.validate_token(token)
+        if not session:
+            return None
+        
+        return self.get_user(session.user_id)
+    
+    def get_user_roles(self) -> List[str]:
+        """
+        Получает список доступных ролей пользователей.
+        
+        Returns:
+            List[str]: Список ролей
+        """
+        return ["admin", "manager", "user"]
+    
+    def get_user_statuses(self) -> List[str]:
+        """
+        Получает список доступных статусов пользователей.
+        
+        Returns:
+            List[str]: Список статусов
+        """
+        return ["active", "inactive", "blocked"]
+    
+    def get_active_sessions(self, user_id: Optional[str] = None) -> List[Session]:
+        """
+        Получает список активных сессий.
+        
+        Args:
+            user_id: ID пользователя (если указан, то только для этого пользователя)
+            
+        Returns:
+            List[Session]: Список активных сессий
+        """
+        result = []
+        
+        for session in self.sessions.values():
+            if user_id and session.user_id != user_id:
+                continue
+            if session.is_active and not session.is_expired():
+                result.append(session)
+        
+        return result
+    
+    def terminate_sessions(self, user_id: str) -> int:
+        """
+        Завершает все сессии пользователя.
+        
+        Args:
+            user_id: ID пользователя
+            
+        Returns:
+            int: Количество завершенных сессий
+        """
+        count = 0
+        
+        for session_id, session in list(self.sessions.items()):
+            if session.user_id == user_id and session.is_active:
+                session.is_active = False
+                self._save_session(session)
+                del self.sessions[session_id]
+                count += 1
+        
+        return count
+    
+    def get_user_statistics(self) -> Dict[str, Any]:
+        """
+        Получает статистику по пользователям.
+        
+        Returns:
+            Dict[str, Any]: Статистика по пользователям
+        """
+        active_users = len([u for u in self.users.values() if u.status == "active"])
+        inactive_users = len([u for u in self.users.values() if u.status == "inactive"])
+        blocked_users = len([u for u in self.users.values() if u.status == "blocked"])
+        
+        admins = len([u for u in self.users.values() if u.role == "admin"])
+        managers = len([u for u in self.users.values() if u.role == "manager"])
+        regular_users = len([u for u in self.users.values() if u.role == "user"])
+        
+        active_sessions = len(self.sessions)
+        
+        return {
+            "total_users": len(self.users),
+            "active_users": active_users,
+            "inactive_users": inactive_users,
+            "blocked_users": blocked_users,
+            "admins": admins,
+            "managers": managers,
+            "regular_users": regular_users,
+            "active_sessions": active_sessions
+        }

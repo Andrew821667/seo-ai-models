@@ -1,0 +1,13 @@
+{
+  "id": "a1849820-e701-491d-9ef0-e2b0439f0961",
+  "title": "Task 2",
+  "project_id": "5150fbef-363b-4fd5-8872-a01af184638e",
+  "description": "Second test task",
+  "status": "pending",
+  "priority": "medium",
+  "assignee_id": null,
+  "due_date": null,
+  "created_at": "2025-05-19T10:05:44.539084",
+  "updated_at": "2025-05-19T10:05:44.539084",
+  "metadata": {}
+}

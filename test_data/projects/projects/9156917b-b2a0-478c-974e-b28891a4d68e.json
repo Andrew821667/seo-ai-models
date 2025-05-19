@@ -1,0 +1,12 @@
+{
+  "id": "9156917b-b2a0-478c-974e-b28891a4d68e",
+  "name": "Test Project",
+  "description": "Project for testing",
+  "website": "https://example.com",
+  "status": "active",
+  "owner_id": null,
+  "created_at": "2025-05-19T10:06:13.533465",
+  "updated_at": "2025-05-19T10:06:13.533465",
+  "tasks_count": 0,
+  "metadata": {}
+}

@@ -1,0 +1,54 @@
+{
+  "id": "80c6de0d-0f8f-40c1-b15a-206f615ec5e9",
+  "title": "Test Report",
+  "project_id": "project123",
+  "report_type": "overview",
+  "description": "Report for testing",
+  "created_by": null,
+  "created_at": "2025-05-19T10:06:13.534528",
+  "updated_at": "2025-05-19T10:06:13.535020",
+  "visualizations": [
+    {
+      "id": "8892fcef-501a-4538-87eb-d1b3538a945a",
+      "title": "Test Visualization 1",
+      "visualization_type": "bar_chart",
+      "data": {
+        "labels": [
+          "A",
+          "B",
+          "C"
+        ],
+        "values": [
+          10,
+          20,
+          30
+        ]
+      },
+      "config": {},
+      "description": "First test visualization",
+      "created_at": "2025-05-19T10:06:13.534745"
+    },
+    {
+      "id": "fe4472c5-1570-4a91-ae78-14373651e50e",
+      "title": "Test Visualization 2",
+      "visualization_type": "pie_chart",
+      "data": {
+        "labels": [
+          "X",
+          "Y",
+          "Z"
+        ],
+        "values": [
+          15,
+          25,
+          35
+        ]
+      },
+      "config": {},
+      "description": "Second test visualization",
+      "created_at": "2025-05-19T10:06:13.535016"
+    }
+  ],
+  "metadata": {},
+  "content": {}
+}

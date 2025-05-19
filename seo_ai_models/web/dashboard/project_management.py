@@ -1,332 +1,530 @@
 
 """
-ProjectManagement - Модуль для управления проектами SEO-оптимизации.
-Предоставляет функциональность для создания, редактирования и отслеживания
-проектов и заданий по SEO-оптимизации.
+ProjectManagement - Модуль для управления проектами через панель управления.
+Обеспечивает функциональность создания, редактирования, удаления и анализа проектов.
 """
 
 from typing import Dict, List, Optional, Any, Union
 import json
 import logging
 from datetime import datetime
-from uuid import uuid4, UUID
-from enum import Enum
+import os
 from pathlib import Path
 
-
-class ProjectStatus(Enum):
-    """Статусы проекта."""
-    DRAFT = "draft"
-    ACTIVE = "active"
-    ON_HOLD = "on_hold"
-    COMPLETED = "completed"
-    ARCHIVED = "archived"
-
-
-class TaskPriority(Enum):
-    """Приоритеты задач."""
-    LOW = "low"
-    MEDIUM = "medium"
-    HIGH = "high"
-    CRITICAL = "critical"
-
-
-class TaskStatus(Enum):
-    """Статусы задач."""
-    PENDING = "pending"
-    IN_PROGRESS = "in_progress"
-    REVIEW = "review"
-    COMPLETED = "completed"
-    CANCELLED = "cancelled"
-
+logger = logging.getLogger(__name__)
 
 class Project:
-    """Класс проекта SEO-оптимизации."""
+    """Класс, представляющий проект в системе."""
     
     def __init__(self, 
+                 project_id: str,
                  name: str,
+                 url: str,
+                 created_at: Optional[datetime] = None,
+                 updated_at: Optional[datetime] = None,
+                 owner_id: Optional[str] = None,
                  description: str = "",
-                 website: str = "",
-                 status: ProjectStatus = ProjectStatus.DRAFT,
-                 owner_id: Optional[Union[str, UUID]] = None,
-                 created_at: Optional[datetime] = None):
-        self.id = str(uuid4())
+                 settings: Optional[Dict[str, Any]] = None,
+                 status: str = "active"):
+        """
+        Инициализирует проект.
+        
+        Args:
+            project_id: Уникальный идентификатор проекта
+            name: Название проекта
+            url: URL сайта или страницы проекта
+            created_at: Время создания проекта
+            updated_at: Время последнего обновления проекта
+            owner_id: ID владельца проекта
+            description: Описание проекта
+            settings: Настройки проекта
+            status: Статус проекта (active, archived, deleted)
+        """
+        self.project_id = project_id
         self.name = name
-        self.description = description
-        self.website = website
-        self.status = status
-        self.owner_id = str(owner_id) if owner_id else None
+        self.url = url
         self.created_at = created_at or datetime.now()
-        self.updated_at = self.created_at
-        self.tasks = []
-        self.metadata = {}
+        self.updated_at = updated_at or datetime.now()
+        self.owner_id = owner_id
+        self.description = description
+        self.settings = settings or {}
+        self.status = status
+        self.analyses = []
         
     def to_dict(self) -> Dict[str, Any]:
         """Преобразует проект в словарь."""
         return {
-            "id": self.id,
+            "project_id": self.project_id,
             "name": self.name,
-            "description": self.description,
-            "website": self.website,
-            "status": self.status.value,
-            "owner_id": self.owner_id,
+            "url": self.url,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
-            "tasks_count": len(self.tasks),
-            "metadata": self.metadata
+            "owner_id": self.owner_id,
+            "description": self.description,
+            "settings": self.settings,
+            "status": self.status,
+            "analyses_count": len(self.analyses)
         }
     
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'Project':
         """Создает проект из словаря."""
-        project = cls(
-            name=data.get("name", ""),
+        # Обрабатываем даты, которые приходят в виде строк
+        created_at = datetime.fromisoformat(data["created_at"]) if isinstance(data.get("created_at"), str) else data.get("created_at")
+        updated_at = datetime.fromisoformat(data["updated_at"]) if isinstance(data.get("updated_at"), str) else data.get("updated_at")
+        
+        return cls(
+            project_id=data["project_id"],
+            name=data["name"],
+            url=data["url"],
+            created_at=created_at,
+            updated_at=updated_at,
+            owner_id=data.get("owner_id"),
             description=data.get("description", ""),
-            website=data.get("website", ""),
-            status=ProjectStatus(data.get("status", "draft")),
-            owner_id=data.get("owner_id")
+            settings=data.get("settings", {}),
+            status=data.get("status", "active")
         )
-        
-        project.id = data.get("id", str(uuid4()))
-        project.created_at = datetime.fromisoformat(data.get("created_at", datetime.now().isoformat()))
-        project.updated_at = datetime.fromisoformat(data.get("updated_at", datetime.now().isoformat()))
-        project.metadata = data.get("metadata", {})
-        
-        return project
 
 
-class Task:
-    """Класс задачи SEO-оптимизации."""
+class Analysis:
+    """Класс, представляющий анализ проекта."""
     
     def __init__(self,
-                 title: str,
+                 analysis_id: str,
                  project_id: str,
-                 description: str = "",
-                 status: TaskStatus = TaskStatus.PENDING,
-                 priority: TaskPriority = TaskPriority.MEDIUM,
-                 assignee_id: Optional[str] = None,
-                 due_date: Optional[datetime] = None,
-                 created_at: Optional[datetime] = None):
-        self.id = str(uuid4())
-        self.title = title
+                 created_at: Optional[datetime] = None,
+                 completed_at: Optional[datetime] = None,
+                 status: str = "pending",
+                 settings: Optional[Dict[str, Any]] = None,
+                 results: Optional[Dict[str, Any]] = None):
+        """
+        Инициализирует анализ.
+        
+        Args:
+            analysis_id: Уникальный идентификатор анализа
+            project_id: ID проекта, к которому относится анализ
+            created_at: Время создания анализа
+            completed_at: Время завершения анализа
+            status: Статус анализа (pending, running, completed, failed)
+            settings: Настройки анализа
+            results: Результаты анализа
+        """
+        self.analysis_id = analysis_id
         self.project_id = project_id
-        self.description = description
-        self.status = status
-        self.priority = priority
-        self.assignee_id = assignee_id
-        self.due_date = due_date
         self.created_at = created_at or datetime.now()
-        self.updated_at = self.created_at
-        self.metadata = {}
+        self.completed_at = completed_at
+        self.status = status
+        self.settings = settings or {}
+        self.results = results or {}
         
     def to_dict(self) -> Dict[str, Any]:
-        """Преобразует задачу в словарь."""
+        """Преобразует анализ в словарь."""
         return {
-            "id": self.id,
-            "title": self.title,
+            "analysis_id": self.analysis_id,
             "project_id": self.project_id,
-            "description": self.description,
-            "status": self.status.value,
-            "priority": self.priority.value,
-            "assignee_id": self.assignee_id,
-            "due_date": self.due_date.isoformat() if self.due_date else None,
             "created_at": self.created_at.isoformat(),
-            "updated_at": self.updated_at.isoformat(),
-            "metadata": self.metadata
+            "completed_at": self.completed_at.isoformat() if self.completed_at else None,
+            "status": self.status,
+            "settings": self.settings,
+            "results": self.results
         }
     
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> 'Task':
-        """Создает задачу из словаря."""
-        task = cls(
-            title=data.get("title", ""),
-            project_id=data.get("project_id", ""),
-            description=data.get("description", ""),
-            status=TaskStatus(data.get("status", "pending")),
-            priority=TaskPriority(data.get("priority", "medium")),
-            assignee_id=data.get("assignee_id"),
-            due_date=datetime.fromisoformat(data.get("due_date")) if data.get("due_date") else None
+    def from_dict(cls, data: Dict[str, Any]) -> 'Analysis':
+        """Создает анализ из словаря."""
+        # Обрабатываем даты, которые приходят в виде строк
+        created_at = datetime.fromisoformat(data["created_at"]) if isinstance(data.get("created_at"), str) else data.get("created_at")
+        completed_at = datetime.fromisoformat(data["completed_at"]) if isinstance(data.get("completed_at"), str) and data.get("completed_at") else None
+        
+        return cls(
+            analysis_id=data["analysis_id"],
+            project_id=data["project_id"],
+            created_at=created_at,
+            completed_at=completed_at,
+            status=data.get("status", "pending"),
+            settings=data.get("settings", {}),
+            results=data.get("results", {})
+        )
+
+
+class ProjectManagement:
+    """
+    Класс для управления проектами в панели управления.
+    """
+    
+    def __init__(self, data_dir: Optional[str] = None, api_client=None):
+        """
+        Инициализирует управление проектами.
+        
+        Args:
+            data_dir: Директория для хранения данных проектов (для локального режима)
+            api_client: Клиент API для взаимодействия с бэкендом
+        """
+        self.data_dir = data_dir or os.path.join(os.path.expanduser("~"), ".seo_ai_models", "projects")
+        self.api_client = api_client
+        self.projects = {}
+        self.analyses = {}
+        
+        # Создаем директорию для данных, если она не существует
+        os.makedirs(self.data_dir, exist_ok=True)
+        
+        # Загружаем существующие проекты
+        self._load_projects()
+    
+    def _load_projects(self):
+        """Загружает существующие проекты из хранилища."""
+        projects_dir = os.path.join(self.data_dir, "projects")
+        analyses_dir = os.path.join(self.data_dir, "analyses")
+        
+        # Создаем директории, если они не существуют
+        os.makedirs(projects_dir, exist_ok=True)
+        os.makedirs(analyses_dir, exist_ok=True)
+        
+        # Загружаем проекты
+        for project_file in Path(projects_dir).glob("*.json"):
+            try:
+                with open(project_file, 'r', encoding='utf-8') as f:
+                    project_data = json.load(f)
+                    project = Project.from_dict(project_data)
+                    self.projects[project.project_id] = project
+            except Exception as e:
+                logger.error(f"Failed to load project from {project_file}: {str(e)}")
+        
+        # Загружаем анализы
+        for analysis_file in Path(analyses_dir).glob("*.json"):
+            try:
+                with open(analysis_file, 'r', encoding='utf-8') as f:
+                    analysis_data = json.load(f)
+                    analysis = Analysis.from_dict(analysis_data)
+                    self.analyses[analysis.analysis_id] = analysis
+                    
+                    # Добавляем анализ к соответствующему проекту
+                    if analysis.project_id in self.projects:
+                        self.projects[analysis.project_id].analyses.append(analysis.analysis_id)
+            except Exception as e:
+                logger.error(f"Failed to load analysis from {analysis_file}: {str(e)}")
+    
+    def create_project(self, name: str, url: str, description: str = "", 
+                     settings: Optional[Dict[str, Any]] = None, 
+                     owner_id: Optional[str] = None) -> Project:
+        """
+        Создает новый проект.
+        
+        Args:
+            name: Название проекта
+            url: URL сайта или страницы проекта
+            description: Описание проекта
+            settings: Настройки проекта
+            owner_id: ID владельца проекта
+            
+        Returns:
+            Project: Созданный проект
+        """
+        # Генерируем уникальный ID для проекта
+        import uuid
+        project_id = str(uuid.uuid4())
+        
+        # Создаем проект
+        project = Project(
+            project_id=project_id,
+            name=name,
+            url=url,
+            description=description,
+            settings=settings,
+            owner_id=owner_id
         )
         
-        task.id = data.get("id", str(uuid4()))
-        task.created_at = datetime.fromisoformat(data.get("created_at", datetime.now().isoformat()))
-        task.updated_at = datetime.fromisoformat(data.get("updated_at", datetime.now().isoformat()))
-        task.metadata = data.get("metadata", {})
+        # Сохраняем проект
+        self.projects[project_id] = project
+        self._save_project(project)
         
-        return task
-
-
-class ProjectManager:
-    """Менеджер проектов для управления проектами и задачами."""
+        return project
     
-    def __init__(self, data_dir: Optional[str] = None):
-        self.data_dir = Path(data_dir) if data_dir else Path("./data/projects")
-        self.data_dir.mkdir(parents=True, exist_ok=True)
-        self.projects: Dict[str, Project] = {}
-        self.tasks: Dict[str, Task] = {}
-        
-    def load_projects(self):
-        """Загружает проекты из файлов."""
-        projects_dir = self.data_dir / "projects"
-        if not projects_dir.exists():
-            projects_dir.mkdir(parents=True, exist_ok=True)
-            return
-            
-        for project_file in projects_dir.glob("*.json"):
-            try:
-                with open(project_file, 'r') as f:
-                    project_data = json.load(f)
-                project = Project.from_dict(project_data)
-                self.projects[project.id] = project
-            except Exception as e:
-                logging.error(f"Failed to load project from {project_file}: {str(e)}")
-                
-    def load_tasks(self):
-        """Загружает задачи из файлов."""
-        tasks_dir = self.data_dir / "tasks"
-        if not tasks_dir.exists():
-            tasks_dir.mkdir(parents=True, exist_ok=True)
-            return
-            
-        for task_file in tasks_dir.glob("*.json"):
-            try:
-                with open(task_file, 'r') as f:
-                    task_data = json.load(f)
-                task = Task.from_dict(task_data)
-                self.tasks[task.id] = task
-                
-                # Добавляем задачу в соответствующий проект
-                if task.project_id in self.projects:
-                    self.projects[task.project_id].tasks.append(task.id)
-            except Exception as e:
-                logging.error(f"Failed to load task from {task_file}: {str(e)}")
-                
-    def create_project(self, name: str, **kwargs) -> Project:
-        """Создает новый проект."""
-        project = Project(name=name, **kwargs)
-        self.projects[project.id] = project
-        self._save_project(project)
-        return project
-        
-    def update_project(self, project_id: str, **kwargs) -> Optional[Project]:
-        """Обновляет существующий проект."""
-        if project_id not in self.projects:
-            return None
-            
-        project = self.projects[project_id]
-        for key, value in kwargs.items():
-            if hasattr(project, key):
-                setattr(project, key, value)
-                
-        project.updated_at = datetime.now()
-        self._save_project(project)
-        return project
-        
     def _save_project(self, project: Project):
-        """Сохраняет проект в файл."""
-        projects_dir = self.data_dir / "projects"
-        projects_dir.mkdir(parents=True, exist_ok=True)
+        """
+        Сохраняет проект в хранилище.
         
-        file_path = projects_dir / f"{project.id}.json"
-        with open(file_path, 'w') as f:
-            json.dump(project.to_dict(), f, indent=2)
-            
-    def create_task(self, title: str, project_id: str, **kwargs) -> Optional[Task]:
-        """Создает новую задачу."""
-        if project_id not in self.projects:
-            return None
-            
-        task = Task(title=title, project_id=project_id, **kwargs)
-        self.tasks[task.id] = task
-        self.projects[project_id].tasks.append(task.id)
-        self._save_task(task)
-        return task
+        Args:
+            project: Проект для сохранения
+        """
+        projects_dir = os.path.join(self.data_dir, "projects")
+        os.makedirs(projects_dir, exist_ok=True)
         
-    def update_task(self, task_id: str, **kwargs) -> Optional[Task]:
-        """Обновляет существующую задачу."""
-        if task_id not in self.tasks:
-            return None
-            
-        task = self.tasks[task_id]
-        for key, value in kwargs.items():
-            if hasattr(task, key):
-                setattr(task, key, value)
-                
-        task.updated_at = datetime.now()
-        self._save_task(task)
-        return task
+        project_file = os.path.join(projects_dir, f"{project.project_id}.json")
         
-    def _save_task(self, task: Task):
-        """Сохраняет задачу в файл."""
-        tasks_dir = self.data_dir / "tasks"
-        tasks_dir.mkdir(parents=True, exist_ok=True)
-        
-        file_path = tasks_dir / f"{task.id}.json"
-        with open(file_path, 'w') as f:
-            json.dump(task.to_dict(), f, indent=2)
-            
+        with open(project_file, 'w', encoding='utf-8') as f:
+            json.dump(project.to_dict(), f, indent=2, ensure_ascii=False)
+    
     def get_project(self, project_id: str) -> Optional[Project]:
-        """Возвращает проект по ID."""
+        """
+        Получает проект по ID.
+        
+        Args:
+            project_id: ID проекта
+            
+        Returns:
+            Optional[Project]: Проект, если найден, иначе None
+        """
         return self.projects.get(project_id)
+    
+    def get_projects(self, owner_id: Optional[str] = None, 
+                    status: Optional[str] = None) -> List[Project]:
+        """
+        Получает список проектов с возможностью фильтрации.
         
-    def get_task(self, task_id: str) -> Optional[Task]:
-        """Возвращает задачу по ID."""
-        return self.tasks.get(task_id)
-        
-    def get_project_tasks(self, project_id: str) -> List[Task]:
-        """Возвращает список задач проекта."""
-        if project_id not in self.projects:
-            return []
+        Args:
+            owner_id: Фильтр по ID владельца
+            status: Фильтр по статусу
             
-        project = self.projects[project_id]
-        return [self.tasks.get(task_id) for task_id in project.tasks if task_id in self.tasks]
+        Returns:
+            List[Project]: Список проектов
+        """
+        result = []
         
+        for project in self.projects.values():
+            if owner_id and project.owner_id != owner_id:
+                continue
+            if status and project.status != status:
+                continue
+            result.append(project)
+        
+        return result
+    
+    def update_project(self, project_id: str, 
+                      name: Optional[str] = None,
+                      url: Optional[str] = None,
+                      description: Optional[str] = None,
+                      settings: Optional[Dict[str, Any]] = None,
+                      status: Optional[str] = None) -> Optional[Project]:
+        """
+        Обновляет проект.
+        
+        Args:
+            project_id: ID проекта
+            name: Новое название проекта
+            url: Новый URL сайта или страницы
+            description: Новое описание
+            settings: Новые настройки
+            status: Новый статус
+            
+        Returns:
+            Optional[Project]: Обновленный проект, если найден, иначе None
+        """
+        project = self.get_project(project_id)
+        if not project:
+            return None
+        
+        if name:
+            project.name = name
+        if url:
+            project.url = url
+        if description:
+            project.description = description
+        if settings:
+            project.settings.update(settings)
+        if status:
+            project.status = status
+        
+        project.updated_at = datetime.now()
+        
+        # Сохраняем проект
+        self._save_project(project)
+        
+        return project
+    
     def delete_project(self, project_id: str) -> bool:
-        """Удаляет проект и все его задачи."""
-        if project_id not in self.projects:
-            return False
-            
-        # Удаляем задачи проекта
-        project = self.projects[project_id]
-        for task_id in project.tasks:
-            if task_id in self.tasks:
-                del self.tasks[task_id]
-                task_file = self.data_dir / "tasks" / f"{task_id}.json"
-                if task_file.exists():
-                    task_file.unlink()
-                    
-        # Удаляем проект
-        del self.projects[project_id]
-        project_file = self.data_dir / "projects" / f"{project_id}.json"
-        if project_file.exists():
-            project_file.unlink()
-            
-        return True
+        """
+        Удаляет проект.
         
-    def delete_task(self, task_id: str) -> bool:
-        """Удаляет задачу."""
-        if task_id not in self.tasks:
+        Args:
+            project_id: ID проекта
+            
+        Returns:
+            bool: True, если проект успешно удален, иначе False
+        """
+        project = self.get_project(project_id)
+        if not project:
             return False
-            
-        task = self.tasks[task_id]
-        if task.project_id in self.projects:
-            project = self.projects[task.project_id]
-            if task_id in project.tasks:
-                project.tasks.remove(task_id)
-                self._save_project(project)
-                
-        del self.tasks[task_id]
-        task_file = self.data_dir / "tasks" / f"{task_id}.json"
-        if task_file.exists():
-            task_file.unlink()
-            
+        
+        # Помечаем проект как удаленный
+        project.status = "deleted"
+        project.updated_at = datetime.now()
+        
+        # Сохраняем проект
+        self._save_project(project)
+        
         return True
+    
+    def create_analysis(self, project_id: str, 
+                       settings: Optional[Dict[str, Any]] = None) -> Optional[Analysis]:
+        """
+        Создает новый анализ для проекта.
+        
+        Args:
+            project_id: ID проекта
+            settings: Настройки анализа
+            
+        Returns:
+            Optional[Analysis]: Созданный анализ, если проект найден, иначе None
+        """
+        project = self.get_project(project_id)
+        if not project:
+            return None
+        
+        # Генерируем уникальный ID для анализа
+        import uuid
+        analysis_id = str(uuid.uuid4())
+        
+        # Создаем анализ
+        analysis = Analysis(
+            analysis_id=analysis_id,
+            project_id=project_id,
+            settings=settings
+        )
+        
+        # Сохраняем анализ
+        self.analyses[analysis_id] = analysis
+        project.analyses.append(analysis_id)
+        self._save_analysis(analysis)
+        
+        return analysis
+    
+    def _save_analysis(self, analysis: Analysis):
+        """
+        Сохраняет анализ в хранилище.
+        
+        Args:
+            analysis: Анализ для сохранения
+        """
+        analyses_dir = os.path.join(self.data_dir, "analyses")
+        os.makedirs(analyses_dir, exist_ok=True)
+        
+        analysis_file = os.path.join(analyses_dir, f"{analysis.analysis_id}.json")
+        
+        with open(analysis_file, 'w', encoding='utf-8') as f:
+            json.dump(analysis.to_dict(), f, indent=2, ensure_ascii=False)
+    
+    def get_analysis(self, analysis_id: str) -> Optional[Analysis]:
+        """
+        Получает анализ по ID.
+        
+        Args:
+            analysis_id: ID анализа
+            
+        Returns:
+            Optional[Analysis]: Анализ, если найден, иначе None
+        """
+        return self.analyses.get(analysis_id)
+    
+    def get_project_analyses(self, project_id: str) -> List[Analysis]:
+        """
+        Получает список анализов для проекта.
+        
+        Args:
+            project_id: ID проекта
+            
+        Returns:
+            List[Analysis]: Список анализов
+        """
+        project = self.get_project(project_id)
+        if not project:
+            return []
+        
+        return [self.analyses.get(analysis_id) for analysis_id in project.analyses if analysis_id in self.analyses]
+    
+    def update_analysis_status(self, analysis_id: str, status: str, 
+                             results: Optional[Dict[str, Any]] = None) -> Optional[Analysis]:
+        """
+        Обновляет статус анализа.
+        
+        Args:
+            analysis_id: ID анализа
+            status: Новый статус
+            results: Результаты анализа (если status == "completed")
+            
+        Returns:
+            Optional[Analysis]: Обновленный анализ, если найден, иначе None
+        """
+        analysis = self.get_analysis(analysis_id)
+        if not analysis:
+            return None
+        
+        analysis.status = status
+        
+        if status == "completed":
+            analysis.completed_at = datetime.now()
+            if results:
+                analysis.results = results
+        
+        # Сохраняем анализ
+        self._save_analysis(analysis)
+        
+        return analysis
+    
+    def get_recent_analyses(self, limit: int = 10) -> List[Analysis]:
+        """
+        Получает список последних анализов.
+        
+        Args:
+            limit: Максимальное количество анализов
+            
+        Returns:
+            List[Analysis]: Список анализов
+        """
+        # Сортируем анализы по дате создания (от новых к старым)
+        sorted_analyses = sorted(
+            self.analyses.values(),
+            key=lambda x: x.created_at,
+            reverse=True
+        )
+        
+        return sorted_analyses[:limit]
 
-
-# Функция для создания экземпляра ProjectManager
-def create_project_manager(data_dir: Optional[str] = None) -> ProjectManager:
-    """Создает экземпляр менеджера проектов."""
-    manager = ProjectManager(data_dir)
-    manager.load_projects()
-    manager.load_tasks()
-    return manager
+    def get_active_analyses(self) -> List[Analysis]:
+        """
+        Получает список активных анализов (pending, running).
+        
+        Returns:
+            List[Analysis]: Список активных анализов
+        """
+        return [a for a in self.analyses.values() if a.status in ["pending", "running"]]
+    
+    def get_completed_analyses(self, limit: int = 100) -> List[Analysis]:
+        """
+        Получает список завершенных анализов.
+        
+        Args:
+            limit: Максимальное количество анализов
+            
+        Returns:
+            List[Analysis]: Список завершенных анализов
+        """
+        # Сортируем завершенные анализы по дате завершения (от новых к старым)
+        sorted_analyses = sorted(
+            [a for a in self.analyses.values() if a.status == "completed" and a.completed_at],
+            key=lambda x: x.completed_at,
+            reverse=True
+        )
+        
+        return sorted_analyses[:limit]
+    
+    def get_project_statistics(self) -> Dict[str, Any]:
+        """
+        Получает статистику по проектам.
+        
+        Returns:
+            Dict[str, Any]: Статистика по проектам
+        """
+        active_projects = len([p for p in self.projects.values() if p.status == "active"])
+        active_analyses = len(self.get_active_analyses())
+        completed_analyses = len([a for a in self.analyses.values() if a.status == "completed"])
+        failed_analyses = len([a for a in self.analyses.values() if a.status == "failed"])
+        
+        return {
+            "total_projects": len(self.projects),
+            "active_projects": active_projects,
+            "total_analyses": len(self.analyses),
+            "active_analyses": active_analyses,
+            "completed_analyses": completed_analyses,
+            "failed_analyses": failed_analyses
+        }

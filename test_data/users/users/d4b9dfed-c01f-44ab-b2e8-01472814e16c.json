@@ -1,0 +1,14 @@
+{
+  "id": "d4b9dfed-c01f-44ab-b2e8-01472814e16c",
+  "username": "testuser",
+  "email": "test@example.com",
+  "role": "analyst",
+  "first_name": "Test",
+  "last_name": "User",
+  "created_at": "2025-05-19T10:06:13.535613",
+  "last_login": "2025-05-19T10:06:13.535804",
+  "is_active": true,
+  "preferences": {},
+  "access_projects": [],
+  "password_hash": "7e856d70afe419e125cd62fc958fc95d:dbcbc18af38bb860fa1b1dd78737941cb7635853e8a3e39e9d3e4712c72bdef5"
+}
