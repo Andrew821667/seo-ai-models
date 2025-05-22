@@ -1,0 +1,63 @@
+{
+  "template_id": "b05c768a-aee2-4b32-ae02-4cf5838d1fb0",
+  "name": "LLM-оптимизация",
+  "description": "Шаблон для отчета по LLM-оптимизации",
+  "type": "llm_optimization",
+  "structure": {
+    "sections": [
+      {
+        "id": "summary",
+        "title": "Сводка",
+        "description": "Общая сводка по результатам анализа LLM-совместимости",
+        "content_type": "summary"
+      },
+      {
+        "id": "llm_content_analysis",
+        "title": "Анализ контента для LLM",
+        "description": "Подробный анализ контента с точки зрения LLM",
+        "content_type": "llm_content_metrics"
+      },
+      {
+        "id": "citability_analysis",
+        "title": "Анализ цитируемости",
+        "description": "Анализ потенциала цитирования контента в LLM-ответах",
+        "content_type": "citability_metrics"
+      },
+      {
+        "id": "semantic_structure",
+        "title": "Семантическая структура",
+        "description": "Анализ семантической структуры контента",
+        "content_type": "semantic_metrics"
+      },
+      {
+        "id": "llm_recommendations",
+        "title": "Рекомендации по LLM-оптимизации",
+        "description": "Рекомендации по улучшению для LLM",
+        "content_type": "llm_recommendations"
+      }
+    ],
+    "charts": [
+      {
+        "id": "llm_metrics_chart",
+        "title": "Метрики LLM",
+        "type": "radar",
+        "data_source": "llm_metrics"
+      },
+      {
+        "id": "citability_chart",
+        "title": "Метрики цитируемости",
+        "type": "bar",
+        "data_source": "citability_metrics"
+      },
+      {
+        "id": "semantic_structure_chart",
+        "title": "Семантическая структура",
+        "type": "tree",
+        "data_source": "semantic_metrics"
+      }
+    ]
+  },
+  "created_at": "2025-05-22T16:52:11.026097",
+  "updated_at": "2025-05-22T16:52:11.026097",
+  "creator_id": null
+}

@@ -1,0 +1,63 @@
+{
+  "template_id": "8f06f5d0-b55c-4382-a9f8-9e90bcc59986",
+  "name": "Стандартный анализ проекта",
+  "description": "Стандартный шаблон для отчета по анализу проекта",
+  "type": "analysis",
+  "structure": {
+    "sections": [
+      {
+        "id": "summary",
+        "title": "Сводка",
+        "description": "Общая сводка по результатам анализа",
+        "content_type": "summary"
+      },
+      {
+        "id": "content_analysis",
+        "title": "Анализ контента",
+        "description": "Подробный анализ контента",
+        "content_type": "content_metrics"
+      },
+      {
+        "id": "eeat_analysis",
+        "title": "Анализ E-E-A-T",
+        "description": "Анализ E-E-A-T (Experience, Expertise, Authoritativeness, Trustworthiness)",
+        "content_type": "eeat_metrics"
+      },
+      {
+        "id": "llm_compatibility",
+        "title": "Совместимость с LLM",
+        "description": "Анализ совместимости контента с требованиями LLM",
+        "content_type": "llm_metrics"
+      },
+      {
+        "id": "recommendations",
+        "title": "Рекомендации",
+        "description": "Рекомендации по улучшению",
+        "content_type": "recommendations"
+      }
+    ],
+    "charts": [
+      {
+        "id": "content_metrics_chart",
+        "title": "Метрики контента",
+        "type": "radar",
+        "data_source": "content_metrics"
+      },
+      {
+        "id": "eeat_metrics_chart",
+        "title": "Метрики E-E-A-T",
+        "type": "radar",
+        "data_source": "eeat_metrics"
+      },
+      {
+        "id": "llm_metrics_chart",
+        "title": "Метрики LLM",
+        "type": "radar",
+        "data_source": "llm_metrics"
+      }
+    ]
+  },
+  "created_at": "2025-05-22T16:52:11.026071",
+  "updated_at": "2025-05-22T16:52:11.026075",
+  "creator_id": null
+}

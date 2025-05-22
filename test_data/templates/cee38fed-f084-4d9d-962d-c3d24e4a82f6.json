@@ -1,0 +1,63 @@
+{
+  "template_id": "cee38fed-f084-4d9d-962d-c3d24e4a82f6",
+  "name": "Сравнение проектов",
+  "description": "Шаблон для сравнения нескольких проектов",
+  "type": "comparison",
+  "structure": {
+    "sections": [
+      {
+        "id": "summary",
+        "title": "Сводка",
+        "description": "Общая сводка по результатам сравнения",
+        "content_type": "summary"
+      },
+      {
+        "id": "content_comparison",
+        "title": "Сравнение контента",
+        "description": "Сравнение контента проектов",
+        "content_type": "content_comparison"
+      },
+      {
+        "id": "eeat_comparison",
+        "title": "Сравнение E-E-A-T",
+        "description": "Сравнение E-E-A-T проектов",
+        "content_type": "eeat_comparison"
+      },
+      {
+        "id": "llm_comparison",
+        "title": "Сравнение совместимости с LLM",
+        "description": "Сравнение совместимости проектов с требованиями LLM",
+        "content_type": "llm_comparison"
+      },
+      {
+        "id": "recommendations",
+        "title": "Рекомендации",
+        "description": "Сравнительные рекомендации по улучшению",
+        "content_type": "comparison_recommendations"
+      }
+    ],
+    "charts": [
+      {
+        "id": "content_comparison_chart",
+        "title": "Сравнение метрик контента",
+        "type": "bar",
+        "data_source": "content_comparison"
+      },
+      {
+        "id": "eeat_comparison_chart",
+        "title": "Сравнение метрик E-E-A-T",
+        "type": "bar",
+        "data_source": "eeat_comparison"
+      },
+      {
+        "id": "llm_comparison_chart",
+        "title": "Сравнение метрик LLM",
+        "type": "bar",
+        "data_source": "llm_comparison"
+      }
+    ]
+  },
+  "created_at": "2025-05-22T16:52:11.026087",
+  "updated_at": "2025-05-22T16:52:11.026087",
+  "creator_id": null
+}

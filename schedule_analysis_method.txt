@@ -1,0 +1,38 @@
+
+    def schedule_analysis(self, project_id: str, analysis_name: str, 
+                         analysis_type: str = 'full_seo',
+                         scheduled_time: Optional[datetime] = None,
+                         priority: str = 'normal') -> Optional[Analysis]:
+        """Планирует выполнение анализа проекта."""
+        from datetime import timedelta
+        import uuid
+        
+        project = self.get_project(project_id)
+        if not project:
+            print(f'❌ Проект {project_id} не найден для планирования анализа')
+            return None
+            
+        analysis_id = str(uuid.uuid4())
+        
+        if not scheduled_time:
+            scheduled_time = datetime.now() + timedelta(minutes=5)
+            
+        analysis = Analysis(
+            analysis_id=analysis_id,
+            project_id=project_id,
+            name=analysis_name,
+            type=analysis_type,
+            status='scheduled',
+            created_at=datetime.now(),
+            settings={
+                'scheduled_time': scheduled_time.isoformat(),
+                'priority': priority
+            }
+        )
+        
+        self.analyses[analysis_id] = analysis
+        project.analyses.append(analysis_id)
+        self._save_analysis(analysis)
+        
+        print(f'✅ Анализ "{analysis_name}" запланирован на {scheduled_time.strftime("%Y-%m-%d %H:%M:%S")}')
+        return analysis
