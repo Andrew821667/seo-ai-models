@@ -269,12 +269,3 @@ class UpgradePath:
             "status": "success",
             "message": f"Upgrade to {target_plan.value} cancelled"
         }
-
-
-    def get_personalized_recommendations(self):
-        """Возвращает персонализированные рекомендации."""
-        return [{'plan': 'basic', 'reason': 'Расширьте возможности'}]
-
-    def get_trial_offers(self):
-        """Возвращает пробные предложения."""
-        return [{'offer_type': '7_day_trial', 'plan': 'professional'}]

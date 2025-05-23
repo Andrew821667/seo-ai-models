@@ -58,13 +58,13 @@ class CPUUtilizationPolicy:
         # Проверяем, прошел ли период охлаждения
         current_time = time.time()
         if current_time - self.last_scale_time < self.cooldown_period:
-            return self._handle_cooldown_check(metrics)
+            return None
         
         # Получаем загрузку CPU
         cpu_utilization = metrics.get("cpu", {}).get("percent")
         
         if cpu_utilization is None:
-            return self._handle_no_metrics(metrics)
+            return None
         
         # Определяем, нужно ли масштабирование
         if cpu_utilization > self.scale_up_threshold:
@@ -86,7 +86,7 @@ class CPUUtilizationPolicy:
                 "reason": f"CPU utilization ({cpu_utilization}%) below scale down threshold ({self.scale_down_threshold}%)"
             }
         
-        return self._handle_no_scaling_needed(metrics)
+        return None
     
     def to_dict(self) -> Dict[str, Any]:
         """
@@ -107,22 +107,6 @@ class CPUUtilizationPolicy:
             "last_action": self.last_action
         }
 
-
-    def _handle_cooldown_check(self, metrics: Dict[str, Any]) -> None:
-        """Обрабатывает проверку периода охлаждения."""
-        logger.debug(f"Cooldown period active for {self.component}")
-        return None
-
-    def _handle_no_metrics(self, metrics: Dict[str, Any]) -> None:
-        """Обрабатывает отсутствие CPU метрик."""
-        logger.warning(f"No CPU metrics available for {self.component}")
-        return None
-
-    def _handle_no_scaling_needed(self, metrics: Dict[str, Any]) -> None:
-        """Обрабатывает случай когда масштабирование не требуется."""
-        cpu_util = metrics.get('cpu', {}).get('percent', 0)
-        logger.debug(f"No scaling needed for {self.component}, CPU: {cpu_util}%")
-        return None
 class AutoScaling:
     """
     Автоматическое масштабирование компонентов системы.
