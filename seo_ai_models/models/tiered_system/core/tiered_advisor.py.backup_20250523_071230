@@ -305,50 +305,7 @@ class FeatureGating:
             Список уровней
         """
         if feature_name not in self.FEATURE_AVAILABILITY:
-            # Проверяем, существует ли функция в конфигурации
-            if feature_name not in self.FEATURE_AVAILABILITY:
-                import logging
-                logger = logging.getLogger(__name__)
-                logger.warning(f"Feature '{feature_name}' not found in FEATURE_AVAILABILITY")
-                return []
-            
-            # Получаем доступные уровни для функции
-            available_tiers = []
-            feature_config = self.FEATURE_AVAILABILITY[feature_name]
-            
-            for tier, is_available in feature_config.items():
-                if is_available:
-                    # Добавляем информацию об уровне
-                    tier_info = {
-                        'tier': tier,
-                        'available': True,
-                        'feature': feature_name
-                    }
-                    
-                    # Добавляем дополнительную информацию об уровне
-                    if hasattr(self, 'TIER_METADATA'):
-                        tier_metadata = self.TIER_METADATA.get(tier, {})
-                        tier_info.update({
-                            'display_name': tier_metadata.get('display_name', tier.title()),
-                            'description': tier_metadata.get('description', f'{tier.title()} tier access'),
-                            'monthly_price': tier_metadata.get('monthly_price', 0),
-                            'yearly_price': tier_metadata.get('yearly_price', 0),
-                            'limits': tier_metadata.get('limits', {})
-                        })
-                    
-                    available_tiers.append(tier_info)
-            
-            # Сортируем уровни по приоритету (если определен)
-            if hasattr(self, 'TIER_PRIORITY'):
-                tier_priority = self.TIER_PRIORITY
-                available_tiers.sort(key=lambda x: tier_priority.get(x['tier'], 999))
-            
-            # Логируем результат
-            import logging
-            logger = logging.getLogger(__name__)
-            logger.debug(f"Available tiers for feature '{feature_name}': {[t['tier'] for t in available_tiers]}")
-            
-            return available_tiers
+            return []
         
         return [
             tier for tier, available in self.FEATURE_AVAILABILITY[feature_name].items()
