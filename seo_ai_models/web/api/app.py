@@ -11,6 +11,10 @@ from typing import Optional, Dict, Any
 # Импортируем роутеры
 from .routers import auth, projects, cms_connectors, webhooks
 
+# Новые роутеры для enhanced functionality
+from ...api.routes import auth_routes, enhanced_analysis_routes
+from ...api.websocket import routes as ws_routes
+
 # Конфигурация логгера
 logging.basicConfig(
     level=logging.INFO,
@@ -49,6 +53,11 @@ def create_app(config: Optional[Dict[str, Any]] = None) -> FastAPI:
     app.include_router(projects.router, prefix="/api/projects", tags=["Projects"])
     app.include_router(cms_connectors.router, prefix="/api/cms", tags=["CMS Connectors"])
     app.include_router(webhooks.router, prefix="/api/webhooks", tags=["Webhooks"])
+
+    # Новые enhanced роутеры
+    app.include_router(auth_routes.router, prefix="/api/v2", tags=["Auth V2"])
+    app.include_router(enhanced_analysis_routes.router, prefix="/api/v2", tags=["Enhanced Analysis"])
+    app.include_router(ws_routes.router, tags=["WebSocket"])
     
     @app.get("/api/health")
     async def health_check():
