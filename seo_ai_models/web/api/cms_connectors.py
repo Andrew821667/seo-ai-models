@@ -132,7 +132,7 @@ class CMSConnector(ABC):
         Returns:
             bool: True, если аутентификация успешна, иначе False
         """
-        pass
+        raise NotImplementedError("Subclasses must implement this method")
     
     @abstractmethod
     def get_pages(self) -> List[Dict[str, Any]]:
@@ -142,7 +142,7 @@ class CMSConnector(ABC):
         Returns:
             List[Dict[str, Any]]: Список страниц
         """
-        pass
+        raise NotImplementedError("Subclasses must implement this method")
     
     @abstractmethod
     def get_page_content(self, page_id: str) -> Dict[str, Any]:
@@ -155,7 +155,7 @@ class CMSConnector(ABC):
         Returns:
             Dict[str, Any]: Содержимое страницы
         """
-        pass
+        raise NotImplementedError("Subclasses must implement this method")
     
     @abstractmethod
     def update_page_content(self, page_id: str, content: str) -> bool:
@@ -169,7 +169,7 @@ class CMSConnector(ABC):
         Returns:
             bool: True, если обновление успешно, иначе False
         """
-        pass
+        raise NotImplementedError("Subclasses must implement this method")
     
     @abstractmethod
     def get_cms_info(self) -> Dict[str, Any]:
@@ -179,7 +179,7 @@ class CMSConnector(ABC):
         Returns:
             Dict[str, Any]: Информация о CMS
         """
-        pass
+        raise NotImplementedError("Subclasses must implement this method")
 
 
 class WordPressConnector(CMSConnector):

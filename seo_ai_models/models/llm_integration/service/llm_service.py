@@ -54,7 +54,7 @@ class LLMProvider(ABC):
         Returns:
             Dict[str, Any]: Ответ от LLM с метаданными
         """
-        pass
+        raise NotImplementedError("Subclasses must implement this method")
     
     @abstractmethod
     def estimate_tokens(self, prompt: str) -> int:
@@ -67,7 +67,7 @@ class LLMProvider(ABC):
         Returns:
             int: Оценка количества токенов
         """
-        pass
+        raise NotImplementedError("Subclasses must implement this method")
     
     @abstractmethod
     def estimate_cost(self, input_tokens: int, output_tokens: int) -> float:
@@ -81,7 +81,7 @@ class LLMProvider(ABC):
         Returns:
             float: Оценочная стоимость в рублях
         """
-        pass
+        raise NotImplementedError("Subclasses must implement this method")
     
 
 class OpenAIProvider(LLMProvider):

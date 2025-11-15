@@ -48,31 +48,37 @@ class AnalyticsConnector(ABC):
     def authenticate(self) -> bool:
         """
         Аутентифицирует коннектор в аналитической системе.
-        
+
         Returns:
             bool: True, если аутентификация успешна, иначе False
+
+        Raises:
+            NotImplementedError: Должен быть реализован в подклассе
         """
-        pass
+        raise NotImplementedError("Subclasses must implement authenticate() method")
     
     @abstractmethod
-    def get_visits(self, 
-                  start_date: str, 
-                  end_date: str, 
+    def get_visits(self,
+                  start_date: str,
+                  end_date: str,
                   dimensions: Optional[List[str]] = None,
                   metrics: Optional[List[str]] = None) -> Dict[str, Any]:
         """
         Получает данные о посещаемости сайта.
-        
+
         Args:
             start_date: Начальная дата в формате 'YYYY-MM-DD'
             end_date: Конечная дата в формате 'YYYY-MM-DD'
             dimensions: Измерения (группировки) для данных
             metrics: Метрики для данных
-            
+
         Returns:
             Dict[str, Any]: Данные о посещаемости
+
+        Raises:
+            NotImplementedError: Должен быть реализован в подклассе
         """
-        pass
+        raise NotImplementedError("Subclasses must implement get_visits() method")
     
     @abstractmethod
     def get_sources(self,
@@ -80,15 +86,18 @@ class AnalyticsConnector(ABC):
                    end_date: str) -> Dict[str, Any]:
         """
         Получает данные об источниках трафика.
-        
+
         Args:
             start_date: Начальная дата в формате 'YYYY-MM-DD'
             end_date: Конечная дата в формате 'YYYY-MM-DD'
-            
+
         Returns:
             Dict[str, Any]: Данные об источниках трафика
+
+        Raises:
+            NotImplementedError: Должен быть реализован в подклассе
         """
-        pass
+        raise NotImplementedError("Subclasses must implement get_sources() method")
     
     @abstractmethod
     def get_page_stats(self,
@@ -97,16 +106,19 @@ class AnalyticsConnector(ABC):
                       end_date: str) -> Dict[str, Any]:
         """
         Получает статистику по конкретной странице.
-        
+
         Args:
             page_path: Путь к странице
             start_date: Начальная дата в формате 'YYYY-MM-DD'
             end_date: Конечная дата в формате 'YYYY-MM-DD'
-            
+
         Returns:
             Dict[str, Any]: Статистика по странице
+
+        Raises:
+            NotImplementedError: Должен быть реализован в подклассе
         """
-        pass
+        raise NotImplementedError("Subclasses must implement get_page_stats() method")
     
     def generate_chart(self, 
                       data: pd.DataFrame, 

@@ -162,15 +162,25 @@ async def update_project(
 async def delete_project(project_id: str, token: str = Depends(oauth2_scheme)):
     """
     Удаление проекта по ID.
-    
+
     Args:
         project_id: ID проекта.
         token: Токен доступа.
+
+    Raises:
+        HTTPException: 501 Not Implemented - функционал находится в разработке.
     """
-    # Здесь будет код для удаления проекта
-    # с использованием ProjectManager
-    
-    pass
+    # TODO: Реализовать удаление проекта с использованием ProjectManager
+    # - Проверить существование проекта
+    # - Проверить права доступа (только владелец может удалить)
+    # - Удалить все связанные задачи и данные
+    # - Удалить проект из базы данных
+    # - Логировать операцию удаления
+
+    raise HTTPException(
+        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        detail="Project deletion functionality is not implemented yet. Coming soon!"
+    )
 
 
 # Маршруты для задач
@@ -336,13 +346,23 @@ async def update_task(
 async def delete_task(project_id: str, task_id: str, token: str = Depends(oauth2_scheme)):
     """
     Удаление задачи по ID.
-    
+
     Args:
         project_id: ID проекта.
         task_id: ID задачи.
         token: Токен доступа.
+
+    Raises:
+        HTTPException: 501 Not Implemented - функционал находится в разработке.
     """
-    # Здесь будет код для удаления задачи
-    # с использованием ProjectManager
-    
-    pass
+    # TODO: Реализовать удаление задачи с использованием ProjectManager
+    # - Проверить существование проекта и задачи
+    # - Проверить права доступа
+    # - Удалить задачу из базы данных
+    # - Обновить счетчик задач проекта
+    # - Логировать операцию удаления
+
+    raise HTTPException(
+        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        detail="Task deletion functionality is not implemented yet. Coming soon!"
+    )

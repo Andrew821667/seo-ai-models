@@ -286,8 +286,8 @@ class AdvancedSPACrawler:
                         self.failed_urls.add(current_url)
                         try:
                             await page.close()
-                        except:
-                            pass
+                        except Exception as e:
+                            logger.debug(f"Exception: {str(e)}")
                 
             finally:
                 # Закрываем браузер
@@ -448,10 +448,10 @@ class AdvancedSPACrawler:
                                     "timestamp": time.time()
                                 }
                                 
-                        except:
-                            pass
-                except:
-                    pass
+                        except Exception as e:
+                            logger.debug(f"Exception: {str(e)}")
+                except Exception as e:
+                    logger.debug(f"Exception: {str(e)}")
                     
         except Exception as e:
             logger.error(f"Ошибка при обработке запроса {url}: {str(e)}")
@@ -490,10 +490,10 @@ class AdvancedSPACrawler:
                             # Перехватываем GraphQL-ответ
                             self.graphql_interceptor.intercept_response(body, None, status)
                             
-                    except:
-                        pass
-                except:
-                    pass
+                    except Exception as e:
+                        logger.debug(f"Exception: {str(e)}")
+                except Exception as e:
+                    logger.debug(f"Exception: {str(e)}")
                     
         except Exception as e:
             logger.error(f"Ошибка при обработке ответа {url}: {str(e)}")
@@ -647,8 +647,8 @@ class AdvancedSPACrawler:
                         
                         # Регистрируем изменение маршрута
                         self.routing_handler.record_route_change(from_url, to_url, state)
-        except:
-            pass
+        except Exception as e:
+            logger.debug(f"Exception: {str(e)}")
     
     async def _extract_links_from_page(self, page: Page, current_url: str) -> Set[str]:
         """
@@ -786,8 +786,8 @@ class AdvancedSPACrawler:
                         await element.focus()
                         await asyncio.sleep(0.2)
                         break
-            except:
-                pass
+            except Exception as e:
+                logger.debug(f"Exception: {str(e)}")
                 
         except Exception as e:
             logger.warning(f"Ошибка при эмуляции поведения пользователя: {str(e)}")

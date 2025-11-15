@@ -10,6 +10,8 @@ import logging
 import json
 import hmac
 import hashlib
+import os
+import secrets
 
 from .auth import oauth2_scheme
 
@@ -43,10 +45,12 @@ async def create_webhook(
         token: Токен доступа.
     """
     # Здесь будет код для создания webhook
-    
+
     # Генерация секретного ключа для подписи
+    # Используем переменную окружения или генерируем безопасный секрет
+    secret_key = os.environ.get("WEBHOOK_SECRET_KEY", secrets.token_hex(32))
     webhook_secret = hmac.new(
-        key=bytes("secret_key", "utf-8"),  # В реальном коде ключ должен быть безопасным
+        key=bytes(secret_key, "utf-8"),
         msg=bytes(f"{url}:{','.join(events)}", "utf-8"),
         digestmod=hashlib.sha256
     ).hexdigest()
@@ -179,14 +183,25 @@ async def update_webhook(
 async def delete_webhook(webhook_id: str, token: str = Depends(oauth2_scheme)):
     """
     Удаление webhook по ID.
-    
+
     Args:
         webhook_id: ID webhook.
         token: Токен доступа.
+
+    Raises:
+        HTTPException: 501 Not Implemented - функционал находится в разработке.
     """
-    # Здесь будет код для удаления webhook
-    
-    pass
+    # TODO: Реализовать удаление webhook
+    # - Проверить существование webhook
+    # - Проверить права доступа
+    # - Удалить webhook из базы данных
+    # - Деактивировать все связанные подписки
+    # - Логировать операцию удаления
+
+    raise HTTPException(
+        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        detail="Webhook deletion functionality is not implemented yet. Coming soon!"
+    )
 
 
 # Маршрут для тестирования webhook
