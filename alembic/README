@@ -1,0 +1,43 @@
+# Database Migrations with Alembic
+
+This directory contains database migration scripts using Alembic.
+
+## Commands
+
+### Create a new migration
+```bash
+alembic revision --autogenerate -m "Description of changes"
+```
+
+### Apply migrations
+```bash
+# Upgrade to latest
+alembic upgrade head
+
+# Upgrade one step
+alembic upgrade +1
+
+# Downgrade one step
+alembic downgrade -1
+```
+
+### View migration history
+```bash
+alembic history
+
+# View current version
+alembic current
+```
+
+### Offline SQL generation
+```bash
+alembic upgrade head --sql > migration.sql
+```
+
+## Migration Best Practices
+
+1. Always review auto-generated migrations before applying
+2. Test migrations in development environment first
+3. Create backup before running migrations in production
+4. Use descriptive migration messages
+5. Never edit applied migrations - create new ones instead

@@ -9,8 +9,9 @@ from sqlalchemy.orm import Session
 
 from .database.connection import SessionLocal
 from .services.auth_service import AuthService
-from .services.project_service_db import ProjectServiceDB
-from .services.webhook_service_db import WebhookServiceDB
+from .services.project_service_cached import ProjectServiceCached
+from .services.webhook_service_cached import WebhookServiceCached
+from .services.cache_service import get_cache_service
 from .routers.auth import oauth2_scheme
 
 logger = logging.getLogger(__name__)
@@ -30,14 +31,19 @@ def get_auth_service() -> AuthService:
     return AuthService()
 
 
-def get_project_service(db: Session = Depends(get_db)) -> ProjectServiceDB:
-    """Get ProjectServiceDB instance."""
-    return ProjectServiceDB(db)
+def get_project_service(db: Session = Depends(get_db)) -> ProjectServiceCached:
+    """Get ProjectServiceCached instance with Redis caching."""
+    return ProjectServiceCached(db)
 
 
-def get_webhook_service(db: Session = Depends(get_db)) -> WebhookServiceDB:
-    """Get WebhookServiceDB instance."""
-    return WebhookServiceDB(db)
+def get_webhook_service(db: Session = Depends(get_db)) -> WebhookServiceCached:
+    """Get WebhookServiceCached instance with Redis caching."""
+    return WebhookServiceCached(db)
+
+
+def get_cache_service_dependency():
+    """Get CacheService instance."""
+    return get_cache_service()
 
 
 def get_current_user_id(
