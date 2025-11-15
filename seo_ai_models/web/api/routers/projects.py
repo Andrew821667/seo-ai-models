@@ -6,15 +6,42 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from typing import List, Optional
 from datetime import datetime
+import logging
 
 from ..models.projects import (
     ProjectCreate, ProjectResponse, ProjectUpdate,
     TaskCreate, TaskResponse, TaskUpdate
 )
 from .auth import oauth2_scheme
+from ..services.project_service import ProjectService
 
 # Создаем объект роутера
 router = APIRouter()
+
+# Логгер
+logger = logging.getLogger(__name__)
+
+# Глобальный экземпляр сервиса (в production будет через Dependency Injection)
+_project_service = None
+
+
+def get_project_service() -> ProjectService:
+    """Получает экземпляр ProjectService (Dependency)."""
+    global _project_service
+    if _project_service is None:
+        _project_service = ProjectService()
+    return _project_service
+
+
+def get_current_user_id(token: str = Depends(oauth2_scheme)) -> str:
+    """
+    Извлекает ID текущего пользователя из токена.
+
+    В реальной системе здесь будет декодирование JWT токена.
+    Пока возвращаем тестовый ID.
+    """
+    # TODO: Implement actual JWT token decoding
+    return "user123"
 
 
 # Маршрут для получения списка проектов
@@ -159,28 +186,57 @@ async def update_project(
 
 # Маршрут для удаления проекта
 @router.delete("/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_project(project_id: str, token: str = Depends(oauth2_scheme)):
+async def delete_project(
+    project_id: str,
+    user_id: str = Depends(get_current_user_id),
+    service: ProjectService = Depends(get_project_service)
+):
     """
-    Удаление проекта по ID.
+    Удаление проекта по ID (soft delete).
+
+    Проект помечается как удаленный, но физически не удаляется из хранилища.
+    Все связанные задачи также помечаются как удаленные.
 
     Args:
         project_id: ID проекта.
-        token: Токен доступа.
+        user_id: ID текущего пользователя (из токена).
+        service: Сервис проектов (dependency injection).
 
     Raises:
-        HTTPException: 501 Not Implemented - функционал находится в разработке.
-    """
-    # TODO: Реализовать удаление проекта с использованием ProjectManager
-    # - Проверить существование проекта
-    # - Проверить права доступа (только владелец может удалить)
-    # - Удалить все связанные задачи и данные
-    # - Удалить проект из базы данных
-    # - Логировать операцию удаления
+        HTTPException: 404 Not Found - проект не найден.
+        HTTPException: 403 Forbidden - недостаточно прав для удаления.
 
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Project deletion functionality is not implemented yet. Coming soon!"
-    )
+    Returns:
+        Статус 204 No Content при успешном удалении.
+    """
+    logger.info(f"User {user_id} attempting to delete project {project_id}")
+
+    result = service.delete_project(project_id, user_id)
+
+    if not result["success"]:
+        error = result.get("error", "Unknown error")
+
+        if "not found" in error.lower():
+            logger.warning(f"Project {project_id} not found")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Project {project_id} not found"
+            )
+        elif "access denied" in error.lower():
+            logger.warning(f"User {user_id} access denied for project {project_id}")
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Access denied. Only project owner can delete the project."
+            )
+        else:
+            logger.error(f"Error deleting project {project_id}: {error}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Failed to delete project: {error}"
+            )
+
+    logger.info(f"Project {project_id} successfully deleted. {result.get('tasks_deleted', 0)} tasks deleted.")
+    # Возвращаем 204 No Content (FastAPI автоматически обработает при успехе)
 
 
 # Маршруты для задач
@@ -343,26 +399,62 @@ async def update_task(
 
 # Маршрут для удаления задачи
 @router.delete("/{project_id}/tasks/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_task(project_id: str, task_id: str, token: str = Depends(oauth2_scheme)):
+async def delete_task(
+    project_id: str,
+    task_id: str,
+    user_id: str = Depends(get_current_user_id),
+    service: ProjectService = Depends(get_project_service)
+):
     """
-    Удаление задачи по ID.
+    Удаление задачи по ID (soft delete).
+
+    Задача помечается как удаленная, но физически не удаляется из хранилища.
 
     Args:
         project_id: ID проекта.
         task_id: ID задачи.
-        token: Токен доступа.
+        user_id: ID текущего пользователя (из токена).
+        service: Сервис проектов (dependency injection).
 
     Raises:
-        HTTPException: 501 Not Implemented - функционал находится в разработке.
-    """
-    # TODO: Реализовать удаление задачи с использованием ProjectManager
-    # - Проверить существование проекта и задачи
-    # - Проверить права доступа
-    # - Удалить задачу из базы данных
-    # - Обновить счетчик задач проекта
-    # - Логировать операцию удаления
+        HTTPException: 404 Not Found - задача не найдена.
+        HTTPException: 403 Forbidden - недостаточно прав для удаления.
+        HTTPException: 400 Bad Request - задача не принадлежит проекту.
 
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Task deletion functionality is not implemented yet. Coming soon!"
-    )
+    Returns:
+        Статус 204 No Content при успешном удалении.
+    """
+    logger.info(f"User {user_id} attempting to delete task {task_id} from project {project_id}")
+
+    result = service.delete_task(project_id, task_id, user_id)
+
+    if not result["success"]:
+        error = result.get("error", "Unknown error")
+
+        if "not found" in error.lower():
+            logger.warning(f"Task {task_id} not found")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Task {task_id} not found"
+            )
+        elif "access denied" in error.lower():
+            logger.warning(f"User {user_id} access denied for task {task_id}")
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Access denied. You don't have permission to delete this task."
+            )
+        elif "does not belong" in error.lower():
+            logger.warning(f"Task {task_id} does not belong to project {project_id}")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Task {task_id} does not belong to project {project_id}"
+            )
+        else:
+            logger.error(f"Error deleting task {task_id}: {error}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Failed to delete task: {error}"
+            )
+
+    logger.info(f"Task {task_id} successfully deleted from project {project_id}")
+    # Возвращаем 204 No Content (FastAPI автоматически обработает при успехе)

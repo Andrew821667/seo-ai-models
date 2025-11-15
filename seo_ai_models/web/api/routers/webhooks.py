@@ -14,11 +14,29 @@ import os
 import secrets
 
 from .auth import oauth2_scheme
+from ..services.webhook_service import WebhookService
 
 # Создаем объект роутера
 router = APIRouter()
 
 logger = logging.getLogger(__name__)
+
+# Глобальный экземпляр сервиса
+_webhook_service = None
+
+
+def get_webhook_service() -> WebhookService:
+    """Получает экземпляр WebhookService."""
+    global _webhook_service
+    if _webhook_service is None:
+        _webhook_service = WebhookService()
+    return _webhook_service
+
+
+def get_current_user_id(token: str = Depends(oauth2_scheme)) -> str:
+    """Извлекает ID пользователя из токена."""
+    # TODO: Implement JWT decoding
+    return "user123"
 
 
 # Модели данных для webhooks будут определены здесь
@@ -180,28 +198,49 @@ async def update_webhook(
 
 # Маршрут для удаления webhook
 @router.delete("/{webhook_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_webhook(webhook_id: str, token: str = Depends(oauth2_scheme)):
+async def delete_webhook(
+    webhook_id: str,
+    user_id: str = Depends(get_current_user_id),
+    service: WebhookService = Depends(get_webhook_service)
+):
     """
-    Удаление webhook по ID.
+    Удаление webhook по ID (soft delete).
+
+    Webhook деактивируется, но не удаляется из хранилища.
 
     Args:
         webhook_id: ID webhook.
-        token: Токен доступа.
+        user_id: ID текущего пользователя.
+        service: Сервис webhooks (dependency injection).
 
     Raises:
-        HTTPException: 501 Not Implemented - функционал находится в разработке.
-    """
-    # TODO: Реализовать удаление webhook
-    # - Проверить существование webhook
-    # - Проверить права доступа
-    # - Удалить webhook из базы данных
-    # - Деактивировать все связанные подписки
-    # - Логировать операцию удаления
+        HTTPException: 404 Not Found - webhook не найден.
 
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Webhook deletion functionality is not implemented yet. Coming soon!"
-    )
+    Returns:
+        Статус 204 No Content при успешном удалении.
+    """
+    logger.info(f"User {user_id} attempting to delete webhook {webhook_id}")
+
+    result = service.delete_webhook(webhook_id, user_id)
+
+    if not result["success"]:
+        error = result.get("error", "Unknown error")
+
+        if "not found" in error.lower():
+            logger.warning(f"Webhook {webhook_id} not found")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Webhook {webhook_id} not found"
+            )
+        else:
+            logger.error(f"Error deleting webhook {webhook_id}: {error}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Failed to delete webhook: {error}"
+            )
+
+    logger.info(f"Webhook {webhook_id} successfully deactivated")
+    # Возвращаем 204 No Content
 
 
 # Маршрут для тестирования webhook
