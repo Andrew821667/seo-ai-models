@@ -52,8 +52,9 @@ class CacheManager:
         key_data = url
         if params:
             key_data += json.dumps(params, sort_keys=True)
-            
-        return hashlib.md5(key_data.encode('utf-8')).hexdigest()
+
+        # MD5 используется только для кеширования, не для криптографии
+        return hashlib.md5(key_data.encode('utf-8'), usedforsecurity=False).hexdigest()
     
     def _get_cache_path(self, cache_key: str) -> str:
         """

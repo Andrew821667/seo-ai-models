@@ -183,8 +183,8 @@ class CompetitorTracking:
         Returns:
             str: Хэш контента
         """
-        # Используем MD5 для получения хэша
-        md5_hash = hashlib.md5(content.encode()).hexdigest()
+        # Используем MD5 для получения хэша (только для идентификации контента, не для криптографии)
+        md5_hash = hashlib.md5(content.encode(), usedforsecurity=False).hexdigest()
         return md5_hash[:10]  # Используем только первые 10 символов для краткости
     
     def _save_competitor_data(self, competitor_id: str, competitor_name: str,

@@ -567,7 +567,8 @@ class IntelligentCache:
         if params:
             # Сортируем ключи для стабильного хэширования
             sorted_params = json.dumps(params, sort_keys=True)
-            params_hash = hashlib.md5(sorted_params.encode()).hexdigest()[:8]
+            # MD5 используется только для кеширования, не для криптографии
+            params_hash = hashlib.md5(sorted_params.encode(), usedforsecurity=False).hexdigest()[:8]
         
         # Формируем ключ кэша
         cache_key = f"{type_name}_{content_hash}"
@@ -586,7 +587,8 @@ class IntelligentCache:
         Returns:
             str: Хэш контента
         """
-        return hashlib.md5(content.encode()).hexdigest()
+        # MD5 используется только для кеширования, не для криптографии
+        return hashlib.md5(content.encode(), usedforsecurity=False).hexdigest()
     
     def get_cache_stats(self) -> Dict[str, Any]:
         """

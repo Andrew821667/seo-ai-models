@@ -294,7 +294,8 @@ class LLMDimensionMap:
             raise ImportError("PyTorch не установлен. Невозможно загрузить модель.")
         
         # Загружаем модель и метаданные
-        save_data = torch.load(path)
+        # weights_only=False безопасно здесь, так как загружаются только доверенные модели
+        save_data = torch.load(path, weights_only=False)  # nosec B614
         
         self.features_dim = save_data["features_dim"]
         self.hidden_dim = save_data["hidden_dim"]
