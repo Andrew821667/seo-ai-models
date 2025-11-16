@@ -12,7 +12,8 @@ Pillow>=10.0.0
 
 # Machine Learning - CPU версии для быстрой установки
 # PyTorch CPU-only (легче и быстрее устанавливается)
-torch>=2.0.0+cpu --index-url https://download.pytorch.org/whl/cpu
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch>=2.0.0
 tiktoken>=0.5.0
 
 # NLP и семантический анализ (базовые версии)
