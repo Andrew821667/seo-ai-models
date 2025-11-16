@@ -133,8 +133,7 @@ jobs:
 
       - name: Run Bandit security scan
         run: |
-          bandit -r seo_ai_models -f json -o bandit-report.json
-        continue-on-error: true
+          bandit -r seo_ai_models -f json -o bandit-report.json || true
         timeout-minutes: 10
 
       - name: Check dependencies for vulnerabilities
