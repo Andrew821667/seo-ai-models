@@ -1029,9 +1029,9 @@ class EnhancedSPACrawlerLLM:
                             }} else if (['a'].includes(tagName)) {{
                                 // Ссылки
                                 const innerText = extractFormattedText(node);
-                                const href = node.getAttribute('href');
+                                const href = node.getAttribute('href');  # noqa: F821
                                 if (innerText) {{
-                                    result += innerText + (href ? ` [${href}]` : '');
+                                    result += innerText + (href ? ` [${{href}}]` : '');
                                 }}
                             }} else {{
                                 // Прочие элементы

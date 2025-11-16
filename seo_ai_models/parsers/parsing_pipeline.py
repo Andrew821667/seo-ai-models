@@ -4,9 +4,11 @@
 """
 
 import logging
+import re
 import time
 import json
 from typing import Dict, List, Optional, Any, Union
+from urllib.parse import urlparse
 
 from seo_ai_models.parsers.crawlers.web_crawler import WebCrawler
 from seo_ai_models.parsers.extractors.content_extractor import ContentExtractor

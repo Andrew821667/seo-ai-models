@@ -17,6 +17,8 @@ import logging
 from typing import Dict, Any, List, Optional
 from datetime import datetime
 
+logger = logging.getLogger(__name__)
+
 # Base advisor
 from .seo_advisor.advisor import SEOAdvisor, SEOAnalysisReport
 
@@ -59,8 +61,6 @@ except ImportError as e:
     CROIntegration = None
     MobileOptimizer = None
     AIContentGenerator = None
-
-logger = logging.getLogger(__name__)
 
 
 class EnhancedSEOAdvisor:
