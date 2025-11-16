@@ -218,28 +218,28 @@ class JSEnhancedUnifiedParser(UnifiedParser):
                 soup = BeautifulSoup(html_content, 'html.parser')
 
                 # 1. Извлекаем информацию о формах
-                forms_info = []
+                forms_info: List[Dict[str, Any]] = []
                 forms = soup.find_all('form')
                 for i, form in enumerate(forms):
-                    form_info = {
+                    form_info: Dict[str, Any] = {
                         'id': i,
-                        'action': form.get('action', ''),
-                        'method': form.get('method', 'get').upper(),
+                        'action': str(form.get('action', '')),
+                        'method': str(form.get('method', 'get')).upper(),
                         'fields': []
                     }
 
                     # Извлекаем информацию о полях формы
                     inputs = form.find_all(['input', 'select', 'textarea'])
                     for input_field in inputs:
-                        field_info = {
-                            'type': input_field.name,
-                            'name': input_field.get('name', ''),
-                            'id': input_field.get('id', ''),
+                        field_info: Dict[str, Any] = {
+                            'type': str(input_field.name) if input_field.name else '',
+                            'name': str(input_field.get('name', '')),
+                            'id': str(input_field.get('id', '')),
                             'required': input_field.has_attr('required'),
                         }
 
                         if input_field.name == 'input':
-                            field_info['input_type'] = input_field.get('type', 'text')
+                            field_info['input_type'] = str(input_field.get('type', 'text'))
 
                         form_info['fields'].append(field_info)
 
@@ -249,7 +249,7 @@ class JSEnhancedUnifiedParser(UnifiedParser):
                     result['page_data']['forms'] = forms_info
 
                 # 2. Извлекаем информацию о медиа-контенте
-                media_info = {
+                media_info: Dict[str, List[Dict[str, Any]]] = {
                     'images': [],
                     'videos': [],
                     'audio': []
@@ -258,29 +258,30 @@ class JSEnhancedUnifiedParser(UnifiedParser):
                 # Изображения
                 images = soup.find_all('img')
                 for img in images:
-                    img_info = {
-                        'src': img.get('src', ''),
-                        'alt': img.get('alt', ''),
-                        'width': img.get('width', ''),
-                        'height': img.get('height', ''),
-                        'lazy_loading': img.get('loading') == 'lazy'
+                    img_info: Dict[str, Any] = {
+                        'src': str(img.get('src', '')),
+                        'alt': str(img.get('alt', '')),
+                        'width': str(img.get('width', '')),
+                        'height': str(img.get('height', '')),
+                        'lazy_loading': str(img.get('loading', '')) == 'lazy'
                     }
                     media_info['images'].append(img_info)
 
                 # Видео
                 videos = soup.find_all(['video', 'iframe'])
                 for video in videos:
+                    video_info: Dict[str, Any]
                     if video.name == 'video':
                         video_info = {
-                            'src': video.get('src', ''),
+                            'src': str(video.get('src', '')),
                             'type': 'html5',
-                            'width': video.get('width', ''),
-                            'height': video.get('height', ''),
+                            'width': str(video.get('width', '')),
+                            'height': str(video.get('height', '')),
                             'controls': video.has_attr('controls'),
                             'autoplay': video.has_attr('autoplay')
                         }
                     else:  # iframe
-                        src = video.get('src', '')
+                        src = str(video.get('src', ''))
                         video_type = 'unknown'
                         if 'youtube' in src:
                             video_type = 'youtube'
@@ -290,8 +291,8 @@ class JSEnhancedUnifiedParser(UnifiedParser):
                         video_info = {
                             'src': src,
                             'type': video_type,
-                            'width': video.get('width', ''),
-                            'height': video.get('height', '')
+                            'width': str(video.get('width', '')),
+                            'height': str(video.get('height', ''))
                         }
 
                     media_info['videos'].append(video_info)
@@ -299,8 +300,8 @@ class JSEnhancedUnifiedParser(UnifiedParser):
                 # Аудио
                 audios = soup.find_all('audio')
                 for audio in audios:
-                    audio_info = {
-                        'src': audio.get('src', ''),
+                    audio_info: Dict[str, Any] = {
+                        'src': str(audio.get('src', '')),
                         'controls': audio.has_attr('controls'),
                         'autoplay': audio.has_attr('autoplay')
                     }
