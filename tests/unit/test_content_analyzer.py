@@ -1,5 +1,5 @@
 import pytest
-from seo_advisor.core.models.content_analyzer import ContentAnalyzer
+from seo_ai_models.models.seo_advisor.analyzers.content_analyzer import ContentAnalyzer
 
 def test_content_analyzer_initialization():
     analyzer = ContentAnalyzer()

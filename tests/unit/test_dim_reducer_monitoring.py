@@ -5,7 +5,7 @@ import torch
 import numpy as np
 from unittest.mock import patch, MagicMock
 
-from models.dim_reducer.monitoring import DimReducerMonitor
+from seo_ai_models.models.dim_reducer.monitoring import DimReducerMonitor
 
 @pytest.fixture
 def monitor():

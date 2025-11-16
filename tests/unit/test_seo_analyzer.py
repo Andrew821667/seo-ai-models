@@ -1,6 +1,6 @@
 import pytest
-from seo_advisor.core.models.content_analyzer import ContentAnalyzer
-from seo_advisor.core.models.rank_predictor import RankPredictor
+from seo_ai_models.models.seo_advisor.analyzers.content_analyzer import ContentAnalyzer
+from seo_ai_models.models.seo_advisor.predictors.rank_predictor import RankPredictor
 
 class TestSEOAnalyzer:
     @pytest.fixture

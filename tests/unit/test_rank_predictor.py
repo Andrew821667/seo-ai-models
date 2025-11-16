@@ -1,5 +1,5 @@
 import pytest
-from seo_advisor.core.models.rank_predictor import RankPredictor
+from seo_ai_models.models.seo_advisor.predictors.rank_predictor import RankPredictor
 
 def test_rank_predictor_initialization():
     predictor = RankPredictor()

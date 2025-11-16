@@ -39,7 +39,7 @@ class TestAutoFixEngine:
     def test_register_action(self, engine):
         """Test registering fix actions."""
         fixer = MetaTagsFixer(llm_service=None)
-        engine.register_action("missing_meta_tags", fixer)
+        engine.register_fix_action("missing_meta_tags", fixer)
 
         assert "missing_meta_tags" in engine.actions_registry
         assert engine.actions_registry["missing_meta_tags"] == fixer
@@ -48,7 +48,7 @@ class TestAutoFixEngine:
         """Test creating fix plan from analysis."""
         # Register fixer
         fixer = MetaTagsFixer(llm_service=None)
-        engine.register_action("missing_meta_tags", fixer)
+        engine.register_fix_action("missing_meta_tags", fixer)
 
         # Create plan
         plan = engine.analyze_and_plan(sample_analysis)
@@ -83,7 +83,7 @@ class TestAutoFixEngine:
     def test_execute_plan_with_auto_execute(self, engine, sample_analysis):
         """Test executing fix plan with auto-execute enabled."""
         fixer = MetaTagsFixer(llm_service=None)
-        engine.register_action("missing_meta_tags", fixer)
+        engine.register_fix_action("missing_meta_tags", fixer)
 
         plan = engine.analyze_and_plan(sample_analysis)
 
