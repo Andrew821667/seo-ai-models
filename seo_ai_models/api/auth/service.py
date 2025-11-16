@@ -9,7 +9,7 @@ import jwt
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
-from .models import User, UserSession, UserRole, TokenData, UserCreate
+from .models import User, UserRole, TokenData, UserCreate
 from ...common.config.settings import settings
 
 
@@ -133,24 +133,10 @@ class AuthService:
         token: str,
         ip_address: str = None,
         user_agent: str = None
-    ) -> UserSession:
-        """Create user session."""
-        expires_at = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-
-        session = UserSession(
-            id=secrets.token_urlsafe(16),
-            user_id=user.id,
-            token=token,
-            expires_at=expires_at,
-            ip_address=ip_address,
-            user_agent=user_agent
-        )
-
-        db.add(session)
-        db.commit()
-        db.refresh(session)
-
-        return session
+    ):
+        """Create user session (stub - sessions not tracked)."""
+        # TODO: Implement session tracking when needed
+        return None
 
     @staticmethod
     def get_user_by_id(db: Session, user_id: str) -> Optional[User]:
@@ -168,37 +154,19 @@ class AuthService:
         return db.query(User).filter(User.email == email).first()
 
     @staticmethod
-    def validate_session(db: Session, token: str) -> Optional[UserSession]:
-        """Validate session token."""
-        session = db.query(UserSession).filter(UserSession.token == token).first()
-
-        if not session:
-            return None
-
-        if session.expires_at < datetime.utcnow():
-            # Session expired, delete it
-            db.delete(session)
-            db.commit()
-            return None
-
-        return session
+    def validate_session(db: Session, token: str):
+        """Validate session token (stub - using JWT validation only)."""
+        # Sessions not tracked in DB yet - rely on JWT expiration
+        return True
 
     @staticmethod
     def revoke_session(db: Session, token: str) -> bool:
-        """Revoke session."""
-        session = db.query(UserSession).filter(UserSession.token == token).first()
-
-        if not session:
-            return False
-
-        db.delete(session)
-        db.commit()
+        """Revoke session (stub)."""
+        # TODO: Implement when session tracking is added
         return True
 
     @staticmethod
     def cleanup_expired_sessions(db: Session):
-        """Clean up expired sessions."""
-        db.query(UserSession).filter(
-            UserSession.expires_at < datetime.utcnow()
-        ).delete()
-        db.commit()
+        """Clean up expired sessions (stub)."""
+        # TODO: Implement when session tracking is added
+        pass

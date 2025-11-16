@@ -13,8 +13,10 @@ from .connection import Base
 class UserRole(str, enum.Enum):
     """User role enumeration."""
     ADMIN = "admin"
+    ANALYST = "analyst"
     USER = "user"
-    VIEWER = "viewer"
+    OBSERVER = "observer"
+    VIEWER = "viewer"  # Legacy support
 
 
 class ProjectStatus(str, enum.Enum):
@@ -53,6 +55,8 @@ class User(Base):
     full_name = Column(String(255))
     role = Column(Enum(UserRole), default=UserRole.USER, nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
+    is_verified = Column(Boolean, default=False)  # Added for auth v2
+    last_login = Column(DateTime, nullable=True)  # Added for auth v2
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

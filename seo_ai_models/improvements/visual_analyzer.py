@@ -10,9 +10,20 @@ Visual Content Analyzer - Анализ и оптимизация визуаль�
 
 import logging
 from typing import Dict, Any, List
-from PIL import Image
-import requests
 from io import BytesIO
+
+# Optional imports
+try:
+    from PIL import Image
+    PIL_AVAILABLE = True
+except ImportError:
+    PIL_AVAILABLE = False
+
+try:
+    import requests
+    REQUESTS_AVAILABLE = True
+except ImportError:
+    REQUESTS_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
 

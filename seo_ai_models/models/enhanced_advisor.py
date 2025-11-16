@@ -30,19 +30,35 @@ from ..autofix.fixers import (
     InternalLinksFixer
 )
 
-# Improvement modules
-from ..improvements import (
-    ContentRefreshAutomation,
-    VisualContentAnalyzer,
-    IntentBasedOptimizer,
-    CompetitorMonitor,
-    InternationalSEO,
-    LinkBuildingAssistant,
-    PredictiveAnalytics,
-    CROIntegration,
-    MobileOptimizer,
-    AIContentGenerator
-)
+# Improvement modules (optional)
+try:
+    from ..improvements import (
+        ContentRefreshAutomation,
+        VisualContentAnalyzer,
+        IntentBasedOptimizer,
+        CompetitorMonitor,
+        InternationalSEO,
+        LinkBuildingAssistant,
+        PredictiveAnalytics,
+        CROIntegration,
+        MobileOptimizer,
+        AIContentGenerator
+    )
+    IMPROVEMENTS_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"Some improvement modules not available: {e}")
+    IMPROVEMENTS_AVAILABLE = False
+    # Create dummy classes
+    ContentRefreshAutomation = None
+    VisualContentAnalyzer = None
+    IntentBasedOptimizer = None
+    CompetitorMonitor = None
+    InternationalSEO = None
+    LinkBuildingAssistant = None
+    PredictiveAnalytics = None
+    CROIntegration = None
+    MobileOptimizer = None
+    AIContentGenerator = None
 
 logger = logging.getLogger(__name__)
 
@@ -87,55 +103,69 @@ class EnhancedSEOAdvisor:
         # Register fixers
         self._register_fixers(llm_service, cms_connector)
 
-        # Improvement modules
-        self.content_refresh = ContentRefreshAutomation(
-            cms_connector=cms_connector,
-            llm_service=llm_service,
-            autofix_engine=self.autofix_engine
-        )
+        # Improvement modules (только если доступны)
+        if IMPROVEMENTS_AVAILABLE:
+            self.content_refresh = ContentRefreshAutomation(
+                cms_connector=cms_connector,
+                llm_service=llm_service,
+                autofix_engine=self.autofix_engine
+            )
 
-        self.visual_analyzer = VisualContentAnalyzer(
-            llm_service=llm_service,
-            autofix_engine=self.autofix_engine
-        )
+            self.visual_analyzer = VisualContentAnalyzer(
+                llm_service=llm_service,
+                autofix_engine=self.autofix_engine
+            )
 
-        self.intent_optimizer = IntentBasedOptimizer(
-            llm_service=llm_service,
-            autofix_engine=self.autofix_engine
-        )
+            self.intent_optimizer = IntentBasedOptimizer(
+                llm_service=llm_service,
+                autofix_engine=self.autofix_engine
+            )
 
-        self.competitor_monitor = CompetitorMonitor(
-            crawler=crawler,
-            llm_service=llm_service
-        )
+            self.competitor_monitor = CompetitorMonitor(
+                crawler=crawler,
+                llm_service=llm_service
+            )
 
-        self.international_seo = InternationalSEO(
-            llm_service=llm_service,
-            cms_connector=cms_connector
-        )
+            self.international_seo = InternationalSEO(
+                llm_service=llm_service,
+                cms_connector=cms_connector
+            )
 
-        self.link_building = LinkBuildingAssistant(
-            llm_service=llm_service,
-            crawler=crawler
-        )
+            self.link_building = LinkBuildingAssistant(
+                llm_service=llm_service,
+                crawler=crawler
+            )
 
-        self.predictive = PredictiveAnalytics(
-            analytics_connector=analytics_connector
-        )
+            self.predictive = PredictiveAnalytics(
+                analytics_connector=analytics_connector
+            )
 
-        self.cro = CROIntegration(
-            analytics_connector=analytics_connector,
-            llm_service=llm_service
-        )
+            self.cro = CROIntegration(
+                analytics_connector=analytics_connector,
+                llm_service=llm_service
+            )
 
-        self.mobile_optimizer = MobileOptimizer(
-            crawler=crawler
-        )
+            self.mobile_optimizer = MobileOptimizer(
+                crawler=crawler
+            )
 
-        self.ai_content = AIContentGenerator(
-            llm_service=llm_service,
-            seo_advisor=self.base_advisor
-        )
+            self.ai_content = AIContentGenerator(
+                llm_service=llm_service,
+                seo_advisor=self.base_advisor
+            )
+        else:
+            # Stub implementations
+            self.content_refresh = None
+            self.visual_analyzer = None
+            self.intent_optimizer = None
+            self.competitor_monitor = None
+            self.international_seo = None
+            self.link_building = None
+            self.predictive = None
+            self.cro = None
+            self.mobile_optimizer = None
+            self.ai_content = None
+            logger.warning("Improvement modules not available - running in basic mode")
 
         self.analysis_history = []
 

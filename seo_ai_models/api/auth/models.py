@@ -1,33 +1,19 @@
 """
 Authentication and Authorization models with roles.
 
-Roles:
-- ADMIN: Full access, user management
-- USER: Standard access, can run analyses
-- OBSERVER: Read-only access, can view results
-- ANALYST: Can run analyses and view all results
+Uses existing User model from web.api.database.models
 """
 
-from enum import Enum
 from datetime import datetime
 from typing import Optional, List
-from pydantic import BaseModel, EmailStr, Field
-from sqlalchemy import Column, String, DateTime, Boolean, Table, ForeignKey, Enum as SQLEnum
-from sqlalchemy.orm import relationship
+from pydantic import BaseModel, EmailStr
 
-from ..infrastructure.database import Base
-
-
-class UserRole(str, Enum):
-    """User roles with different permission levels."""
-    ADMIN = "admin"
-    ANALYST = "analyst"
-    USER = "user"
-    OBSERVER = "observer"
+# Use existing database models
+from ...web.api.database.models import User, UserRole
 
 
-class Permission(str, Enum):
-    """Granular permissions."""
+class Permission(str):
+    """Granular permissions - using string constants instead of Enum"""
     # Analysis permissions
     RUN_ANALYSIS = "run_analysis"
     VIEW_ANALYSIS = "view_analysis"
@@ -82,44 +68,11 @@ ROLE_PERMISSIONS = {
         Permission.VIEW_ANALYSIS,
         Permission.VIEW_SYSTEM_STATS,
     ],
+    UserRole.VIEWER: [  # Legacy support
+        Permission.VIEW_ANALYSIS,
+        Permission.VIEW_SYSTEM_STATS,
+    ],
 }
-
-
-# Database Models
-class User(Base):
-    """User database model."""
-    __tablename__ = "users"
-
-    id = Column(String, primary_key=True)
-    email = Column(String, unique=True, index=True, nullable=False)
-    username = Column(String, unique=True, index=True, nullable=False)
-    hashed_password = Column(String, nullable=False)
-    full_name = Column(String)
-    role = Column(SQLEnum(UserRole), default=UserRole.USER, nullable=False)
-    is_active = Column(Boolean, default=True)
-    is_verified = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    last_login = Column(DateTime, nullable=True)
-
-    # Relationships
-    analyses = relationship("Analysis", back_populates="user")
-    sessions = relationship("UserSession", back_populates="user")
-
-
-class UserSession(Base):
-    """Active user sessions."""
-    __tablename__ = "user_sessions"
-
-    id = Column(String, primary_key=True)
-    user_id = Column(String, ForeignKey("users.id"), nullable=False)
-    token = Column(String, unique=True, index=True, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    expires_at = Column(DateTime, nullable=False)
-    ip_address = Column(String)
-    user_agent = Column(String)
-
-    user = relationship("User", back_populates="sessions")
 
 
 # Pydantic Schemas
@@ -206,11 +159,11 @@ class ResetPasswordRequest(BaseModel):
     email: EmailStr
 
 
-def has_permission(role: UserRole, permission: Permission) -> bool:
+def has_permission(role: UserRole, permission: str) -> bool:
     """Check if role has permission."""
     return permission in ROLE_PERMISSIONS.get(role, [])
 
 
-def get_user_permissions(role: UserRole) -> List[Permission]:
+def get_user_permissions(role: UserRole) -> List[str]:
     """Get all permissions for a role."""
     return ROLE_PERMISSIONS.get(role, [])
