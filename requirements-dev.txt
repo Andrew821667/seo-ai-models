@@ -1,31 +1,32 @@
-# Development dependencies for SEO AI Models
+# Облегченные зависимости для CI/CD
+# Используются для тестирования и линтинга
 
-# Testing
-pytest>=7.4.0
-pytest-cov>=4.1.0
-pytest-asyncio>=0.21.0
-pytest-mock>=3.11.1
+# Основные зависимости
+requests>=2.28.0
+beautifulsoup4>=4.11.0
+lxml>=4.9.0
+markdown>=3.4.0
+numpy>=1.23.0
+scikit-learn>=1.1.0
+Pillow>=10.0.0
 
-# Code Quality
-black>=24.1.0
-flake8>=7.0.0
-isort>=5.13.0
-mypy>=1.8.0
-pylint>=3.0.0
+# Machine Learning - CPU версии для быстрой установки
+# PyTorch CPU-only (легче и быстрее устанавливается)
+torch>=2.0.0+cpu --index-url https://download.pytorch.org/whl/cpu
+tiktoken>=0.5.0
 
-# Security
-bandit>=1.7.5
-safety>=3.0.0
+# NLP и семантический анализ (базовые версии)
+spacy>=3.4.0
+nltk>=3.7.0
+gensim>=4.2.0
 
-# Pre-commit
-pre-commit>=3.5.0
+# Работа с поисковыми системами
+google-search-results>=2.4.0
 
-# Type stubs
-types-requests>=2.31.0
+# Прогресс и логирование
+tqdm>=4.64.0
+colorlog>=6.7.0
 
-# Coverage reporting
-coverage[toml]>=7.3.0
-
-# Documentation
-sphinx>=7.2.0
-sphinx-rtd-theme>=2.0.0
+# NOTE: playwright и pyppeteer исключены из dev зависимостей
+# так как они требуют установки браузеров и занимают много места
+# Они устанавливаются отдельным шагом в CI, если нужны для тестов

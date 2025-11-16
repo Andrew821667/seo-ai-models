@@ -22,7 +22,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements-dev.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
@@ -30,7 +30,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install flake8 black mypy
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
         timeout-minutes: 45
 
       - name: Lint with flake8
@@ -63,7 +63,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-py${{ matrix.python-version }}-pip-${{ hashFiles('**/requirements.txt') }}
+          key: ${{ runner.os }}-py${{ matrix.python-version }}-pip-${{ hashFiles('**/requirements-dev.txt') }}
           restore-keys: |
             ${{ runner.os }}-py${{ matrix.python-version }}-pip-
 
@@ -71,13 +71,21 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            libxml2-dev libxslt1-dev python3-dev
+            build-essential \
+            gcc \
+            g++ \
+            libxml2-dev \
+            libxslt1-dev \
+            python3-dev \
+            libjpeg-dev \
+            zlib1g-dev \
+            libpng-dev
 
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install pytest pytest-cov pytest-asyncio
-          pip install -r requirements.txt || true
+          pip install -r requirements-dev.txt || true
           pip install -e .
         timeout-minutes: 45
 
@@ -131,7 +139,7 @@ jobs:
 
       - name: Check dependencies for vulnerabilities
         run: |
-          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
           safety check --json
         continue-on-error: true
         timeout-minutes: 45
@@ -152,7 +160,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install build wheel setuptools
-          pip install -r requirements.txt || true
+          pip install -r requirements-dev.txt || true
         timeout-minutes: 45
 
       - name: Build package
@@ -181,7 +189,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install mypy types-requests
-          pip install -r requirements.txt || true
+          pip install -r requirements-dev.txt || true
         timeout-minutes: 45
 
       - name: Run mypy
