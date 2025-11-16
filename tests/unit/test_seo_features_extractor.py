@@ -2,7 +2,7 @@ import pytest
 from bs4 import BeautifulSoup
 import numpy as np
 
-from models.dim_reducer.features import SEOFeaturesExtractor
+from seo_ai_models.models.dim_reducer.features import SEOFeaturesExtractor
 
 @pytest.fixture
 def extractor():

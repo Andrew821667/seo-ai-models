@@ -1,6 +1,6 @@
 
 import pytest
-from models.seo_advisor.suggester import Suggester
+from seo_ai_models.models.seo_advisor.suggester.suggester import Suggester
 
 @pytest.fixture
 def default_suggester():

@@ -2,7 +2,7 @@ import pytest
 import torch
 import os
 from torch.utils.data import DataLoader, TensorDataset
-from models.dim_reducer.trainer import DimReducerTrainer
+from seo_ai_models.models.dim_reducer.trainer import DimReducerTrainer
 
 class TestDimReducer:
     @pytest.fixture

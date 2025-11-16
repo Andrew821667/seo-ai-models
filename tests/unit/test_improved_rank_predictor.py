@@ -1,6 +1,6 @@
 import pytest
 from datetime import datetime
-from models.seo_advisor.improved_rank_predictor import ImprovedRankPredictor, IndustryThresholds, IndustryWeights
+from seo_ai_models.models.seo_advisor.improved_rank_predictor import ImprovedRankPredictor, IndustryThresholds, IndustryWeights
 
 @pytest.fixture
 def default_predictor():

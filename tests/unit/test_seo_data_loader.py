@@ -5,8 +5,8 @@ import numpy as np
 from pathlib import Path
 import tempfile
 
-from models.dim_reducer.data_loader import SEODataset, SEODataLoader
-from models.dim_reducer.features import SEOFeaturesExtractor
+from seo_ai_models.models.dim_reducer.data_loader import SEODataset, SEODataLoader
+from seo_ai_models.models.dim_reducer.features import SEOFeaturesExtractor
 
 @pytest.fixture
 def sample_data():

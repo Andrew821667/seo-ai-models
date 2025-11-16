@@ -3,9 +3,9 @@ import torch
 import tempfile
 from pathlib import Path
 
-from models.dim_reducer.model import DimensionReducer
-from models.dim_reducer.trainer import DimReducerTrainer
-from common.config.dim_reducer_config import DimReducerConfig
+from seo_ai_models.models.dim_reducer.model import DimensionReducer
+from seo_ai_models.models.dim_reducer.trainer import DimReducerTrainer
+from seo_ai_models.common.config.dim_reducer_config import DimReducerConfig
 
 @pytest.fixture
 def config():
