@@ -29,6 +29,9 @@ nosetests.xml
 coverage.xml
 *.cover
 
+# Отчеты безопасности
+bandit-report.json
+
 # Логи и БД
 *.log
 *.sqlite3
