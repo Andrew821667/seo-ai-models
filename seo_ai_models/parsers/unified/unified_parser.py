@@ -907,26 +907,26 @@ class UnifiedParser(ParserInterface):
             }
         
         # Строим дерево
-        root = {"name": "/", "children": [], "url": "", "title": "Root"}
-        
+        root: Dict[str, Any] = {"name": "/", "children": [], "url": "", "title": "Root"}
+
         for path, info in sorted(url_paths.items()):
             # Разбиваем путь на сегменты
             segments = [s for s in path.split("/") if s]
-            
+
             # Начинаем с корня
-            current = root
+            current: Dict[str, Any] = root
             current_path = ""
-            
+
             for i, segment in enumerate(segments):
                 current_path += f"/{segment}"
-                
+
                 # Ищем существующий сегмент в дочерних элементах
-                child = None
+                child: Optional[Dict[str, Any]] = None
                 for child_node in current["children"]:
                     if child_node["name"] == segment:
                         child = child_node
                         break
-                
+
                 # Если не нашли, создаем
                 if child is None:
                     child = {
@@ -937,7 +937,7 @@ class UnifiedParser(ParserInterface):
                         "title": info["title"] if current_path == path else segment
                     }
                     current["children"].append(child)
-                
+
                 # Переходим к этому дочернему элементу
                 current = child
         
