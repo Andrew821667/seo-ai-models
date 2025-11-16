@@ -24,7 +24,7 @@ class ParserInterface(ABC):
         Returns:
             Dict[str, Any]: Результат парсинга
         """
-        pass
+        raise NotImplementedError("Subclasses must implement this method")
     
     @abstractmethod
     def parse_html(self, html: str, base_url: Optional[str] = None, **options) -> Dict[str, Any]:
@@ -39,7 +39,7 @@ class ParserInterface(ABC):
         Returns:
             Dict[str, Any]: Результат парсинга
         """
-        pass
+        raise NotImplementedError("Subclasses must implement this method")
     
     @abstractmethod
     def crawl_site(self, base_url: str, **options) -> Dict[str, Any]:
@@ -53,7 +53,7 @@ class ParserInterface(ABC):
         Returns:
             Dict[str, Any]: Результаты сканирования и парсинга
         """
-        pass
+        raise NotImplementedError("Subclasses must implement this method")
     
     @abstractmethod
     def parse_search_results(self, query: str, **options) -> Dict[str, Any]:
@@ -67,4 +67,4 @@ class ParserInterface(ABC):
         Returns:
             Dict[str, Any]: Результаты парсинга поисковой выдачи
         """
-        pass
+        raise NotImplementedError("Subclasses must implement this method")

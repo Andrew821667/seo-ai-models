@@ -1,17 +1,13 @@
-
 """
 Роутер для управления webhooks для интеграции с внешними системами.
 """
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query, Body, Request
 from typing import List, Dict, Any, Optional
-from datetime import datetime
 import logging
-import json
-import hmac
-import hashlib
 
-from .auth import oauth2_scheme
+from ..services.webhook_service_db import WebhookServiceDB
+from ..dependencies import get_webhook_service, get_current_user_id
 
 # Создаем объект роутера
 router = APIRouter()
@@ -19,120 +15,150 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
-# Модели данных для webhooks будут определены здесь
-# или импортированы из отдельного модуля
+# ===== WEBHOOK ENDPOINTS =====
 
-
-# Маршрут для создания webhook
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_webhook(
     url: str = Body(..., embed=True),
     events: List[str] = Body(..., embed=True),
-    project_id: Optional[str] = Body(None, embed=True),
-    description: Optional[str] = Body(None, embed=True),
-    token: str = Depends(oauth2_scheme)
+    project_id: str = Body(..., embed=True),
+    description: Optional[str] = Body("", embed=True),
+    secret: Optional[str] = Body(None, embed=True),
+    metadata: Optional[Dict[str, Any]] = Body(None, embed=True),
+    user_id: str = Depends(get_current_user_id),
+    service: WebhookServiceDB = Depends(get_webhook_service)
 ):
     """
     Создание нового webhook.
-    
+
     Args:
         url: URL для отправки событий.
         events: Список событий, на которые реагирует webhook.
-        project_id: ID проекта (если webhook связан с проектом).
+        project_id: ID проекта.
         description: Описание webhook.
-        token: Токен доступа.
+        secret: Секретный ключ для подписи (генерируется автоматически если не указан).
+        metadata: Дополнительные метаданные.
+        user_id: ID текущего пользователя (из токена).
+        service: Сервис webhooks (dependency injection).
+
+    Returns:
+        Данные созданного webhook.
     """
-    # Здесь будет код для создания webhook
-    
-    # Генерация секретного ключа для подписи
-    webhook_secret = hmac.new(
-        key=bytes("secret_key", "utf-8"),  # В реальном коде ключ должен быть безопасным
-        msg=bytes(f"{url}:{','.join(events)}", "utf-8"),
-        digestmod=hashlib.sha256
-    ).hexdigest()
-    
-    return {
-        "id": "webhook123",
-        "url": url,
-        "events": events,
-        "project_id": project_id,
-        "description": description,
-        "status": "active",
-        "created_at": datetime.now(),
-        "secret": webhook_secret  # В реальном коде лучше не возвращать секрет в ответе
-    }
+    result = service.create_webhook(
+        project_id=project_id,
+        url=url,
+        events=events,
+        user_id=user_id,
+        description=description,
+        secret=secret,
+        metadata=metadata
+    )
+
+    if not result["success"]:
+        error = result.get("error", "Unknown error")
+
+        if "access denied" in error.lower():
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Access denied to project"
+            )
+        elif "invalid" in error.lower():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=error
+            )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=error
+            )
+
+    return result["webhook"]
 
 
-# Маршрут для получения списка webhooks
 @router.get("/", response_model=List[Dict[str, Any]])
 async def get_webhooks(
-    project_id: Optional[str] = None,
-    event: Optional[str] = None,
+    project_id: str = Query(...),
     status: Optional[str] = None,
-    token: str = Depends(oauth2_scheme)
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=100),
+    user_id: str = Depends(get_current_user_id),
+    service: WebhookServiceDB = Depends(get_webhook_service)
 ):
     """
-    Получение списка webhooks с возможностью фильтрации.
-    
+    Получение списка webhooks проекта с фильтрацией.
+
     Args:
-        project_id: Фильтр по ID проекта.
-        event: Фильтр по типу события.
+        project_id: ID проекта.
         status: Фильтр по статусу.
-        token: Токен доступа.
-        
+        skip: Количество пропускаемых записей (для пагинации).
+        limit: Максимальное количество возвращаемых записей.
+        user_id: ID текущего пользователя (из токена).
+        service: Сервис webhooks (dependency injection).
+
     Returns:
         List[Dict[str, Any]]: Список webhooks.
     """
-    # Здесь будет код для получения списка webhooks
-    
-    # Пока просто заглушка
-    return [
-        {
-            "id": "webhook123",
-            "url": "https://example.com/webhook",
-            "events": ["project.created", "project.updated"],
-            "project_id": project_id or "project123",
-            "description": "Test webhook",
-            "status": status or "active",
-            "created_at": datetime.now(),
-            "last_triggered_at": datetime.now(),
-            "success_count": 10,
-            "error_count": 0
-        }
-    ]
+    result = service.list_webhooks(project_id, user_id, status, skip, limit)
+
+    if not result["success"]:
+        error = result.get("error", "Unknown error")
+
+        if "access denied" in error.lower():
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Access denied"
+            )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=error
+            )
+
+    return result["webhooks"]
 
 
-# Маршрут для получения информации о webhook
 @router.get("/{webhook_id}", response_model=Dict[str, Any])
-async def get_webhook(webhook_id: str, token: str = Depends(oauth2_scheme)):
+async def get_webhook(
+    webhook_id: str,
+    user_id: str = Depends(get_current_user_id),
+    service: WebhookServiceDB = Depends(get_webhook_service)
+):
     """
     Получение информации о webhook по ID.
-    
+
     Args:
         webhook_id: ID webhook.
-        token: Токен доступа.
-        
+        user_id: ID текущего пользователя (из токена).
+        service: Сервис webhooks (dependency injection).
+
     Returns:
         Dict[str, Any]: Данные webhook.
     """
-    # Здесь будет код для получения webhook по ID
-    
-    # Пока просто заглушка
-    return {
-        "id": webhook_id,
-        "url": "https://example.com/webhook",
-        "events": ["project.created", "project.updated"],
-        "project_id": "project123",
-        "description": "Test webhook",
-        "status": "active",
-        "created_at": datetime.now(),
-        "last_triggered_at": datetime.now(),
-        "success_count": 10,
-        "error_count": 0
-    }
+    result = service.get_webhook(webhook_id, user_id)
+
+    if not result["success"]:
+        error = result.get("error", "Unknown error")
+
+        if "not found" in error.lower():
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Webhook {webhook_id} not found"
+            )
+        elif "access denied" in error.lower():
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Access denied"
+            )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=error
+            )
+
+    return result["webhook"]
 
 
-# Маршрут для обновления webhook
 @router.put("/{webhook_id}", response_model=Dict[str, Any])
 async def update_webhook(
     webhook_id: str,
@@ -140,105 +166,196 @@ async def update_webhook(
     events: Optional[List[str]] = Body(None, embed=True),
     description: Optional[str] = Body(None, embed=True),
     status: Optional[str] = Body(None, embed=True),
-    token: str = Depends(oauth2_scheme)
+    metadata: Optional[Dict[str, Any]] = Body(None, embed=True),
+    user_id: str = Depends(get_current_user_id),
+    service: WebhookServiceDB = Depends(get_webhook_service)
 ):
     """
     Обновление webhook по ID.
-    
+
     Args:
         webhook_id: ID webhook.
         url: Новый URL.
         events: Новый список событий.
         description: Новое описание.
         status: Новый статус.
-        token: Токен доступа.
-        
+        metadata: Новые метаданные.
+        user_id: ID текущего пользователя (из токена).
+        service: Сервис webhooks (dependency injection).
+
     Returns:
         Dict[str, Any]: Обновленные данные webhook.
     """
-    # Здесь будет код для обновления webhook
-    
-    # Пока просто заглушка
-    return {
-        "id": webhook_id,
-        "url": url or "https://example.com/webhook",
-        "events": events or ["project.created", "project.updated"],
-        "project_id": "project123",
-        "description": description or "Test webhook",
-        "status": status or "active",
-        "created_at": datetime.now(),
-        "updated_at": datetime.now(),
-        "last_triggered_at": datetime.now(),
-        "success_count": 10,
-        "error_count": 0
-    }
+    update_data = {}
+    if url is not None:
+        update_data["url"] = url
+    if events is not None:
+        update_data["events"] = events
+    if description is not None:
+        update_data["description"] = description
+    if status is not None:
+        update_data["status"] = status
+    if metadata is not None:
+        update_data["metadata"] = metadata
+
+    result = service.update_webhook(webhook_id, user_id, update_data)
+
+    if not result["success"]:
+        error = result.get("error", "Unknown error")
+
+        if "not found" in error.lower():
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Webhook {webhook_id} not found"
+            )
+        elif "access denied" in error.lower():
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Access denied"
+            )
+        elif "invalid" in error.lower():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=error
+            )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=error
+            )
+
+    return result["webhook"]
 
 
-# Маршрут для удаления webhook
 @router.delete("/{webhook_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_webhook(webhook_id: str, token: str = Depends(oauth2_scheme)):
+async def delete_webhook(
+    webhook_id: str,
+    user_id: str = Depends(get_current_user_id),
+    service: WebhookServiceDB = Depends(get_webhook_service)
+):
     """
-    Удаление webhook по ID.
-    
+    Удаление webhook по ID (hard delete).
+
+    Webhook полностью удаляется из базы данных.
+
     Args:
         webhook_id: ID webhook.
-        token: Токен доступа.
+        user_id: ID текущего пользователя.
+        service: Сервис webhooks (dependency injection).
+
+    Raises:
+        HTTPException: 404 Not Found - webhook не найден.
+        HTTPException: 403 Forbidden - недостаточно прав для удаления.
+
+    Returns:
+        Статус 204 No Content при успешном удалении.
     """
-    # Здесь будет код для удаления webhook
-    
-    pass
+    logger.info(f"User {user_id} attempting to delete webhook {webhook_id}")
+
+    result = service.delete_webhook(webhook_id, user_id)
+
+    if not result["success"]:
+        error = result.get("error", "Unknown error")
+
+        if "not found" in error.lower():
+            logger.warning(f"Webhook {webhook_id} not found")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Webhook {webhook_id} not found"
+            )
+        elif "access denied" in error.lower():
+            logger.warning(f"User {user_id} access denied for webhook {webhook_id}")
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Access denied. Only project owner can delete webhooks."
+            )
+        else:
+            logger.error(f"Error deleting webhook {webhook_id}: {error}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Failed to delete webhook: {error}"
+            )
+
+    logger.info(f"Webhook {webhook_id} successfully deleted")
 
 
-# Маршрут для тестирования webhook
 @router.post("/{webhook_id}/test", status_code=status.HTTP_200_OK)
-async def test_webhook(webhook_id: str, token: str = Depends(oauth2_scheme)):
+async def test_webhook(
+    webhook_id: str,
+    event: str = Body(..., embed=True),
+    payload: Dict[str, Any] = Body(..., embed=True),
+    user_id: str = Depends(get_current_user_id),
+    service: WebhookServiceDB = Depends(get_webhook_service)
+):
     """
     Тестирование webhook путем отправки тестового события.
-    
+
     Args:
         webhook_id: ID webhook.
-        token: Токен доступа.
+        event: Тип события для тестирования.
+        payload: Тестовые данные для отправки.
+        user_id: ID текущего пользователя (из токена).
+        service: Сервис webhooks (dependency injection).
+
+    Returns:
+        Результат тестирования webhook.
     """
-    # Здесь будет код для тестирования webhook
-    
+    # Check if user has access to webhook
+    result = service.get_webhook(webhook_id, user_id)
+
+    if not result["success"]:
+        error = result.get("error", "Unknown error")
+
+        if "not found" in error.lower():
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Webhook {webhook_id} not found"
+            )
+        elif "access denied" in error.lower():
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Access denied"
+            )
+
+    # Trigger webhook
+    trigger_result = service.trigger_webhook(webhook_id, event, payload)
+
+    if not trigger_result["success"]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=trigger_result.get("error", "Failed to trigger webhook")
+        )
+
     return {
         "success": True,
-        "message": "Test event sent successfully",
-        "timestamp": datetime.now()
+        "message": trigger_result.get("message", "Test event sent successfully"),
+        "webhook_id": webhook_id,
+        "event": event
     }
 
 
-# Внутренний маршрут для получения webhooks по событию
+# Internal endpoint for getting webhooks by event
 @router.get("/internal/by-event/{event}", response_model=List[Dict[str, Any]])
-async def get_webhooks_by_event(event: str, token: str = Depends(oauth2_scheme)):
+async def get_webhooks_by_event(
+    event: str,
+    service: WebhookServiceDB = Depends(get_webhook_service)
+):
     """
     Получение списка активных webhooks для указанного события.
-    
+    Внутренний endpoint для системных операций.
+
     Args:
         event: Тип события.
-        token: Токен доступа.
-        
+        service: Сервис webhooks (dependency injection).
+
     Returns:
         List[Dict[str, Any]]: Список webhooks.
     """
-    # Здесь будет код для получения webhooks по событию
-    
-    # Пока просто заглушка
-    return [
-        {
-            "id": "webhook123",
-            "url": "https://example.com/webhook",
-            "events": [event, "project.updated"],
-            "project_id": "project123",
-            "description": "Test webhook",
-            "status": "active",
-            "created_at": datetime.now(),
-            "secret": "webhook_secret"
-        }
-    ]
+    webhooks = service.get_webhooks_by_event(event)
+    return webhooks
 
 
-# Приемник входящих webhook событий (для внешних систем)
+# Receiver for incoming webhook events (from external systems)
 @router.post("/incoming/{endpoint_key}", status_code=status.HTTP_200_OK)
 async def handle_incoming_webhook(
     endpoint_key: str,
@@ -246,29 +363,30 @@ async def handle_incoming_webhook(
 ):
     """
     Обработка входящих webhook событий от внешних систем.
-    
+
     Args:
         endpoint_key: Ключ эндпоинта.
         request: Объект запроса.
+
+    Returns:
+        Подтверждение получения события.
     """
-    # Здесь будет код для обработки входящих webhook событий
-    
-    # Получаем данные запроса
+    # Get request data
     body = await request.body()
     headers = dict(request.headers)
-    
-    # Проверяем подпись, если она есть
+
+    # Verify signature if present
     if "X-Webhook-Signature" in headers:
         signature = headers["X-Webhook-Signature"]
-        # Проверка подписи (в реальном коде)
-    
-    # Логируем событие
+        # TODO: Implement signature verification
+
+    # Log event
     logger.info(f"Received webhook event for endpoint {endpoint_key}")
-    
-    # Обрабатываем событие (в реальном коде)
-    
+
+    # TODO: Process event and store in database
+
     return {
         "success": True,
-        "message": "Event received and processed",
-        "timestamp": datetime.now()
+        "message": "Event received and queued for processing",
+        "endpoint_key": endpoint_key
     }

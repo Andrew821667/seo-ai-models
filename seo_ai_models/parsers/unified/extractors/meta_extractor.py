@@ -18,14 +18,11 @@ class MetaExtractor:
     """
     Экстрактор метаданных из HTML-страниц.
     Извлекает мета-теги, Open Graph, Twitter Cards, Schema.org и другие.
+
+    Экземпляры класса не требуют специальной инициализации,
+    все методы работают со входными параметрами.
     """
-    
-    def __init__(self):
-        """
-        Инициализация экстрактора метаданных.
-        """
-        pass
-    
+
     def extract_meta_information(self, html: str, url: Optional[str] = None) -> Dict[str, Any]:
         """
         Извлекает метаданные из HTML-страницы.

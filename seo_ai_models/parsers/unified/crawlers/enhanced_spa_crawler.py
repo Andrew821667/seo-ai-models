@@ -84,8 +84,9 @@ class EnhancedSPACrawler:
         # Инициализация robots.txt
         self.robots_rules = []
         if self.respect_robots:
-            # В реальной реализации здесь был бы код загрузки robots.txt
-            pass
+            # TODO: В будущем реализовать загрузку и парсинг robots.txt
+            # Например, используя библиотеку robotexclusionrulesparser или urllib.robotparser
+            logger.debug(f"robots.txt support is enabled but not yet implemented for {base_url}")
             
         logger.info(f"EnhancedSPACrawler initialized for {base_url} with {browser_type} browser")
     
@@ -213,8 +214,8 @@ class EnhancedSPACrawler:
                         self.failed_urls.add(current_url)
                         try:
                             await page.close()
-                        except:
-                            pass
+                        except Exception as close_error:
+                            logger.debug(f"Failed to close page for {current_url}: {str(close_error)}")
                 
             finally:
                 # Закрываем браузер

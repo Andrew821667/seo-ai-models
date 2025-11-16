@@ -305,8 +305,8 @@ class ImprovedSPACrawler:
                         self.failed_urls.add(current_url)
                         try:
                             await page.close()
-                        except:
-                            pass
+                        except Exception as close_error:
+                            logger.debug(f"Не удалось закрыть страницу для {current_url}: {str(close_error)}")
                 
             finally:
                 # Закрываем браузер
@@ -368,7 +368,8 @@ class ImprovedSPACrawler:
         """
         try:
             loop = asyncio.get_event_loop()
-        except:
+        except RuntimeError as e:
+            logger.debug(f"Создание нового event loop: {str(e)}")
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             
@@ -401,12 +402,14 @@ class ImprovedSPACrawler:
                 for selector in self.wait_for_selectors:
                     try:
                         await page.wait_for_selector(selector, timeout=self.wait_for_idle // 2)
+                        logger.debug(f"Найден селектор контента '{selector}' для {url}")
                         break  # Если нашли хотя бы один селектор, выходим
-                    except:
+                    except TimeoutError:
+                        logger.debug(f"Селектор '{selector}' не найден в течение {self.wait_for_idle // 2}мс")
                         continue
-            except:
+            except Exception as e:
                 # Если не смогли дождаться селекторов, просто продолжаем
-                logger.debug(f"Селекторы контента не найдены для {url}")
+                logger.debug(f"Селекторы контента не найдены для {url}: {str(e)}")
                 
             # Ожидаем дополнительное время для полной загрузки
             await asyncio.sleep(self.delay)
@@ -454,8 +457,8 @@ class ImprovedSPACrawler:
                     if post_data:
                         # Перехватываем GraphQL-запрос
                         self.graphql_interceptor.intercept_request(url, headers, post_data, method)
-                except:
-                    pass
+                except Exception as gql_error:
+                    logger.debug(f"Не удалось перехватить GraphQL запрос {url}: {str(gql_error)}")
                     
         except Exception as e:
             logger.error(f"Ошибка при обработке запроса {url}: {str(e)}")
@@ -480,8 +483,8 @@ class ImprovedSPACrawler:
                     
                     # Пытаемся перехватить как GraphQL-ответ
                     self.graphql_interceptor.intercept_response(body_text, None, status, url)
-                except:
-                    pass
+                except Exception as gql_response_error:
+                    logger.debug(f"Не удалось перехватить GraphQL ответ {url}: {str(gql_response_error)}")
                     
         except Exception as e:
             logger.error(f"Ошибка при обработке ответа {url}: {str(e)}")
@@ -635,8 +638,8 @@ class ImprovedSPACrawler:
                         
                         # Регистрируем изменение маршрута
                         self.routing_handler.record_route_change(from_url, to_url, state)
-        except:
-            pass
+        except Exception as routing_error:
+            logger.debug(f"Ошибка при обработке сообщения маршрутизации: {str(routing_error)}")
     
     async def _extract_links_from_page(self, page: Page, current_url: str) -> Set[str]:
         """
@@ -774,8 +777,8 @@ class ImprovedSPACrawler:
                         await element.focus()
                         await asyncio.sleep(0.2)
                         break
-            except:
-                pass
+            except Exception as focus_error:
+                logger.debug(f"Не удалось установить фокус на элемент: {str(focus_error)}")
                 
         except Exception as e:
             logger.warning(f"Ошибка при эмуляции поведения пользователя: {str(e)}")
@@ -793,5 +796,6 @@ class ImprovedSPACrawler:
         try:
             netloc = urlparse(url).netloc
             return netloc == self.base_netloc or netloc == f"www.{self.base_netloc}" or f"www.{netloc}" == self.base_netloc
-        except:
+        except Exception as parse_error:
+            logger.debug(f"Не удалось распарсить URL {url}: {str(parse_error)}")
             return False
