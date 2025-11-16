@@ -191,14 +191,14 @@ class EnhancedSPACrawlerLLM:
         
         # Регулярные выражения для идентификации контента
         self.content_patterns = {
-            'json_ld': re.compile(r'<script[^>]*type=["']application/ld\+json["'][^>]*>(.*?)</script>', re.DOTALL),
+            'json_ld': re.compile(r'<script[^>]*type=[\'"]application/ld\+json[\'"][^>]*>(.*?)</script>', re.DOTALL),
             'email': re.compile(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'),
             'phone': re.compile(r'(?:\+\d{1,3}[-. ]?)?\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}'),
             'price': re.compile(r'\b(?:\d{1,3}[., ]?)*\d{1,3}(?:[.,]\d{2})?\s*(?:[₽руб$€£¥₴]|руб(?:лей)?|USD|EUR|RUB)\b', re.IGNORECASE),
             'date': re.compile(r'\b(?:\d{1,2}[./-]\d{1,2}[./-]\d{2,4}|\d{4}-\d{2}-\d{2})\b'),
             'html_comment': re.compile(r'<!--.*?-->', re.DOTALL),
-            'internal_link': re.compile(r'<a[^>]*href=["'](?!(?:https?:|tel:|mailto:|#|javascript:|\s*$))[^"']*["'][^>]*>'),
-            'external_link': re.compile(r'<a[^>]*href=["'](?:https?:)[^"']*["'][^>]*>')
+            'internal_link': re.compile(r'<a[^>]*href=[\'"](?!(?:https?:|tel:|mailto:|#|javascript:|\s*$))[^\'"]*[\'"][^>]*>'),
+            'external_link': re.compile(r'<a[^>]*href=[\'"](?:https?:)[^\'"]*[\'"][^>]*>')
         }
         
         # Расширенные настройки из kwargs
@@ -219,38 +219,38 @@ class EnhancedSPACrawlerLLM:
         self._init_crawler()
     
     def _init_crawler(self):
-    """Инициализирует компоненты краулера."""
-    # Инициализируем playwright если еще не инициализирован
-    if self.playwright is None:
-        self._start_browser()
-    
-    # Инициализируем параметры
-    self.browser_content = None
-    self.navigation_history = []
-    self.extracted_links = set()
-    self.processed_links = set()
-    self.resources_info = {}
-    self.requests_log = []
-    self.dom_changes = []
-    
-    # Инициализируем компоненты для извлечения данных
-    self.structured_data_extractor = None
-    self.metadata_enhancer = None
-    
-    # Настройка логгера для сбора данных о работе краулера
-    self.logger.info(f"Краулер инициализирован с параметрами: headless={self.headless}, "
-                     f"wait_for_network_idle={self.wait_for_network_idle}, wait_time={self.wait_time}")
+        """Инициализирует компоненты краулера."""
+        # Инициализируем playwright если еще не инициализирован
+        if self.playwright is None:
+            self._start_browser()
 
-# Улучшенная обработка исключения при определении языка
-def improved_language_detection_exception_handling(self, text_sample):
-    try:
-        lang_code = langdetect.detect(text_sample)
-        return lang_code
-    except langdetect.LangDetectException as e:
-        self.logger.warning(f"Ошибка LangDetect при определении языка: {str(e)}")
-        # Альтернативный способ определения языка - по частоте встречаемости характерных символов
-        ru_chars = len(re.findall('[а-яА-Я]', text_sample))
-        en_chars = len(re.findall('[a-zA-Z]', text_sample))
+        # Инициализируем параметры
+        self.browser_content = None
+        self.navigation_history = []
+        self.extracted_links = set()
+        self.processed_links = set()
+        self.resources_info = {}
+        self.requests_log = []
+        self.dom_changes = []
+
+        # Инициализируем компоненты для извлечения данных
+        self.structured_data_extractor = None
+        self.metadata_enhancer = None
+
+        # Настройка логгера для сбора данных о работе краулера
+        logger.info(f"Краулер инициализирован с параметрами: headless={self.headless}, "
+                    f"wait_for_network_idle={self.wait_for_network_idle}, wait_time={self.wait_time}")
+
+    # Улучшенная обработка исключения при определении языка
+    def improved_language_detection_exception_handling(self, text_sample):
+        try:
+            lang_code = langdetect.detect(text_sample)
+            return lang_code
+        except langdetect.LangDetectException as e:
+            logger.warning(f"Ошибка LangDetect при определении языка: {str(e)}")
+            # Альтернативный способ определения языка - по частоте встречаемости характерных символов
+            ru_chars = len(re.findall('[а-яА-Я]', text_sample))
+            en_chars = len(re.findall('[a-zA-Z]', text_sample))
         
         if ru_chars > en_chars * 0.3:  # если русских символов больше 30% от английских
             self.logger.info("Язык определен альтернативным способом: ru")
@@ -723,8 +723,8 @@ def improved_language_detection_exception_handling(self, text_sample):
                     lang_code = langdetect.detect(text_sample)
                     return lang_code
                 except:
-        lang_code = self.improved_language_detection_exception_handling(text_sample)
-        return lang_code
+                    lang_code = self.improved_language_detection_exception_handling(text_sample)
+                    return lang_code
         
         # По умолчанию возвращаем язык, указанный при инициализации
             return self.language

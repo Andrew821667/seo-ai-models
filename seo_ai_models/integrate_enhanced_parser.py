@@ -70,10 +70,9 @@ def update_init_files():
     Обновляет файлы __init__.py для правильной инициализации модулей.
     """
     # Корневой модуль парсеров
-    parsers_init = """"""
+    parsers_init = """
 Модуль парсеров для проекта SEO AI Models.
 Предоставляет компоненты для парсинга и анализа сайтов.
-"""
 
 from seo_ai_models.parsers.unified.unified_parser import UnifiedParser
 from seo_ai_models.parsers.unified.site_analyzer import SiteAnalyzer
@@ -98,8 +97,7 @@ __all__ = ['UnifiedParser', 'SiteAnalyzer']
         init_path = Path(subdir) / "__init__.py"
         if not init_path.exists():
             with open(init_path, 'w') as f:
-                f.write("# Инициализация модуля
-")
+                f.write("# Инициализация модуля\n")
                 
     logger.info("Файлы __init__.py обновлены")
     return True
@@ -110,10 +108,9 @@ def create_demo_script():
     """
     demo_dir = Path("examples/unified_parser")
     demo_dir.mkdir(parents=True, exist_ok=True)
-    
-    demo_script = """"""
+
+    demo_script = """
 Демонстрация возможностей унифицированного парсера SEO AI Models.
-"""
 
 import argparse
 import json
