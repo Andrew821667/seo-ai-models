@@ -11,8 +11,8 @@ from seo_ai_models.models.tiered_system.micro.basic_recommender import BasicReco
 from seo_ai_models.models.tiered_system.micro.lightweight_optimizer import LightweightOptimizer
 
 __all__ = [
-    'MicroAdvisor',
-    'StatisticalAnalyzer',
-    'BasicRecommender',
-    'LightweightOptimizer',
+    "MicroAdvisor",
+    "StatisticalAnalyzer",
+    "BasicRecommender",
+    "LightweightOptimizer",
 ]

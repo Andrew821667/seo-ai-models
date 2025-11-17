@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 # ===== WEBHOOK ENDPOINTS =====
 
+
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_webhook(
     url: str = Body(..., embed=True),
@@ -26,7 +27,7 @@ async def create_webhook(
     secret: Optional[str] = Body(None, embed=True),
     metadata: Optional[Dict[str, Any]] = Body(None, embed=True),
     user_id: str = Depends(get_current_user_id),
-    service: WebhookServiceDB = Depends(get_webhook_service)
+    service: WebhookServiceDB = Depends(get_webhook_service),
 ):
     """
     Создание нового webhook.
@@ -51,7 +52,7 @@ async def create_webhook(
         user_id=user_id,
         description=description,
         secret=secret,
-        metadata=metadata
+        metadata=metadata,
     )
 
     if not result["success"]:
@@ -59,19 +60,12 @@ async def create_webhook(
 
         if "access denied" in error.lower():
             raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Access denied to project"
+                status_code=status.HTTP_403_FORBIDDEN, detail="Access denied to project"
             )
         elif "invalid" in error.lower():
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=error
-            )
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error)
         else:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=error
-            )
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=error)
 
     return result["webhook"]
 
@@ -83,7 +77,7 @@ async def get_webhooks(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=100),
     user_id: str = Depends(get_current_user_id),
-    service: WebhookServiceDB = Depends(get_webhook_service)
+    service: WebhookServiceDB = Depends(get_webhook_service),
 ):
     """
     Получение списка webhooks проекта с фильтрацией.
@@ -105,15 +99,9 @@ async def get_webhooks(
         error = result.get("error", "Unknown error")
 
         if "access denied" in error.lower():
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Access denied"
-            )
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
         else:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=error
-            )
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=error)
 
     return result["webhooks"]
 
@@ -122,7 +110,7 @@ async def get_webhooks(
 async def get_webhook(
     webhook_id: str,
     user_id: str = Depends(get_current_user_id),
-    service: WebhookServiceDB = Depends(get_webhook_service)
+    service: WebhookServiceDB = Depends(get_webhook_service),
 ):
     """
     Получение информации о webhook по ID.
@@ -142,19 +130,12 @@ async def get_webhook(
 
         if "not found" in error.lower():
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Webhook {webhook_id} not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail=f"Webhook {webhook_id} not found"
             )
         elif "access denied" in error.lower():
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Access denied"
-            )
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
         else:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=error
-            )
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=error)
 
     return result["webhook"]
 
@@ -168,7 +149,7 @@ async def update_webhook(
     status: Optional[str] = Body(None, embed=True),
     metadata: Optional[Dict[str, Any]] = Body(None, embed=True),
     user_id: str = Depends(get_current_user_id),
-    service: WebhookServiceDB = Depends(get_webhook_service)
+    service: WebhookServiceDB = Depends(get_webhook_service),
 ):
     """
     Обновление webhook по ID.
@@ -205,24 +186,14 @@ async def update_webhook(
 
         if "not found" in error.lower():
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Webhook {webhook_id} not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail=f"Webhook {webhook_id} not found"
             )
         elif "access denied" in error.lower():
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Access denied"
-            )
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
         elif "invalid" in error.lower():
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=error
-            )
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error)
         else:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=error
-            )
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=error)
 
     return result["webhook"]
 
@@ -231,7 +202,7 @@ async def update_webhook(
 async def delete_webhook(
     webhook_id: str,
     user_id: str = Depends(get_current_user_id),
-    service: WebhookServiceDB = Depends(get_webhook_service)
+    service: WebhookServiceDB = Depends(get_webhook_service),
 ):
     """
     Удаление webhook по ID (hard delete).
@@ -260,20 +231,19 @@ async def delete_webhook(
         if "not found" in error.lower():
             logger.warning(f"Webhook {webhook_id} not found")
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Webhook {webhook_id} not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail=f"Webhook {webhook_id} not found"
             )
         elif "access denied" in error.lower():
             logger.warning(f"User {user_id} access denied for webhook {webhook_id}")
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Access denied. Only project owner can delete webhooks."
+                detail="Access denied. Only project owner can delete webhooks.",
             )
         else:
             logger.error(f"Error deleting webhook {webhook_id}: {error}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Failed to delete webhook: {error}"
+                detail=f"Failed to delete webhook: {error}",
             )
 
     logger.info(f"Webhook {webhook_id} successfully deleted")
@@ -285,7 +255,7 @@ async def test_webhook(
     event: str = Body(..., embed=True),
     payload: Dict[str, Any] = Body(..., embed=True),
     user_id: str = Depends(get_current_user_id),
-    service: WebhookServiceDB = Depends(get_webhook_service)
+    service: WebhookServiceDB = Depends(get_webhook_service),
 ):
     """
     Тестирование webhook путем отправки тестового события.
@@ -308,14 +278,10 @@ async def test_webhook(
 
         if "not found" in error.lower():
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Webhook {webhook_id} not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail=f"Webhook {webhook_id} not found"
             )
         elif "access denied" in error.lower():
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Access denied"
-            )
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
     # Trigger webhook
     trigger_result = service.trigger_webhook(webhook_id, event, payload)
@@ -323,22 +289,21 @@ async def test_webhook(
     if not trigger_result["success"]:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=trigger_result.get("error", "Failed to trigger webhook")
+            detail=trigger_result.get("error", "Failed to trigger webhook"),
         )
 
     return {
         "success": True,
         "message": trigger_result.get("message", "Test event sent successfully"),
         "webhook_id": webhook_id,
-        "event": event
+        "event": event,
     }
 
 
 # Internal endpoint for getting webhooks by event
 @router.get("/internal/by-event/{event}", response_model=List[Dict[str, Any]])
 async def get_webhooks_by_event(
-    event: str,
-    service: WebhookServiceDB = Depends(get_webhook_service)
+    event: str, service: WebhookServiceDB = Depends(get_webhook_service)
 ):
     """
     Получение списка активных webhooks для указанного события.
@@ -357,10 +322,7 @@ async def get_webhooks_by_event(
 
 # Receiver for incoming webhook events (from external systems)
 @router.post("/incoming/{endpoint_key}", status_code=status.HTTP_200_OK)
-async def handle_incoming_webhook(
-    endpoint_key: str,
-    request: Request
-):
+async def handle_incoming_webhook(endpoint_key: str, request: Request):
     """
     Обработка входящих webhook событий от внешних систем.
 
@@ -388,5 +350,5 @@ async def handle_incoming_webhook(
     return {
         "success": True,
         "message": "Event received and queued for processing",
-        "endpoint_key": endpoint_key
+        "endpoint_key": endpoint_key,
     }

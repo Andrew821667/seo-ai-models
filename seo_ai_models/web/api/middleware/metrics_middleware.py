@@ -34,10 +34,7 @@ class MetricsMiddleware(BaseHTTPMiddleware):
             status_code = response.status_code
         except Exception as e:
             # Record error
-            self.metrics.record_error(
-                error_type=type(e).__name__,
-                endpoint=endpoint
-            )
+            self.metrics.record_error(error_type=type(e).__name__, endpoint=endpoint)
             logger.error(f"Request error: {endpoint} - {str(e)}")
             raise
 
@@ -46,10 +43,7 @@ class MetricsMiddleware(BaseHTTPMiddleware):
 
         # Record metrics
         self.metrics.record_http_request(
-            method=request.method,
-            endpoint=endpoint,
-            status_code=status_code,
-            duration=duration
+            method=request.method, endpoint=endpoint, status_code=status_code, duration=duration
         )
 
         # Add custom headers

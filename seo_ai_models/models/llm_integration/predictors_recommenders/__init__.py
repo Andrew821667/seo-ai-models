@@ -11,9 +11,4 @@ from .hybrid_recommender import HybridRecommender
 from .roi_calculator import ROICalculator
 from .prioritized_action_plan import PrioritizedActionPlan
 
-__all__ = [
-    'LLMRankPredictor',
-    'HybridRecommender',
-    'ROICalculator',
-    'PrioritizedActionPlan'
-]
+__all__ = ["LLMRankPredictor", "HybridRecommender", "ROICalculator", "PrioritizedActionPlan"]

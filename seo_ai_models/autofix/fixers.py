@@ -59,45 +59,50 @@ class MetaTagsFixer(BaseFixer):
 
         # Проверка title
         if not title:
-            problems.append({
-                "type": "missing_title",
-                "description": "Missing title tag",
-                "severity": "high",
-                "auto_fixable": True,
-                "metadata": {"content_text": content.get("text", "")}
-            })
-        elif len(title) < 30 or len(title) > 60:
-            problems.append({
-                "type": "suboptimal_title_length",
-                "description": f"Title length is {len(title)} (optimal: 30-60)",
-                "severity": "medium",
-                "auto_fixable": True,
-                "metadata": {
-                    "current_title": title,
-                    "content_text": content.get("text", "")
+            problems.append(
+                {
+                    "type": "missing_title",
+                    "description": "Missing title tag",
+                    "severity": "high",
+                    "auto_fixable": True,
+                    "metadata": {"content_text": content.get("text", "")},
                 }
-            })
+            )
+        elif len(title) < 30 or len(title) > 60:
+            problems.append(
+                {
+                    "type": "suboptimal_title_length",
+                    "description": f"Title length is {len(title)} (optimal: 30-60)",
+                    "severity": "medium",
+                    "auto_fixable": True,
+                    "metadata": {"current_title": title, "content_text": content.get("text", "")},
+                }
+            )
 
         # Проверка description
         if not description:
-            problems.append({
-                "type": "missing_description",
-                "description": "Missing meta description",
-                "severity": "high",
-                "auto_fixable": True,
-                "metadata": {"content_text": content.get("text", "")}
-            })
-        elif len(description) < 120 or len(description) > 160:
-            problems.append({
-                "type": "suboptimal_description_length",
-                "description": f"Description length is {len(description)} (optimal: 120-160)",
-                "severity": "medium",
-                "auto_fixable": True,
-                "metadata": {
-                    "current_description": description,
-                    "content_text": content.get("text", "")
+            problems.append(
+                {
+                    "type": "missing_description",
+                    "description": "Missing meta description",
+                    "severity": "high",
+                    "auto_fixable": True,
+                    "metadata": {"content_text": content.get("text", "")},
                 }
-            })
+            )
+        elif len(description) < 120 or len(description) > 160:
+            problems.append(
+                {
+                    "type": "suboptimal_description_length",
+                    "description": f"Description length is {len(description)} (optimal: 120-160)",
+                    "severity": "medium",
+                    "auto_fixable": True,
+                    "metadata": {
+                        "current_description": description,
+                        "content_text": content.get("text", ""),
+                    },
+                }
+            )
 
         return problems
 
@@ -112,10 +117,7 @@ class MetaTagsFixer(BaseFixer):
 
             if cms_connector:
                 # Обновляем через CMS API
-                cms_connector.update_meta_tags(
-                    metadata.get("page_id"),
-                    title=new_title
-                )
+                cms_connector.update_meta_tags(metadata.get("page_id"), title=new_title)
 
             logger.info(f"Generated new title: {new_title}")
 
@@ -123,17 +125,14 @@ class MetaTagsFixer(BaseFixer):
                 "success": True,
                 "field": "title",
                 "old_value": metadata.get("current_title"),
-                "new_value": new_title
+                "new_value": new_title,
             }
 
         elif "description" in problem_type:
             new_description = self._generate_description(content_text)
 
             if cms_connector:
-                cms_connector.update_meta_tags(
-                    metadata.get("page_id"),
-                    description=new_description
-                )
+                cms_connector.update_meta_tags(metadata.get("page_id"), description=new_description)
 
             logger.info(f"Generated new description: {new_description}")
 
@@ -141,7 +140,7 @@ class MetaTagsFixer(BaseFixer):
                 "success": True,
                 "field": "description",
                 "old_value": metadata.get("current_description"),
-                "new_value": new_description
+                "new_value": new_description,
             }
 
         return {"success": False, "error": "Unknown problem type"}
@@ -189,7 +188,7 @@ Return only the description, no explanation."""
             return description.strip()[:160]
         else:
             # Используем первое предложение
-            sentences = content.split('.')
+            sentences = content.split(".")
             description = sentences[0] if sentences else content[:160]
             return description[:160]
 
@@ -211,7 +210,10 @@ Return only the description, no explanation."""
             if 120 <= len(new_value) <= 160:
                 return {"success": True}
             else:
-                return {"success": False, "error": f"Description length {len(new_value)} out of range"}
+                return {
+                    "success": False,
+                    "error": f"Description length {len(new_value)} out of range",
+                }
 
         return {"success": True}
 
@@ -245,17 +247,19 @@ class ImageAltTagsFixer(BaseFixer):
 
         for img in images:
             if not img.get("alt"):
-                problems.append({
-                    "type": "missing_alt_tag",
-                    "description": f"Image without alt tag: {img.get('src')}",
-                    "severity": "medium",
-                    "auto_fixable": True,
-                    "metadata": {
-                        "image_url": img.get("src"),
-                        "image_filename": img.get("filename"),
-                        "surrounding_text": img.get("context", "")
+                problems.append(
+                    {
+                        "type": "missing_alt_tag",
+                        "description": f"Image without alt tag: {img.get('src')}",
+                        "severity": "medium",
+                        "auto_fixable": True,
+                        "metadata": {
+                            "image_url": img.get("src"),
+                            "image_filename": img.get("filename"),
+                            "surrounding_text": img.get("context", ""),
+                        },
                     }
-                })
+                )
 
         return problems
 
@@ -274,11 +278,7 @@ class ImageAltTagsFixer(BaseFixer):
 
         logger.info(f"Generated alt text for {image_url}: {alt_text}")
 
-        return {
-            "success": True,
-            "image_url": image_url,
-            "alt_text": alt_text
-        }
+        return {"success": True, "image_url": image_url, "alt_text": alt_text}
 
     def _generate_alt_text(self, filename: str, context: str) -> str:
         """Генерация alt-текста."""
@@ -302,7 +302,7 @@ Return only the alt text, no explanation."""
         else:
             # Генерируем из имени файла
             alt = filename.replace("-", " ").replace("_", " ")
-            alt = re.sub(r'\.[^.]+$', '', alt)  # Удаляем расширение
+            alt = re.sub(r"\.[^.]+$", "", alt)  # Удаляем расширение
             return alt.title()[:125]
 
     def verify(self, result: Dict[str, Any]) -> Dict[str, Any]:
@@ -340,32 +340,30 @@ class ContentRefreshFixer(BaseFixer):
             age_days = (datetime.now() - published_date).days
 
             if age_days > 365:  # Старше года
-                problems.append({
-                    "type": "outdated_content",
-                    "description": f"Content is {age_days} days old",
-                    "severity": "low",
-                    "auto_fixable": True,
-                    "metadata": {
-                        "age_days": age_days,
-                        "content_text": content.get("text", "")
+                problems.append(
+                    {
+                        "type": "outdated_content",
+                        "description": f"Content is {age_days} days old",
+                        "severity": "low",
+                        "auto_fixable": True,
+                        "metadata": {"age_days": age_days, "content_text": content.get("text", "")},
                     }
-                })
+                )
 
         # Поиск устаревших дат в тексте
         text = content.get("text", "")
         outdated_years = self._find_outdated_dates(text)
 
         if outdated_years:
-            problems.append({
-                "type": "outdated_statistics",
-                "description": "Content contains outdated years/statistics",
-                "severity": "medium",
-                "auto_fixable": True,
-                "metadata": {
-                    "outdated_years": outdated_years,
-                    "content_text": text
+            problems.append(
+                {
+                    "type": "outdated_statistics",
+                    "description": "Content contains outdated years/statistics",
+                    "severity": "medium",
+                    "auto_fixable": True,
+                    "metadata": {"outdated_years": outdated_years, "content_text": text},
                 }
-            })
+            )
 
         return problems
 
@@ -373,7 +371,7 @@ class ContentRefreshFixer(BaseFixer):
         """Поиск устаревших дат в тексте."""
         current_year = datetime.now().year
         # Ищем упоминания годов
-        years = re.findall(r'\b(20\d{2})\b', text)
+        years = re.findall(r"\b(20\d{2})\b", text)
 
         # Фильтруем старые годы (старше 2 лет)
         outdated = [year for year in set(years) if int(year) < current_year - 2]
@@ -393,7 +391,7 @@ class ContentRefreshFixer(BaseFixer):
             return {
                 "success": True,
                 "action": "updated_modified_date",
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             }
 
         elif problem_type == "outdated_statistics":
@@ -407,15 +405,12 @@ class ContentRefreshFixer(BaseFixer):
                 updated_text = updated_text.replace(old_year, current_year)
 
             if cms_connector:
-                cms_connector.update_content(
-                    metadata.get("page_id"),
-                    updated_text
-                )
+                cms_connector.update_content(metadata.get("page_id"), updated_text)
 
             return {
                 "success": True,
                 "action": "updated_dates",
-                "changes": {year: current_year for year in outdated_years}
+                "changes": {year: current_year for year in outdated_years},
             }
 
         return {"success": False}
@@ -454,16 +449,15 @@ class SchemaMarkupFixer(BaseFixer):
         if not has_schema:
             content_type = self._detect_content_type(content)
 
-            problems.append({
-                "type": "missing_schema_markup",
-                "description": f"Missing Schema.org markup for {content_type}",
-                "severity": "medium",
-                "auto_fixable": True,
-                "metadata": {
-                    "content_type": content_type,
-                    "content": content
+            problems.append(
+                {
+                    "type": "missing_schema_markup",
+                    "description": f"Missing Schema.org markup for {content_type}",
+                    "severity": "medium",
+                    "auto_fixable": True,
+                    "metadata": {"content_type": content_type, "content": content},
                 }
-            })
+            )
 
         return problems
 
@@ -485,18 +479,11 @@ class SchemaMarkupFixer(BaseFixer):
         schema_markup = self._generate_schema(content_type, content)
 
         if cms_connector:
-            cms_connector.add_schema_markup(
-                metadata.get("page_id"),
-                schema_markup
-            )
+            cms_connector.add_schema_markup(metadata.get("page_id"), schema_markup)
 
         logger.info(f"Generated {content_type} schema markup")
 
-        return {
-            "success": True,
-            "schema_type": content_type,
-            "markup": schema_markup
-        }
+        return {"success": True, "schema_type": content_type, "markup": schema_markup}
 
     def _generate_schema(self, content_type: str, content: Dict[str, Any]) -> Dict:
         """Генерация Schema.org JSON-LD."""
@@ -508,10 +495,7 @@ class SchemaMarkupFixer(BaseFixer):
                 "description": content.get("description", ""),
                 "datePublished": content.get("published_date", datetime.now()).isoformat(),
                 "dateModified": datetime.now().isoformat(),
-                "author": {
-                    "@type": "Person",
-                    "name": content.get("author", "Unknown")
-                }
+                "author": {"@type": "Person", "name": content.get("author", "Unknown")},
             }
         elif content_type == "Product":
             return {
@@ -522,8 +506,8 @@ class SchemaMarkupFixer(BaseFixer):
                 "offers": {
                     "@type": "Offer",
                     "price": content.get("price", "0"),
-                    "priceCurrency": "USD"
-                }
+                    "priceCurrency": "USD",
+                },
             }
         # Добавить другие типы по необходимости
 
@@ -556,16 +540,18 @@ class InternalLinksFixer(BaseFixer):
         internal_links_count = len(content.get("internal_links", []))
 
         if internal_links_count < 3:
-            problems.append({
-                "type": "insufficient_internal_links",
-                "description": f"Only {internal_links_count} internal links found",
-                "severity": "low",
-                "auto_fixable": True,
-                "metadata": {
-                    "current_links": internal_links_count,
-                    "content_text": content.get("text", "")
+            problems.append(
+                {
+                    "type": "insufficient_internal_links",
+                    "description": f"Only {internal_links_count} internal links found",
+                    "severity": "low",
+                    "auto_fixable": True,
+                    "metadata": {
+                        "current_links": internal_links_count,
+                        "content_text": content.get("text", ""),
+                    },
                 }
-            })
+            )
 
         return problems
 
@@ -587,11 +573,7 @@ class InternalLinksFixer(BaseFixer):
                 link_html = f'<a href="{link_url}">{anchor_text}</a>'
                 # TODO: Более умная вставка с учетом контекста
 
-            return {
-                "success": True,
-                "links_added": len(related_pages),
-                "links": related_pages
-            }
+            return {"success": True, "links_added": len(related_pages), "links": related_pages}
 
         return {"success": False, "error": "CMS connector not available"}
 

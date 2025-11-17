@@ -10,7 +10,7 @@ from .fixers import (
     ImageAltTagsFixer,
     ContentRefreshFixer,
     SchemaMarkupFixer,
-    InternalLinksFixer
+    InternalLinksFixer,
 )
 
 __all__ = [

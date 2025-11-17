@@ -7,19 +7,14 @@ import subprocess
 import sys
 import os
 
+
 def install_dependencies():
     """Установка необходимых зависимостей."""
     print("Установка необходимых зависимостей...")
-    
+
     # Основные зависимости
-    dependencies = [
-        'playwright',
-        'beautifulsoup4',
-        'nltk',
-        'spacy',
-        'requests'
-    ]
-    
+    dependencies = ["playwright", "beautifulsoup4", "nltk", "spacy", "requests"]
+
     for dependency in dependencies:
         print(f"Установка {dependency}...")
         try:
@@ -28,7 +23,7 @@ def install_dependencies():
         except subprocess.CalledProcessError:
             print(f"Ошибка при установке {dependency}.")
             return False
-    
+
     # Установка Playwright браузеров
     try:
         print("Установка браузеров для Playwright...")
@@ -37,9 +32,10 @@ def install_dependencies():
     except subprocess.CalledProcessError:
         print("Ошибка при установке браузеров для Playwright.")
         return False
-    
+
     print("Все зависимости успешно установлены!")
     return True
+
 
 def main():
     """Основная функция скрипта."""
@@ -51,8 +47,9 @@ def main():
     else:
         print("\nПроизошла ошибка при настройке окружения.")
         return 1
-    
+
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

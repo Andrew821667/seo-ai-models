@@ -23,12 +23,14 @@ class AIContentGenerator:
         self.seo_advisor = seo_advisor
         logger.info("AIContentGenerator initialized")
 
-    def generate_article(self, keyword: str, word_count: int = 1500, tone: str = "professional") -> Dict[str, Any]:
+    def generate_article(
+        self, keyword: str, word_count: int = 1500, tone: str = "professional"
+    ) -> Dict[str, Any]:
         """Генерирует полную SEO-оптимизированную статью."""
         if not self.llm:
             return {
                 "error": "LLM service not available",
-                "recommendation": "Configure LLM service to enable content generation"
+                "recommendation": "Configure LLM service to enable content generation",
             }
 
         article = {
@@ -36,7 +38,7 @@ class AIContentGenerator:
             "word_count_target": word_count,
             "tone": tone,
             "content": {},
-            "seo_score": 0
+            "seo_score": 0,
         }
 
         # 1. Генерируем outline
@@ -96,7 +98,7 @@ class AIContentGenerator:
             "required_elements": [],
             "competitor_analysis": [],
             "keywords_to_include": [],
-            "tone_and_style": ""
+            "tone_and_style": "",
         }
 
         # Определяем search intent
@@ -134,14 +136,16 @@ class AIContentGenerator:
 
         for product in products:
             desc = self._generate_single_product_description(product)
-            descriptions.append({
-                "product_id": product.get("id"),
-                "product_name": product.get("name"),
-                "short_description": desc["short"],
-                "long_description": desc["long"],
-                "features_list": desc["features"],
-                "seo_keywords": desc["keywords"]
-            })
+            descriptions.append(
+                {
+                    "product_id": product.get("id"),
+                    "product_name": product.get("name"),
+                    "short_description": desc["short"],
+                    "long_description": desc["long"],
+                    "features_list": desc["features"],
+                    "seo_keywords": desc["keywords"],
+                }
+            )
 
         logger.info(f"Generated descriptions for {len(descriptions)} products")
 
@@ -154,7 +158,7 @@ class AIContentGenerator:
             "article_generated": False,
             "published": False,
             "url": None,
-            "errors": []
+            "errors": [],
         }
 
         # Генерируем статью
@@ -174,7 +178,9 @@ class AIContentGenerator:
         else:
             result["errors"].append(article["error"])
 
-        logger.info(f"Auto-blog: {topic} - {'Published' if result['published'] else 'Generated only'}")
+        logger.info(
+            f"Auto-blog: {topic} - {'Published' if result['published'] else 'Generated only'}"
+        )
 
         return result
 
@@ -207,7 +213,7 @@ Format as structured outline."""
         return {
             "h1": f"Complete Guide to {keyword.title()}",
             "sections": sections,
-            "estimated_word_count": word_count
+            "estimated_word_count": word_count,
         }
 
     def _generate_seo_title(self, keyword: str) -> str:
@@ -271,10 +277,7 @@ Introduction:"""
     def _generate_section(self, section_title: str, keyword: str, tone: str) -> Dict:
         """Генерирует секцию статьи."""
         if not self.llm:
-            return {
-                "title": section_title,
-                "content": f"Content about {section_title}..."
-            }
+            return {"title": section_title, "content": f"Content about {section_title}..."}
 
         prompt = f"""Write a detailed section for an article about "{keyword}"
 
@@ -292,10 +295,7 @@ Section content:"""
 
         content = self.llm.generate(prompt, max_tokens=400)
 
-        return {
-            "title": section_title,
-            "content": content.strip()
-        }
+        return {"title": section_title, "content": content.strip()}
 
     def _generate_conclusion(self, keyword: str) -> str:
         """Генерирует заключение."""
@@ -396,12 +396,7 @@ Make questions natural and answers informative (2-3 sentences each)."""
 
     def _assemble_article(self, content: Dict) -> str:
         """Собирает полный текст статьи."""
-        parts = [
-            f"# {content.get('title', '')}",
-            "",
-            content.get("introduction", ""),
-            ""
-        ]
+        parts = [f"# {content.get('title', '')}", "", content.get("introduction", ""), ""]
 
         for section in content.get("sections", []):
             parts.append(f"## {section['title']}")
@@ -441,11 +436,7 @@ Make questions natural and answers informative (2-3 sentences each)."""
         # В реальности анализировать конкурентов
         intent = self._detect_search_intent(keyword)
 
-        word_counts = {
-            "informational": 1500,
-            "commercial": 2000,
-            "commercial_investigation": 2500
-        }
+        word_counts = {"informational": 1500, "commercial": 2000, "commercial_investigation": 2500}
 
         return word_counts.get(intent, 1500)
 
@@ -457,22 +448,22 @@ Make questions natural and answers informative (2-3 sentences each)."""
                 "Step-by-step instructions",
                 "Examples",
                 "FAQ section",
-                "Summary/Conclusion"
+                "Summary/Conclusion",
             ],
             "commercial": [
                 "Product features",
                 "Pricing information",
                 "Pros and cons",
                 "Customer reviews",
-                "Clear CTA"
+                "Clear CTA",
             ],
             "commercial_investigation": [
                 "Comparison table",
                 "Detailed pros and cons",
                 "Expert opinion",
                 "User reviews",
-                "Recommendations"
-            ]
+                "Recommendations",
+            ],
         }
 
         return elements.get(intent, elements["informational"])
@@ -495,7 +486,7 @@ List only the keywords:"""
 
         lsi_text = self.llm.generate(prompt, max_tokens=100)
 
-        keywords = [k.strip().strip('-•123456789. ') for k in lsi_text.split('\n') if k.strip()]
+        keywords = [k.strip().strip("-•123456789. ") for k in lsi_text.split("\n") if k.strip()]
 
         return keywords[:10]
 
@@ -511,12 +502,7 @@ List only the keywords:"""
     def _generate_single_product_description(self, product: Dict) -> Dict:
         """Генерирует описание одного продукта."""
         if not self.llm:
-            return {
-                "short": product.get("name", ""),
-                "long": "",
-                "features": [],
-                "keywords": []
-            }
+            return {"short": product.get("name", ""), "long": "", "features": [], "keywords": []}
 
         name = product.get("name", "")
         category = product.get("category", "")
@@ -549,7 +535,7 @@ Include:
             "short": short_desc.strip(),
             "long": long_desc.strip(),
             "features": product.get("features", []),
-            "keywords": [name.lower(), category.lower()]
+            "keywords": [name.lower(), category.lower()],
         }
 
     def _parse_outline(self, outline_text: str) -> List[Dict]:
@@ -557,17 +543,17 @@ Include:
         # Упрощенный парсинг
         sections = []
 
-        lines = outline_text.split('\n')
+        lines = outline_text.split("\n")
         current_section = None
 
         for line in lines:
             line = line.strip()
-            if line.startswith('##') or line.startswith('H2'):
+            if line.startswith("##") or line.startswith("H2"):
                 if current_section:
                     sections.append(current_section)
                 current_section = {
-                    "title": line.replace('##', '').replace('H2:', '').strip(),
-                    "subsections": []
+                    "title": line.replace("##", "").replace("H2:", "").strip(),
+                    "subsections": [],
                 }
             elif line and current_section:
                 current_section["subsections"].append(line)
@@ -581,22 +567,19 @@ Include:
         """Парсит FAQ из текста."""
         faq_list = []
 
-        lines = faq_text.split('\n')
+        lines = faq_text.split("\n")
         current_q = None
         current_a = None
 
         for line in lines:
             line = line.strip()
-            if line.startswith('Q:'):
-                current_q = line.replace('Q:', '').strip()
-            elif line.startswith('A:'):
-                current_a = line.replace('A:', '').strip()
+            if line.startswith("Q:"):
+                current_q = line.replace("Q:", "").strip()
+            elif line.startswith("A:"):
+                current_a = line.replace("A:", "").strip()
 
                 if current_q and current_a:
-                    faq_list.append({
-                        "question": current_q,
-                        "answer": current_a
-                    })
+                    faq_list.append({"question": current_q, "answer": current_a})
                     current_q = None
                     current_a = None
 

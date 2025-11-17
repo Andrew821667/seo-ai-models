@@ -10,35 +10,26 @@ import importlib
 from pathlib import Path
 
 # Настройка логирования
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
+
 
 def check_dependencies():
     """
     Проверяет наличие необходимых зависимостей.
     """
-    required_packages = [
-        "requests",
-        "beautifulsoup4",
-        "lxml",
-        "concurrent-futures"
-    ]
-    
-    optional_packages = [
-        "playwright",
-        "spacy",
-        "nltk",
-        "gensim"
-    ]
-    
+    required_packages = ["requests", "beautifulsoup4", "lxml", "concurrent-futures"]
+
+    optional_packages = ["playwright", "spacy", "nltk", "gensim"]
+
     # Проверяем обязательные зависимости
     missing_required = []
     for package in required_packages:
         try:
-            importlib.import_module(package.replace('-', '_'))
+            importlib.import_module(package.replace("-", "_"))
         except ImportError:
             missing_required.append(package)
-            
+
     # Проверяем опциональные зависимости
     missing_optional = []
     for package in optional_packages:
@@ -46,8 +37,9 @@ def check_dependencies():
             importlib.import_module(package)
         except ImportError:
             missing_optional.append(package)
-    
+
     return missing_required, missing_optional
+
 
 def install_dependencies(packages):
     """
@@ -55,15 +47,16 @@ def install_dependencies(packages):
     """
     if not packages:
         return True
-        
+
     logger.info(f"Установка пакетов: {', '.join(packages)}")
-    
+
     try:
         subprocess.check_call([sys.executable, "-m", "pip", "install"] + packages)
         return True
     except subprocess.CalledProcessError as e:
         logger.error(f"Ошибка установки пакетов: {e}")
         return False
+
 
 def update_init_files():
     """
@@ -80,27 +73,28 @@ from seo_ai_models.parsers.unified.site_analyzer import SiteAnalyzer
 # Экспортируем основные классы
 __all__ = ['UnifiedParser', 'SiteAnalyzer']
 """
-    
+
     parsers_init_path = Path("seo_ai_models/parsers/__init__.py")
-    with open(parsers_init_path, 'w') as f:
+    with open(parsers_init_path, "w") as f:
         f.write(parsers_init)
-        
+
     # Проверяем наличие всех необходимых __init__.py
     subdirs = [
-        'seo_ai_models/parsers/unified/crawlers',
-        'seo_ai_models/parsers/unified/extractors',
-        'seo_ai_models/parsers/unified/analyzers',
-        'seo_ai_models/parsers/unified/utils'
+        "seo_ai_models/parsers/unified/crawlers",
+        "seo_ai_models/parsers/unified/extractors",
+        "seo_ai_models/parsers/unified/analyzers",
+        "seo_ai_models/parsers/unified/utils",
     ]
-    
+
     for subdir in subdirs:
         init_path = Path(subdir) / "__init__.py"
         if not init_path.exists():
-            with open(init_path, 'w') as f:
+            with open(init_path, "w") as f:
                 f.write("# Инициализация модуля\n")
-                
+
     logger.info("Файлы __init__.py обновлены")
     return True
+
 
 def create_demo_script():
     """
@@ -211,51 +205,57 @@ def main():
 if __name__ == "__main__":
     main()
 """
-    
+
     demo_path = demo_dir / "demo.py"
-    with open(demo_path, 'w') as f:
+    with open(demo_path, "w") as f:
         f.write(demo_script)
-        
+
     logger.info(f"Демонстрационный скрипт создан: {demo_path}")
     return True
 
+
 def main():
     logger.info("Интеграция улучшений унифицированного парсера")
-    
+
     # Проверяем зависимости
     missing_required, missing_optional = check_dependencies()
-    
+
     if missing_required:
-        logger.warning(f"Обнаружены отсутствующие обязательные зависимости: {', '.join(missing_required)}")
+        logger.warning(
+            f"Обнаружены отсутствующие обязательные зависимости: {', '.join(missing_required)}"
+        )
         logger.info("Установка обязательных зависимостей...")
         if not install_dependencies(missing_required):
             logger.error("Не удалось установить обязательные зависимости")
             return False
-    
+
     if missing_optional:
-        logger.info(f"Обнаружены отсутствующие опциональные зависимости: {', '.join(missing_optional)}")
-        install = input("Установить опциональные зависимости? (y/n): ").lower() == 'y'
+        logger.info(
+            f"Обнаружены отсутствующие опциональные зависимости: {', '.join(missing_optional)}"
+        )
+        install = input("Установить опциональные зависимости? (y/n): ").lower() == "y"
         if install and not install_dependencies(missing_optional):
             logger.warning("Не удалось установить опциональные зависимости")
-    
+
     # Обновляем файлы инициализации
     if not update_init_files():
         logger.error("Не удалось обновить файлы инициализации")
         return False
-    
+
     # Создаем демонстрационный скрипт
     if not create_demo_script():
         logger.warning("Не удалось создать демонстрационный скрипт")
-    
+
     # Выполняем базовую проверку модуля
     try:
         from seo_ai_models.parsers.unified.unified_parser import UnifiedParser
+
         parser = UnifiedParser()
         logger.info("Базовая проверка унифицированного парсера успешна")
     except Exception as e:
         logger.error(f"Ошибка при проверке унифицированного парсера: {e}")
         return False
-    
+
     logger.info("Интеграция улучшений унифицированного парсера завершена успешно")
     print("\n" + "=" * 60)
     print("ИНТЕГРАЦИЯ УЛУЧШЕНИЙ ЗАВЕРШЕНА УСПЕШНО")
@@ -263,8 +263,9 @@ def main():
     print("\nТеперь вы можете использовать унифицированный парсер с расширенными возможностями.")
     print("Для демонстрации запустите скрипт: python examples/unified_parser/demo.py URL")
     print("Для тестирования расширенных возможностей: python test_enhanced_parser.py")
-    
+
     return True
+
 
 if __name__ == "__main__":
     main()

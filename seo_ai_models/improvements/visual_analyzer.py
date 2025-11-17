@@ -15,12 +15,14 @@ from io import BytesIO
 # Optional imports
 try:
     from PIL import Image
+
     PIL_AVAILABLE = True
 except ImportError:
     PIL_AVAILABLE = False
 
 try:
     import requests
+
     REQUESTS_AVAILABLE = True
 except ImportError:
     REQUESTS_AVAILABLE = False
@@ -38,42 +40,42 @@ class VisualContentAnalyzer:
     def analyze_images(self, page_content: Dict) -> Dict[str, Any]:
         """Полный анализ всех изображений на странице."""
         images = page_content.get("images", [])
-        
+
         analysis = {
             "total_images": len(images),
             "missing_alt": [],
             "oversized": [],
             "wrong_format": [],
             "optimization_potential": 0,
-            "visual_coverage": 0
+            "visual_coverage": 0,
         }
 
         for img in images:
             # Alt-теги
             if not img.get("alt"):
                 analysis["missing_alt"].append(img["src"])
-            
+
             # Размер и формат
             size_kb = img.get("size_bytes", 0) / 1024
             if size_kb > 200:  # > 200KB
-                analysis["oversized"].append({
-                    "src": img["src"],
-                    "size_kb": round(size_kb, 1),
-                    "recommendation": "compress or use WebP"
-                })
-            
+                analysis["oversized"].append(
+                    {
+                        "src": img["src"],
+                        "size_kb": round(size_kb, 1),
+                        "recommendation": "compress or use WebP",
+                    }
+                )
+
             # Формат
             ext = img["src"].split(".")[-1].lower()
             if ext in ["jpg", "png"] and size_kb > 100:
-                analysis["wrong_format"].append({
-                    "src": img["src"],
-                    "current": ext,
-                    "recommended": "webp"
-                })
+                analysis["wrong_format"].append(
+                    {"src": img["src"], "current": ext, "recommended": "webp"}
+                )
 
         # Визуальное покрытие
         text_length = len(page_content.get("text", ""))
-        images_per_1000_words = (len(images) / max(text_length / 1000, 1))
+        images_per_1000_words = len(images) / max(text_length / 1000, 1)
         analysis["visual_coverage"] = round(images_per_1000_words, 1)
 
         # Потенциал оптимизации
@@ -86,14 +88,10 @@ class VisualContentAnalyzer:
 
     def auto_fix_images(self, page_content: Dict, auto_execute=True) -> Dict:
         """АВТОМАТИЧЕСКОЕ исправление проблем с изображениями."""
-        fixes = {
-            "alt_tags_added": 0,
-            "images_optimized": 0,
-            "formats_converted": 0
-        }
+        fixes = {"alt_tags_added": 0, "images_optimized": 0, "formats_converted": 0}
 
         images = page_content.get("images", [])
-        
+
         for img in images:
             # 1. Добавление alt-тегов
             if not img.get("alt"):
@@ -101,7 +99,7 @@ class VisualContentAnalyzer:
                 if auto_execute and self.autofix:
                     # Через AutoFix
                     fixes["alt_tags_added"] += 1
-                
+
             # 2. Оптимизация размера
             if img.get("size_bytes", 0) > 200000:  # > 200KB
                 if auto_execute:
@@ -116,10 +114,7 @@ class VisualContentAnalyzer:
 
         logger.info(f"✅ Auto-fixed images: {fixes}")
 
-        return {
-            "success": True,
-            "fixes": fixes
-        }
+        return {"success": True, "fixes": fixes}
 
     def _generate_alt_tag(self, image: Dict, context: Dict) -> str:
         """Генерация alt-тега."""
@@ -151,7 +146,7 @@ Alt text only:"""
         # Примерная экономия от оптимизации
         oversized_count = len(analysis.get("oversized", []))
         wrong_format_count = len(analysis.get("wrong_format", []))
-        
+
         # В среднем 60% экономии на изображении
         return round((oversized_count + wrong_format_count) * 0.6, 1)
 
@@ -162,14 +157,16 @@ Alt text only:"""
 
         # Находим длинные секции без изображений
         paragraphs = text.split("\n\n")
-        
+
         for i, para in enumerate(paragraphs):
             if len(para) > 500 and i % 3 == 0:  # Каждый 3-й длинный параграф
-                suggestions.append({
-                    "after_paragraph": i,
-                    "reason": "Long text section needs visual break",
-                    "type": "infographic or diagram"
-                })
+                suggestions.append(
+                    {
+                        "after_paragraph": i,
+                        "reason": "Long text section needs visual break",
+                        "type": "infographic or diagram",
+                    }
+                )
 
         return suggestions
 

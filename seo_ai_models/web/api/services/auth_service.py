@@ -178,4 +178,8 @@ class AuthService:
         access_token = self.create_access_token(token_data)
         refresh_token = self.create_refresh_token(token_data)
 
-        return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
+        return {
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "token_type": "bearer",
+        }

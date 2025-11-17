@@ -16,18 +16,20 @@ logger = logging.getLogger(__name__)
 class Task:
     """Класс, представляющий задачу проекта."""
 
-    def __init__(self,
-                 task_id: str,
-                 project_id: str,
-                 title: str,
-                 description: str = "",
-                 status: str = "pending",
-                 priority: str = "medium",
-                 assignee_id: Optional[str] = None,
-                 due_date: Optional[datetime] = None,
-                 created_at: Optional[datetime] = None,
-                 updated_at: Optional[datetime] = None,
-                 metadata: Optional[Dict[str, Any]] = None):
+    def __init__(
+        self,
+        task_id: str,
+        project_id: str,
+        title: str,
+        description: str = "",
+        status: str = "pending",
+        priority: str = "medium",
+        assignee_id: Optional[str] = None,
+        due_date: Optional[datetime] = None,
+        created_at: Optional[datetime] = None,
+        updated_at: Optional[datetime] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+    ):
         """
         Инициализирует задачу.
 
@@ -69,7 +71,7 @@ class Task:
             "due_date": self.due_date.isoformat() if self.due_date else None,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
-            "metadata": self.metadata
+            "metadata": self.metadata,
         }
 
 
@@ -124,17 +126,14 @@ class ProjectService:
         project = self.project_manager.get_project(project_id)
         if not project:
             logger.warning(f"Project {project_id} not found for deletion")
-            return {
-                "success": False,
-                "error": "Project not found"
-            }
+            return {"success": False, "error": "Project not found"}
 
         # Проверяем права доступа
         if not self.check_project_access(project_id, user_id):
             logger.warning(f"User {user_id} denied access to delete project {project_id}")
             return {
                 "success": False,
-                "error": "Access denied. Only project owner can delete the project."
+                "error": "Access denied. Only project owner can delete the project.",
             }
 
         # Удаляем проект (soft delete)
@@ -147,25 +146,30 @@ class ProjectService:
                 if self._delete_task_internal(task.task_id):
                     tasks_deleted += 1
 
-            logger.info(f"Project {project_id} deleted by user {user_id}. {tasks_deleted} tasks marked as deleted.")
+            logger.info(
+                f"Project {project_id} deleted by user {user_id}. {tasks_deleted} tasks marked as deleted."
+            )
 
             return {
                 "success": True,
                 "project_id": project_id,
                 "tasks_deleted": tasks_deleted,
-                "message": "Project and associated tasks have been marked as deleted"
+                "message": "Project and associated tasks have been marked as deleted",
             }
         else:
             logger.error(f"Failed to delete project {project_id}")
-            return {
-                "success": False,
-                "error": "Failed to delete project"
-            }
+            return {"success": False, "error": "Failed to delete project"}
 
-    def create_task(self, project_id: str, title: str, description: str = "",
-                   status: str = "pending", priority: str = "medium",
-                   assignee_id: Optional[str] = None,
-                   due_date: Optional[datetime] = None) -> Optional[Task]:
+    def create_task(
+        self,
+        project_id: str,
+        title: str,
+        description: str = "",
+        status: str = "pending",
+        priority: str = "medium",
+        assignee_id: Optional[str] = None,
+        due_date: Optional[datetime] = None,
+    ) -> Optional[Task]:
         """
         Создает новую задачу для проекта.
 
@@ -196,7 +200,7 @@ class ProjectService:
             status=status,
             priority=priority,
             assignee_id=assignee_id,
-            due_date=due_date
+            due_date=due_date,
         )
 
         self.tasks[task_id] = task
@@ -208,9 +212,9 @@ class ProjectService:
         """Получает задачу по ID."""
         return self.tasks.get(task_id)
 
-    def get_project_tasks(self, project_id: str,
-                         status: Optional[str] = None,
-                         priority: Optional[str] = None) -> List[Task]:
+    def get_project_tasks(
+        self, project_id: str, status: Optional[str] = None, priority: Optional[str] = None
+    ) -> List[Task]:
         """
         Получает список задач проекта с возможностью фильтрации.
 
@@ -267,26 +271,17 @@ class ProjectService:
         task = self.get_task(task_id)
         if not task:
             logger.warning(f"Task {task_id} not found for deletion")
-            return {
-                "success": False,
-                "error": "Task not found"
-            }
+            return {"success": False, "error": "Task not found"}
 
         # Проверяем что задача принадлежит проекту
         if task.project_id != project_id:
             logger.warning(f"Task {task_id} does not belong to project {project_id}")
-            return {
-                "success": False,
-                "error": "Task does not belong to this project"
-            }
+            return {"success": False, "error": "Task does not belong to this project"}
 
         # Проверяем права доступа к проекту
         if not self.check_project_access(project_id, user_id):
             logger.warning(f"User {user_id} denied access to delete task {task_id}")
-            return {
-                "success": False,
-                "error": "Access denied"
-            }
+            return {"success": False, "error": "Access denied"}
 
         # Удаляем задачу (soft delete)
         success = self._delete_task_internal(task_id)
@@ -296,11 +291,8 @@ class ProjectService:
             return {
                 "success": True,
                 "task_id": task_id,
-                "message": "Task has been marked as deleted"
+                "message": "Task has been marked as deleted",
             }
         else:
             logger.error(f"Failed to delete task {task_id}")
-            return {
-                "success": False,
-                "error": "Failed to delete task"
-            }
+            return {"success": False, "error": "Failed to delete task"}

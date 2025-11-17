@@ -24,6 +24,7 @@ router = APIRouter(prefix="/enhanced-analysis", tags=["enhanced-analysis"])
 # Request/Response models
 class EnhancedAnalysisRequest(BaseModel):
     """Request for enhanced analysis."""
+
     url: HttpUrl
     content: str
     keywords: List[str]
@@ -33,6 +34,7 @@ class EnhancedAnalysisRequest(BaseModel):
 
 class EnhancedAnalysisResponse(BaseModel):
     """Response for enhanced analysis."""
+
     analysis_id: str
     status: str
     message: str
@@ -40,6 +42,7 @@ class EnhancedAnalysisResponse(BaseModel):
 
 class AnalysisStatusResponse(BaseModel):
     """Analysis status response."""
+
     analysis_id: str
     status: str
     progress: int
@@ -58,7 +61,7 @@ async def run_enhanced_analysis_task(
     content: str,
     keywords: List[str],
     auto_fix: bool,
-    complexity_limit: FixComplexity
+    complexity_limit: FixComplexity,
 ):
     """Background task to run enhanced analysis with progress tracking."""
     try:
@@ -73,7 +76,7 @@ async def run_enhanced_analysis_task(
             analysis_id,
             20,
             "Running base SEO analysis",
-            {"detail": "Analyzing content quality and keywords"}
+            {"detail": "Analyzing content quality and keywords"},
         )
 
         # Step 2: Visual Analysis (40%)
@@ -81,7 +84,7 @@ async def run_enhanced_analysis_task(
             analysis_id,
             40,
             "Analyzing visual content",
-            {"detail": "Checking images, alt tags, optimization"}
+            {"detail": "Checking images, alt tags, optimization"},
         )
 
         # Step 3: Mobile & Core Web Vitals (60%)
@@ -89,7 +92,7 @@ async def run_enhanced_analysis_task(
             analysis_id,
             60,
             "Checking mobile friendliness",
-            {"detail": "Analyzing Core Web Vitals (LCP, FID, CLS)"}
+            {"detail": "Analyzing Core Web Vitals (LCP, FID, CLS)"},
         )
 
         # Step 4: Running Auto-Fixes (80%)
@@ -98,7 +101,7 @@ async def run_enhanced_analysis_task(
                 analysis_id,
                 80,
                 "Applying automatic fixes",
-                {"detail": f"Auto-fixing issues up to {complexity_limit.value} complexity"}
+                {"detail": f"Auto-fixing issues up to {complexity_limit.value} complexity"},
             )
 
         # Execute full analysis
@@ -107,7 +110,7 @@ async def run_enhanced_analysis_task(
             content=content,
             keywords=keywords,
             auto_fix=auto_fix,
-            fix_complexity_limit=complexity_limit
+            fix_complexity_limit=complexity_limit,
         )
 
         # Complete
@@ -122,7 +125,7 @@ async def start_enhanced_analysis(
     request: EnhancedAnalysisRequest,
     background_tasks: BackgroundTasks,
     current_user: User = Depends(require_permission(Permission.RUN_ANALYSIS)),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """
     Start enhanced SEO analysis with auto-fix.
@@ -143,12 +146,11 @@ async def start_enhanced_analysis(
         "simple": FixComplexity.SIMPLE,
         "moderate": FixComplexity.MODERATE,
         "complex": FixComplexity.COMPLEX,
-        "critical": FixComplexity.CRITICAL
+        "critical": FixComplexity.CRITICAL,
     }
 
     complexity_limit = complexity_map.get(
-        request.fix_complexity_limit.lower(),
-        FixComplexity.SIMPLE
+        request.fix_complexity_limit.lower(), FixComplexity.SIMPLE
     )
 
     # Start background task
@@ -160,20 +162,19 @@ async def start_enhanced_analysis(
         content=request.content,
         keywords=request.keywords,
         auto_fix=request.auto_fix,
-        complexity_limit=complexity_limit
+        complexity_limit=complexity_limit,
     )
 
     return EnhancedAnalysisResponse(
         analysis_id=analysis_id,
         status="started",
-        message=f"Analysis started. Connect to WebSocket to track progress: /ws/analysis/{analysis_id}"
+        message=f"Analysis started. Connect to WebSocket to track progress: /ws/analysis/{analysis_id}",
     )
 
 
 @router.get("/status/{analysis_id}", response_model=AnalysisStatusResponse)
 async def get_analysis_status(
-    analysis_id: str,
-    current_user: User = Depends(require_permission(Permission.VIEW_ANALYSIS))
+    analysis_id: str, current_user: User = Depends(require_permission(Permission.VIEW_ANALYSIS))
 ):
     """
     Get current status of analysis.
@@ -181,10 +182,7 @@ async def get_analysis_status(
     Permissions: VIEW_ANALYSIS required
     """
     if analysis_id not in progress_tracker.active_analyses:
-        raise HTTPException(
-            status_code=404,
-            detail="Analysis not found or completed"
-        )
+        raise HTTPException(status_code=404, detail="Analysis not found or completed")
 
     analysis = progress_tracker.active_analyses[analysis_id]
 
@@ -196,13 +194,13 @@ async def get_analysis_status(
         url=analysis["url"],
         started_at=analysis["started_at"],
         completed_at=analysis.get("completed_at"),
-        results=analysis.get("results")
+        results=analysis.get("results"),
     )
 
 
 @router.get("/active", response_model=List[AnalysisStatusResponse])
 async def get_active_analyses(
-    current_user: User = Depends(require_permission(Permission.VIEW_ANALYSIS))
+    current_user: User = Depends(require_permission(Permission.VIEW_ANALYSIS)),
 ):
     """
     Get all active analyses.
@@ -220,7 +218,7 @@ async def get_active_analyses(
             url=a["url"],
             started_at=a["started_at"],
             completed_at=a.get("completed_at"),
-            results=a.get("results")
+            results=a.get("results"),
         )
         for a in analyses
     ]
@@ -229,6 +227,7 @@ async def get_active_analyses(
 # AutoFix specific endpoints
 class AutoFixApprovalRequest(BaseModel):
     """Request to approve/reject auto-fix."""
+
     action_id: str
     approved: bool
     reason: Optional[str] = None
@@ -237,7 +236,7 @@ class AutoFixApprovalRequest(BaseModel):
 @router.post("/autofix/approve")
 async def approve_autofix(
     request: AutoFixApprovalRequest,
-    current_user: User = Depends(require_permission(Permission.APPROVE_AUTOFIX))
+    current_user: User = Depends(require_permission(Permission.APPROVE_AUTOFIX)),
 ):
     """
     Approve or reject pending auto-fix action.
@@ -251,13 +250,13 @@ async def approve_autofix(
         "action_id": request.action_id,
         "approved": request.approved,
         "approved_by": current_user.username,
-        "message": "Auto-fix action processed"
+        "message": "Auto-fix action processed",
     }
 
 
 @router.get("/autofix/pending")
 async def get_pending_autofixes(
-    current_user: User = Depends(require_permission(Permission.APPROVE_AUTOFIX))
+    current_user: User = Depends(require_permission(Permission.APPROVE_AUTOFIX)),
 ):
     """
     Get all pending auto-fix actions awaiting approval.
@@ -265,7 +264,4 @@ async def get_pending_autofixes(
     Permissions: APPROVE_AUTOFIX required
     """
     # This would query AutoFix Engine for pending approvals
-    return {
-        "pending_actions": [],
-        "count": 0
-    }
+    return {"pending_actions": [], "count": 0}

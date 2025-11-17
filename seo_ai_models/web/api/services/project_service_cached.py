@@ -101,9 +101,7 @@ class ProjectServiceCached(ProjectServiceDB):
 
         return result
 
-    def get_task(
-        self, project_id: str, task_id: str, user_id: str
-    ) -> Dict[str, Any]:
+    def get_task(self, project_id: str, task_id: str, user_id: str) -> Dict[str, Any]:
         """Get task with caching."""
         cache_key = self._make_cache_key("task", project_id, task_id, user_id)
 
@@ -143,9 +141,7 @@ class ProjectServiceCached(ProjectServiceDB):
 
         return result
 
-    def create_task(
-        self, project_id: str, title: str, user_id: str, **kwargs
-    ) -> Dict[str, Any]:
+    def create_task(self, project_id: str, title: str, user_id: str, **kwargs) -> Dict[str, Any]:
         """Create task and invalidate cache."""
         result = super().create_task(project_id, title, user_id, **kwargs)
 
@@ -174,9 +170,7 @@ class ProjectServiceCached(ProjectServiceDB):
 
         return result
 
-    def delete_task(
-        self, project_id: str, task_id: str, user_id: str
-    ) -> Dict[str, Any]:
+    def delete_task(self, project_id: str, task_id: str, user_id: str) -> Dict[str, Any]:
         """Delete task and invalidate cache."""
         result = super().delete_task(project_id, task_id, user_id)
 

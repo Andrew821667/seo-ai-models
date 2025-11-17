@@ -18,10 +18,11 @@ logger = logging.getLogger(__name__)
 
 class SearchIntent(str, Enum):
     """Типы поисковых намерений."""
+
     INFORMATIONAL = "informational"  # "что такое", "как", "почему"
-    NAVIGATIONAL = "navigational"    # "сайт компании", "facebook login"
+    NAVIGATIONAL = "navigational"  # "сайт компании", "facebook login"
     TRANSACTIONAL = "transactional"  # "купить", "скачать", "заказать"
-    COMMERCIAL = "commercial"        # "лучший", "отзывы", "сравнение"
+    COMMERCIAL = "commercial"  # "лучший", "отзывы", "сравнение"
 
 
 class IntentBasedOptimizer:
@@ -46,7 +47,7 @@ class IntentBasedOptimizer:
             SearchIntent.INFORMATIONAL: 0,
             SearchIntent.TRANSACTIONAL: 0,
             SearchIntent.COMMERCIAL: 0,
-            SearchIntent.NAVIGATIONAL: 0
+            SearchIntent.NAVIGATIONAL: 0,
         }
 
         # Scoring
@@ -70,16 +71,20 @@ class IntentBasedOptimizer:
         primary_intent = max(scores, key=scores.get)
         confidence = scores[primary_intent] / max(sum(scores.values()), 1)
 
-        logger.info(f"Detected intent for '{keyword}': {primary_intent} (confidence: {confidence:.2f})")
+        logger.info(
+            f"Detected intent for '{keyword}': {primary_intent} (confidence: {confidence:.2f})"
+        )
 
         return {
             "keyword": keyword,
             "primary_intent": primary_intent,
             "confidence": round(confidence, 2),
-            "all_scores": scores
+            "all_scores": scores,
         }
 
-    def analyze_content_alignment(self, content: Dict, target_intent: SearchIntent) -> Dict[str, Any]:
+    def analyze_content_alignment(
+        self, content: Dict, target_intent: SearchIntent
+    ) -> Dict[str, Any]:
         """Анализирует соответствие контента целевому намерению."""
         text = content.get("text", "")
         title = content.get("title", "")
@@ -89,7 +94,7 @@ class IntentBasedOptimizer:
             "intent": target_intent,
             "score": 0.0,
             "missing_elements": [],
-            "recommendations": []
+            "recommendations": [],
         }
 
         # Проверяем элементы в зависимости от намерения
@@ -100,7 +105,7 @@ class IntentBasedOptimizer:
                 "Add clear definitions and explanations",
                 "Include step-by-step guides",
                 "Add FAQ section",
-                "Use educational tone"
+                "Use educational tone",
             ]
 
         elif target_intent == SearchIntent.TRANSACTIONAL:
@@ -110,7 +115,7 @@ class IntentBasedOptimizer:
                 "Add clear CTA buttons",
                 "Include pricing information",
                 "Add product/service features",
-                "Show trust signals (reviews, guarantees)"
+                "Show trust signals (reviews, guarantees)",
             ]
 
         elif target_intent == SearchIntent.COMMERCIAL:
@@ -120,7 +125,7 @@ class IntentBasedOptimizer:
                 "Add comparison tables",
                 "Include pros and cons",
                 "Add customer reviews/testimonials",
-                "Show product rankings"
+                "Show product rankings",
             ]
 
         elif target_intent == SearchIntent.NAVIGATIONAL:
@@ -130,20 +135,18 @@ class IntentBasedOptimizer:
                 "Clear brand/company information",
                 "Easy navigation to key pages",
                 "Contact information visible",
-                "Site search functionality"
+                "Site search functionality",
             ]
 
         logger.info(f"Content alignment for {target_intent}: {alignment['score']:.2f}")
 
         return alignment
 
-    def auto_optimize_for_intent(self, content: Dict, target_intent: SearchIntent) -> Dict[str, Any]:
+    def auto_optimize_for_intent(
+        self, content: Dict, target_intent: SearchIntent
+    ) -> Dict[str, Any]:
         """АВТОМАТИЧЕСКАЯ оптимизация контента под намерение."""
-        optimizations = {
-            "intent": target_intent,
-            "changes_made": [],
-            "elements_added": []
-        }
+        optimizations = {"intent": target_intent, "changes_made": [], "elements_added": []}
 
         # Генерация оптимизированного контента через LLM
         if self.llm:
@@ -167,12 +170,11 @@ class IntentBasedOptimizer:
             optimizations["changes_made"].append("Added comparison table")
             optimizations["changes_made"].append("Added review section")
 
-        logger.info(f"✅ Auto-optimized for {target_intent}: {len(optimizations['changes_made'])} changes")
+        logger.info(
+            f"✅ Auto-optimized for {target_intent}: {len(optimizations['changes_made'])} changes"
+        )
 
-        return {
-            "success": True,
-            "optimizations": optimizations
-        }
+        return {"success": True, "optimizations": optimizations}
 
     def _score_informational(self, text: str, headings: List[str]) -> float:
         """Оценка информационного контента."""

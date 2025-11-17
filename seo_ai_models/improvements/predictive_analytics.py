@@ -33,7 +33,7 @@ class PredictiveAnalytics:
         if not historical:
             return {
                 "error": "Insufficient historical data",
-                "recommendation": "Need at least 6 months of data"
+                "recommendation": "Need at least 6 months of data",
             }
 
         # Простое линейное прогнозирование
@@ -43,7 +43,7 @@ class PredictiveAnalytics:
             "predictions": [],
             "confidence": 0,
             "trend": "",
-            "growth_rate": 0
+            "growth_rate": 0,
         }
 
         # Рассчитываем тренд
@@ -57,12 +57,14 @@ class PredictiveAnalytics:
             predicted = last_value + (trend_slope * i)
             predicted = max(0, predicted)  # Не может быть отрицательным
 
-            forecast["predictions"].append({
-                "month": i,
-                "predicted_traffic": round(predicted),
-                "lower_bound": round(predicted * 0.8),
-                "upper_bound": round(predicted * 1.2)
-            })
+            forecast["predictions"].append(
+                {
+                    "month": i,
+                    "predicted_traffic": round(predicted),
+                    "lower_bound": round(predicted * 0.8),
+                    "upper_bound": round(predicted * 1.2),
+                }
+            )
 
         # Определяем тренд
         if trend_slope > 100:
@@ -94,7 +96,7 @@ class PredictiveAnalytics:
             "predicted_position": 0,
             "probability": 0,
             "timeframe": "3 months",
-            "factors": []
+            "factors": [],
         }
 
         # Анализируем факторы
@@ -103,36 +105,32 @@ class PredictiveAnalytics:
         # Фактор 1: Content quality
         content_score = self._assess_content_optimization(keyword)
         if content_score > 0.7:
-            factors.append({
-                "factor": "Content Quality",
-                "impact": "+3 positions",
-                "confidence": "high"
-            })
+            factors.append(
+                {"factor": "Content Quality", "impact": "+3 positions", "confidence": "high"}
+            )
 
         # Фактор 2: Backlinks
         backlinks_trend = self._analyze_backlinks_trend()
         if backlinks_trend == "growing":
-            factors.append({
-                "factor": "Growing Backlinks",
-                "impact": "+2 positions",
-                "confidence": "medium"
-            })
+            factors.append(
+                {"factor": "Growing Backlinks", "impact": "+2 positions", "confidence": "medium"}
+            )
 
         # Фактор 3: Competition
         competition_level = self._assess_competition(keyword)
         if competition_level == "high":
-            factors.append({
-                "factor": "High Competition",
-                "impact": "-1 position",
-                "confidence": "medium"
-            })
+            factors.append(
+                {"factor": "High Competition", "impact": "-1 position", "confidence": "medium"}
+            )
 
         # Рассчитываем предсказанную позицию
-        position_change = sum([
-            3 if "Content Quality" in str(factors) else 0,
-            2 if "Growing Backlinks" in str(factors) else 0,
-            -1 if "High Competition" in str(factors) else 0
-        ])
+        position_change = sum(
+            [
+                3 if "Content Quality" in str(factors) else 0,
+                2 if "Growing Backlinks" in str(factors) else 0,
+                -1 if "High Competition" in str(factors) else 0,
+            ]
+        )
 
         predicted_position = max(1, current_position - position_change)
 
@@ -140,7 +138,9 @@ class PredictiveAnalytics:
         prediction["factors"] = factors
         prediction["probability"] = 0.65  # 65% confidence
 
-        logger.info(f"Ranking prediction for '{keyword}': {current_position} → {predicted_position}")
+        logger.info(
+            f"Ranking prediction for '{keyword}': {current_position} → {predicted_position}"
+        )
 
         return prediction
 
@@ -153,7 +153,7 @@ class PredictiveAnalytics:
             "timeframe": "last 12 months",
             "detected_trends": [],
             "seasonality": None,
-            "anomalies": []
+            "anomalies": [],
         }
 
         if not data:
@@ -172,18 +172,22 @@ class PredictiveAnalytics:
 
         # Общие тренды
         if self._is_growing(values):
-            trends["detected_trends"].append({
-                "type": "growth",
-                "strength": "strong" if self._calculate_trend(values) > 100 else "moderate",
-                "description": f"{metric.title()} is consistently growing"
-            })
+            trends["detected_trends"].append(
+                {
+                    "type": "growth",
+                    "strength": "strong" if self._calculate_trend(values) > 100 else "moderate",
+                    "description": f"{metric.title()} is consistently growing",
+                }
+            )
 
         if self._is_volatile(values):
-            trends["detected_trends"].append({
-                "type": "volatility",
-                "strength": "high",
-                "description": f"{metric.title()} shows high volatility"
-            })
+            trends["detected_trends"].append(
+                {
+                    "type": "volatility",
+                    "strength": "high",
+                    "description": f"{metric.title()} shows high volatility",
+                }
+            )
 
         logger.info(f"Detected {len(trends['detected_trends'])} trends for {metric}")
 
@@ -198,7 +202,7 @@ class PredictiveAnalytics:
             "projected_revenue": 0,
             "projected_roi": 0,
             "monthly_breakdown": [],
-            "assumptions": []
+            "assumptions": [],
         }
 
         # Базовые коэффициенты в зависимости от стратегии
@@ -207,7 +211,7 @@ class PredictiveAnalytics:
             "link_building": 4.0,
             "technical_seo": 2.5,
             "local_seo": 5.0,
-            "comprehensive": 6.0
+            "comprehensive": 6.0,
         }
 
         multiplier = strategy_multipliers.get(strategy, 3.0)
@@ -222,12 +226,14 @@ class PredictiveAnalytics:
 
             total_revenue += monthly_revenue
 
-            roi_forecast["monthly_breakdown"].append({
-                "month": month,
-                "revenue": round(monthly_revenue, 2),
-                "cumulative_revenue": round(total_revenue, 2),
-                "cumulative_roi": round(((total_revenue - investment) / investment) * 100, 1)
-            })
+            roi_forecast["monthly_breakdown"].append(
+                {
+                    "month": month,
+                    "revenue": round(monthly_revenue, 2),
+                    "cumulative_revenue": round(total_revenue, 2),
+                    "cumulative_roi": round(((total_revenue - investment) / investment) * 100, 1),
+                }
+            )
 
         roi_forecast["projected_revenue"] = round(total_revenue, 2)
         roi_forecast["projected_roi"] = round(((total_revenue - investment) / investment) * 100, 1)
@@ -238,7 +244,7 @@ class PredictiveAnalytics:
             "Based on industry averages",
             "Actual results may vary based on competition and niche",
             f"Average conversion rate: 2-3%",
-            "Organic traffic growth: 15-30% quarterly"
+            "Organic traffic growth: 15-30% quarterly",
         ]
 
         logger.info(f"ROI forecast: {roi_forecast['projected_roi']}% for {strategy}")
@@ -255,13 +261,13 @@ class PredictiveAnalytics:
             "peak_months": [],
             "low_months": [],
             "seasonal_index": {},
-            "recommendations": []
+            "recommendations": [],
         }
 
         if not historical or len(historical) < 12:
             return {
                 "error": "Insufficient data for seasonal analysis",
-                "required": "At least 12 months of data"
+                "required": "At least 12 months of data",
             }
 
         # Группируем по месяцам
@@ -274,7 +280,20 @@ class PredictiveAnalytics:
             monthly_averages[month].append(entry["traffic"])
 
         # Рассчитываем средние
-        month_names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        month_names = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+        ]
 
         for month in range(1, 13):
             if month in monthly_averages:
@@ -321,10 +340,7 @@ class PredictiveAnalytics:
             date = datetime.now() - timedelta(days=30 * (months - i))
             traffic = base_traffic + (i * 500) + ((-1) ** i * 200)  # Рост с флуктуациями
 
-            data.append({
-                "date": date,
-                "traffic": max(0, int(traffic))
-            })
+            data.append({"date": date, "traffic": max(0, int(traffic))})
 
         return data
 
@@ -394,11 +410,7 @@ class PredictiveAnalytics:
             return None
 
         # Упрощенная детекция
-        return {
-            "detected": True,
-            "period": "12 months",
-            "strength": "moderate"
-        }
+        return {"detected": True, "period": "12 months", "strength": "moderate"}
 
     def _detect_anomalies(self, values: List[float]) -> List[Dict]:
         """Детектирует аномалии."""
@@ -413,12 +425,14 @@ class PredictiveAnalytics:
             z_score = abs((value - mean) / std_dev) if std_dev > 0 else 0
 
             if z_score > 2:  # Более 2 стандартных отклонений
-                anomalies.append({
-                    "index": i,
-                    "value": value,
-                    "type": "spike" if value > mean else "drop",
-                    "severity": "high" if z_score > 3 else "medium"
-                })
+                anomalies.append(
+                    {
+                        "index": i,
+                        "value": value,
+                        "type": "spike" if value > mean else "drop",
+                        "severity": "high" if z_score > 3 else "medium",
+                    }
+                )
 
         return anomalies
 

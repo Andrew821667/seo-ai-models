@@ -31,46 +31,54 @@ class LinkBuildingAssistant:
         # 1. Guest posting opportunities
         guest_post_sites = self._find_guest_posting_sites(niche)
         for site in guest_post_sites:
-            opportunities.append({
-                "type": "guest_post",
-                "domain": site["domain"],
-                "da": site.get("domain_authority", 0),
-                "relevance": site.get("relevance", 0),
-                "difficulty": "medium",
-                "potential_value": self._calculate_link_value(site)
-            })
+            opportunities.append(
+                {
+                    "type": "guest_post",
+                    "domain": site["domain"],
+                    "da": site.get("domain_authority", 0),
+                    "relevance": site.get("relevance", 0),
+                    "difficulty": "medium",
+                    "potential_value": self._calculate_link_value(site),
+                }
+            )
 
         # 2. Resource pages
         resource_pages = self._find_resource_pages(niche)
         for page in resource_pages:
-            opportunities.append({
-                "type": "resource_page",
-                "url": page["url"],
-                "da": page.get("domain_authority", 0),
-                "difficulty": "easy",
-                "potential_value": self._calculate_link_value(page)
-            })
+            opportunities.append(
+                {
+                    "type": "resource_page",
+                    "url": page["url"],
+                    "da": page.get("domain_authority", 0),
+                    "difficulty": "easy",
+                    "potential_value": self._calculate_link_value(page),
+                }
+            )
 
         # 3. Broken link opportunities
         broken_links = self._find_broken_link_opportunities(niche)
         for link in broken_links:
-            opportunities.append({
-                "type": "broken_link",
-                "url": link["url"],
-                "broken_url": link["broken_url"],
-                "difficulty": "medium",
-                "potential_value": "high"
-            })
+            opportunities.append(
+                {
+                    "type": "broken_link",
+                    "url": link["url"],
+                    "broken_url": link["broken_url"],
+                    "difficulty": "medium",
+                    "potential_value": "high",
+                }
+            )
 
         # 4. Unlinked mentions
         mentions = self._find_unlinked_mentions(domain)
         for mention in mentions:
-            opportunities.append({
-                "type": "unlinked_mention",
-                "url": mention["url"],
-                "difficulty": "easy",
-                "potential_value": "medium"
-            })
+            opportunities.append(
+                {
+                    "type": "unlinked_mention",
+                    "url": mention["url"],
+                    "difficulty": "easy",
+                    "potential_value": "medium",
+                }
+            )
 
         # Сортируем по ценности
         opportunities.sort(key=lambda x: self._opportunity_score(x), reverse=True)
@@ -93,7 +101,7 @@ class LinkBuildingAssistant:
             "metrics": {},
             "red_flags": [],
             "green_flags": [],
-            "recommendation": ""
+            "recommendation": "",
         }
 
         # Метрики
@@ -103,7 +111,7 @@ class LinkBuildingAssistant:
             "spam_score": self._calculate_spam_score(page_data),
             "outbound_links": len(page_data.get("external_links", [])),
             "content_quality": self._assess_content_quality(page_data),
-            "relevance": self._calculate_relevance(page_data)
+            "relevance": self._calculate_relevance(page_data),
         }
 
         analysis["metrics"] = metrics
@@ -130,11 +138,11 @@ class LinkBuildingAssistant:
 
         # Quality score (0-100)
         quality_score = (
-            metrics["domain_authority"] * 0.3 +
-            metrics["page_authority"] * 0.2 +
-            (100 - metrics["spam_score"]) * 0.2 +
-            metrics["content_quality"] * 100 * 0.15 +
-            metrics["relevance"] * 100 * 0.15
+            metrics["domain_authority"] * 0.3
+            + metrics["page_authority"] * 0.2
+            + (100 - metrics["spam_score"]) * 0.2
+            + metrics["content_quality"] * 100 * 0.15
+            + metrics["relevance"] * 100 * 0.15
         )
 
         analysis["quality_score"] = round(quality_score, 1)
@@ -198,18 +206,22 @@ Email:"""
             status = self._check_link_status(link)
 
             if status >= 400:  # 404, 410, etc.
-                broken.append({
-                    "url": link,
-                    "status_code": status,
-                    "found_on": competitor_url,
-                    "opportunity": "Suggest your content as replacement"
-                })
+                broken.append(
+                    {
+                        "url": link,
+                        "status_code": status,
+                        "found_on": competitor_url,
+                        "opportunity": "Suggest your content as replacement",
+                    }
+                )
 
         logger.info(f"Found {len(broken)} broken links on {competitor_url}")
 
         return broken
 
-    def analyze_competitor_backlinks(self, competitor_domain: str, your_domain: str) -> Dict[str, Any]:
+    def analyze_competitor_backlinks(
+        self, competitor_domain: str, your_domain: str
+    ) -> Dict[str, Any]:
         """Анализирует backlinks конкурента для поиска возможностей."""
         # В реальности нужен API Ahrefs/SEMrush/Majestic
         analysis = {
@@ -217,7 +229,7 @@ Email:"""
             "your_domain": your_domain,
             "opportunities": [],
             "easy_wins": [],
-            "gap_analysis": {}
+            "gap_analysis": {},
         }
 
         # Заглушка - в продакшене использовать backlink API
@@ -293,18 +305,9 @@ Format as numbered list."""
 
     def _opportunity_score(self, opportunity: Dict) -> float:
         """Рассчитывает score возможности."""
-        value_scores = {
-            "very_high": 4,
-            "high": 3,
-            "medium": 2,
-            "low": 1
-        }
+        value_scores = {"very_high": 4, "high": 3, "medium": 2, "low": 1}
 
-        difficulty_scores = {
-            "easy": 3,
-            "medium": 2,
-            "hard": 1
-        }
+        difficulty_scores = {"easy": 3, "medium": 2, "hard": 1}
 
         value = value_scores.get(opportunity.get("potential_value", "low"), 1)
         difficulty = difficulty_scores.get(opportunity.get("difficulty", "hard"), 1)
@@ -315,11 +318,13 @@ Format as numbered list."""
         """Оценивает Domain Authority."""
         # В реальности использовать API Moz или аналоги
         import random
+
         return random.randint(20, 80)
 
     def _estimate_page_authority(self, page_data: Dict) -> int:
         """Оценивает Page Authority."""
         import random
+
         return random.randint(15, 70)
 
     def _calculate_spam_score(self, page_data: Dict) -> int:
@@ -374,6 +379,7 @@ Format as numbered list."""
         """Проверяет HTTP status code ссылки."""
         try:
             import requests
+
             response = requests.head(url, timeout=5, allow_redirects=True)
             return response.status_code
         except:
@@ -399,7 +405,6 @@ Would you be interested in a collaboration?
 
 Best regards,
 [Your Name]""",
-
             "broken_link": """Subject: Broken Link on Your Page
 
 Hi [Name],
@@ -415,7 +420,6 @@ Hope this helps!
 
 Best,
 [Your Name]""",
-
             "resource_page": """Subject: Resource Suggestion for Your Page
 
 Hi [Name],
@@ -430,7 +434,7 @@ It covers [brief description] and has been well-received by the community.
 Would you consider adding it to your list?
 
 Thank you,
-[Your Name]"""
+[Your Name]""",
         }
 
         opportunity_type = opportunity.get("type", "guest_post")
@@ -445,9 +449,6 @@ Thank you,
 
         for section in sections:
             if section.strip():
-                ideas.append({
-                    "description": section.strip(),
-                    "estimated_value": "medium"
-                })
+                ideas.append({"description": section.strip(), "estimated_value": "medium"})
 
         return ideas

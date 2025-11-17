@@ -39,14 +39,16 @@ class ContentRefreshAutomation:
 
             if age > threshold_days:
                 score = self._calculate_refresh_priority(page, age)
-                outdated.append({
-                    "page_id": page["id"],
-                    "title": page["title"],
-                    "age_days": age,
-                    "priority_score": score,
-                    "traffic": page.get("traffic", 0),
-                    "needs_refresh": True
-                })
+                outdated.append(
+                    {
+                        "page_id": page["id"],
+                        "title": page["title"],
+                        "age_days": age,
+                        "priority_score": score,
+                        "traffic": page.get("traffic", 0),
+                        "needs_refresh": True,
+                    }
+                )
 
         # Сортируем по приоритету
         outdated.sort(key=lambda x: x["priority_score"], reverse=True)
@@ -77,7 +79,7 @@ class ContentRefreshAutomation:
             "updated_date": True,
             "updated_statistics": False,
             "added_sections": [],
-            "modernized_terms": []
+            "modernized_terms": [],
         }
 
         # 1. Обновление даты модификации
@@ -107,18 +109,14 @@ class ContentRefreshAutomation:
 
         logger.info(f"✅ Auto-refreshed page {page_id}: {changes}")
 
-        return {
-            "success": True,
-            "page_id": page_id,
-            "changes": changes
-        }
+        return {"success": True, "page_id": page_id, "changes": changes}
 
     def _update_statistics(self, text: str) -> str:
         """Обновление дат и статистики."""
         current_year = str(datetime.now().year)
 
         # Находим и обновляем годы (20XX)
-        years_pattern = r'\b(20\d{2})\b'
+        years_pattern = r"\b(20\d{2})\b"
         years = re.findall(years_pattern, text)
 
         for old_year in set(years):
@@ -183,5 +181,5 @@ Keep it factual and relevant."""
             "total_outdated": len(outdated),
             "high_priority": len([p for p in outdated if p["priority_score"] > 2.0]),
             "pages": outdated[:10],  # Top 10
-            "recommendation": "Auto-refresh high priority pages weekly"
+            "recommendation": "Auto-refresh high priority pages weekly",
         }

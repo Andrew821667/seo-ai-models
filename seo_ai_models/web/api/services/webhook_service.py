@@ -13,15 +13,17 @@ logger = logging.getLogger(__name__)
 class Webhook:
     """Класс, представляющий webhook."""
 
-    def __init__(self,
-                 webhook_id: str,
-                 url: str,
-                 events: list,
-                 project_id: Optional[str] = None,
-                 description: str = "",
-                 status: str = "active",
-                 created_at: Optional[datetime] = None,
-                 secret: Optional[str] = None):
+    def __init__(
+        self,
+        webhook_id: str,
+        url: str,
+        events: list,
+        project_id: Optional[str] = None,
+        description: str = "",
+        status: str = "active",
+        created_at: Optional[datetime] = None,
+        secret: Optional[str] = None,
+    ):
         self.webhook_id = webhook_id
         self.url = url
         self.events = events
@@ -54,10 +56,7 @@ class WebhookService:
 
         if not webhook:
             logger.warning(f"Webhook {webhook_id} not found for deletion")
-            return {
-                "success": False,
-                "error": "Webhook not found"
-            }
+            return {"success": False, "error": "Webhook not found"}
 
         # Помечаем как деактивированный
         webhook.status = "deleted"
@@ -67,5 +66,5 @@ class WebhookService:
         return {
             "success": True,
             "webhook_id": webhook_id,
-            "message": "Webhook has been deactivated"
+            "message": "Webhook has been deactivated",
         }

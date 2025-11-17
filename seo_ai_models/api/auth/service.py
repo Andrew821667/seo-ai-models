@@ -37,10 +37,7 @@ class AuthService:
 
     @staticmethod
     def create_access_token(
-        user_id: str,
-        username: str,
-        role: UserRole,
-        expires_delta: Optional[timedelta] = None
+        user_id: str, username: str, role: UserRole, expires_delta: Optional[timedelta] = None
     ) -> str:
         """Create JWT access token."""
         if expires_delta:
@@ -53,7 +50,7 @@ class AuthService:
             "username": username,
             "role": role.value,
             "exp": expire,
-            "iat": datetime.utcnow()
+            "iat": datetime.utcnow(),
         }
 
         encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
@@ -77,7 +74,7 @@ class AuthService:
                 user_id=user_id,
                 username=username,
                 role=UserRole(role),
-                exp=datetime.fromtimestamp(exp)
+                exp=datetime.fromtimestamp(exp),
             )
         except jwt.ExpiredSignatureError:
             return None
@@ -117,7 +114,7 @@ class AuthService:
             hashed_password=hashed_password,
             role=user_create.role,
             is_active=True,
-            is_verified=False
+            is_verified=False,
         )
 
         db.add(user)
@@ -128,11 +125,7 @@ class AuthService:
 
     @staticmethod
     def create_session(
-        db: Session,
-        user: User,
-        token: str,
-        ip_address: str = None,
-        user_agent: str = None
+        db: Session, user: User, token: str, ip_address: str = None, user_agent: str = None
     ):
         """Create user session (stub - sessions not tracked)."""
         # TODO: Implement session tracking when needed

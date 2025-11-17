@@ -172,7 +172,10 @@ class ProjectServiceDB:
     def delete_project(self, project_id: str, user_id: str) -> Dict[str, Any]:
         """Delete project (soft delete)."""
         if not self.check_project_access(project_id, user_id):
-            return {"success": False, "error": "Access denied. Only project owner can delete the project."}
+            return {
+                "success": False,
+                "error": "Access denied. Only project owner can delete the project.",
+            }
 
         project = self.project_repo.get_by_id(project_id)
         if not project:

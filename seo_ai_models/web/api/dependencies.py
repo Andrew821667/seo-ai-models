@@ -47,8 +47,7 @@ def get_cache_service_dependency():
 
 
 def get_current_user_id(
-    token: str = Depends(oauth2_scheme),
-    auth_service: AuthService = Depends(get_auth_service)
+    token: str = Depends(oauth2_scheme), auth_service: AuthService = Depends(get_auth_service)
 ) -> str:
     """
     Extract current user ID from JWT token.

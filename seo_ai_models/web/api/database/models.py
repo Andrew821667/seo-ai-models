@@ -12,6 +12,7 @@ from .connection import Base
 
 class UserRole(str, enum.Enum):
     """User role enumeration."""
+
     ADMIN = "admin"
     ANALYST = "analyst"
     USER = "user"
@@ -21,6 +22,7 @@ class UserRole(str, enum.Enum):
 
 class ProjectStatus(str, enum.Enum):
     """Project status enumeration."""
+
     ACTIVE = "active"
     ARCHIVED = "archived"
     DELETED = "deleted"
@@ -28,6 +30,7 @@ class ProjectStatus(str, enum.Enum):
 
 class TaskStatus(str, enum.Enum):
     """Task status enumeration."""
+
     PENDING = "pending"
     IN_PROGRESS = "in_progress"
     COMPLETED = "completed"
@@ -37,6 +40,7 @@ class TaskStatus(str, enum.Enum):
 
 class TaskPriority(str, enum.Enum):
     """Task priority enumeration."""
+
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
