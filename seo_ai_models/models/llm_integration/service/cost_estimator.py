@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Any, Optional, Union, Tuple
 
 # Импортируем компоненты из common
-from ..common.constants import TOKEN_COSTS
+from ..common.constants import TOKEN_COSTS, LLM_MODELS
 from ..common.exceptions import BudgetExceededError
 from ..common.utils import (
     estimate_tokens,

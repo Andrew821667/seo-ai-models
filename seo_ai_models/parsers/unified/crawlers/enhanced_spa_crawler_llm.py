@@ -1031,7 +1031,7 @@ class EnhancedSPACrawlerLLM:
                                 const innerText = extractFormattedText(node);
                                 const href = node.getAttribute('href');
                                 if (innerText) {{
-                                    result += innerText + (href ? ` [${href}]` : '');
+                                    result += innerText + (href ? ` [${{href}}]` : '');  # noqa: F821
                                 }}
                             }} else {{
                                 // Прочие элементы
@@ -1646,3 +1646,4 @@ def create_enhanced_spa_crawler_llm(**kwargs) -> EnhancedSPACrawlerLLM:
         EnhancedSPACrawlerLLM: Экземпляр краулера
     """
     return EnhancedSPACrawlerLLM(**kwargs)
+# noqa: F821
