@@ -21,15 +21,17 @@ logger = logging.getLogger(__name__)
 
 class FixComplexity(str, Enum):
     """Сложность исправления проблемы."""
-    TRIVIAL = "trivial"      # Можно исправить автоматически без риска
-    SIMPLE = "simple"        # Можно автоматически, минимальный риск
-    MODERATE = "moderate"    # Требует проверки, средний риск
-    COMPLEX = "complex"      # Требует ручного вмешательства
-    CRITICAL = "critical"    # Критическое изменение, требует approval
+
+    TRIVIAL = "trivial"  # Можно исправить автоматически без риска
+    SIMPLE = "simple"  # Можно автоматически, минимальный риск
+    MODERATE = "moderate"  # Требует проверки, средний риск
+    COMPLEX = "complex"  # Требует ручного вмешательства
+    CRITICAL = "critical"  # Критическое изменение, требует approval
 
 
 class FixStatus(str, Enum):
     """Статус исправления."""
+
     PENDING = "pending"
     IN_PROGRESS = "in_progress"
     COMPLETED = "completed"
@@ -50,7 +52,7 @@ class FixAction:
         execute_func: Callable,
         verify_func: Optional[Callable] = None,
         rollback_func: Optional[Callable] = None,
-        metadata: Optional[Dict] = None
+        metadata: Optional[Dict] = None,
     ):
         self.action_id = action_id
         self.problem_type = problem_type
@@ -102,7 +104,7 @@ class AutoFixEngine:
         complexity: FixComplexity,
         execute_func: Callable,
         verify_func: Optional[Callable] = None,
-        rollback_func: Optional[Callable] = None
+        rollback_func: Optional[Callable] = None,
     ):
         """
         Регистрация действия для типа проблемы.
@@ -118,7 +120,7 @@ class AutoFixEngine:
             "complexity": complexity,
             "execute": execute_func,
             "verify": verify_func,
-            "rollback": rollback_func
+            "rollback": rollback_func,
         }
         logger.debug(f"Registered fix action: {problem_type} ({complexity})")
 
@@ -151,7 +153,7 @@ class AutoFixEngine:
                     execute_func=action_config["execute"],
                     verify_func=action_config["verify"],
                     rollback_func=action_config["rollback"],
-                    metadata=problem.get("metadata", {})
+                    metadata=problem.get("metadata", {}),
                 )
 
                 actions.append(action)
@@ -162,9 +164,7 @@ class AutoFixEngine:
         return actions
 
     def execute_plan(
-        self,
-        actions: List[FixAction],
-        require_approval_for: List[FixComplexity] = None
+        self, actions: List[FixAction], require_approval_for: List[FixComplexity] = None
     ) -> Dict[str, Any]:
         """
         Выполнение плана исправлений.
@@ -185,7 +185,7 @@ class AutoFixEngine:
             "failed": 0,
             "requires_approval": 0,
             "skipped": 0,
-            "actions": []
+            "actions": [],
         }
 
         for action in actions:
@@ -233,8 +233,7 @@ class AutoFixEngine:
             # Выполняем исправление
             logger.info(f"Executing fix: {action.description}")
             action.result = action.execute_func(
-                cms_connector=self.cms_connector,
-                metadata=action.metadata
+                cms_connector=self.cms_connector, metadata=action.metadata
             )
 
             # Верификация результата
@@ -252,7 +251,7 @@ class AutoFixEngine:
                     return {
                         "action_id": action.action_id,
                         "status": "rolled_back",
-                        "reason": action.error
+                        "reason": action.error,
                     }
 
             # Успешное выполнение
@@ -265,7 +264,7 @@ class AutoFixEngine:
                 "action_id": action.action_id,
                 "status": "completed",
                 "description": action.description,
-                "result": action.result
+                "result": action.result,
             }
 
         except Exception as e:
@@ -282,11 +281,7 @@ class AutoFixEngine:
                 except Exception as rollback_error:
                     logger.error(f"Rollback failed: {str(rollback_error)}")
 
-            return {
-                "action_id": action.action_id,
-                "status": "failed",
-                "error": str(e)
-            }
+            return {"action_id": action.action_id, "status": "failed", "error": str(e)}
 
     def _create_backup(self, action: FixAction) -> Dict[str, Any]:
         """Создание backup перед изменением."""
@@ -295,17 +290,14 @@ class AutoFixEngine:
         return {
             "timestamp": datetime.now().isoformat(),
             "action_id": action.action_id,
-            "metadata": copy.deepcopy(action.metadata)
+            "metadata": copy.deepcopy(action.metadata),
         }
 
     def _rollback_action(self, action: FixAction):
         """Откат изменений."""
         if action.rollback_func and action.backup:
             logger.info(f"Rolling back: {action.description}")
-            action.rollback_func(
-                cms_connector=self.cms_connector,
-                backup=action.backup
-            )
+            action.rollback_func(cms_connector=self.cms_connector, backup=action.backup)
 
     def _extract_problems(self, analysis_results: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Извлечение списка проблем из результатов анализа."""
@@ -314,21 +306,25 @@ class AutoFixEngine:
         # Проверяем разные секции анализа
         if "issues" in analysis_results:
             for issue in analysis_results["issues"]:
-                problems.append({
-                    "type": issue.get("type"),
-                    "description": issue.get("description"),
-                    "metadata": issue.get("metadata", {})
-                })
+                problems.append(
+                    {
+                        "type": issue.get("type"),
+                        "description": issue.get("description"),
+                        "metadata": issue.get("metadata", {}),
+                    }
+                )
 
         # Проверяем рекомендации
         if "recommendations" in analysis_results:
             for rec in analysis_results["recommendations"]:
                 if rec.get("auto_fixable", False):
-                    problems.append({
-                        "type": rec.get("type"),
-                        "description": rec.get("description"),
-                        "metadata": rec.get("metadata", {})
-                    })
+                    problems.append(
+                        {
+                            "type": rec.get("type"),
+                            "description": rec.get("description"),
+                            "metadata": rec.get("metadata", {}),
+                        }
+                    )
 
         return problems
 
@@ -340,17 +336,14 @@ class AutoFixEngine:
                 "description": action.description,
                 "complexity": action.complexity,
                 "problem_type": action.problem_type,
-                "metadata": action.metadata
+                "metadata": action.metadata,
             }
             for action in self.pending_approvals
         ]
 
     def approve_and_execute(self, action_id: str) -> Dict[str, Any]:
         """Одобрение и выполнение действия."""
-        action = next(
-            (a for a in self.pending_approvals if a.action_id == action_id),
-            None
-        )
+        action = next((a for a in self.pending_approvals if a.action_id == action_id), None)
 
         if not action:
             return {"success": False, "error": "Action not found"}
@@ -374,8 +367,8 @@ class AutoFixEngine:
                     "description": action.description,
                     "status": action.status,
                     "executed_at": action.executed_at.isoformat() if action.executed_at else None,
-                    "error": action.error
+                    "error": action.error,
                 }
                 for action in self.executed_actions
-            ]
+            ],
         }

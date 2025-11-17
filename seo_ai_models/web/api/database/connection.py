@@ -12,10 +12,7 @@ from typing import Generator
 logger = logging.getLogger(__name__)
 
 # Database URL from environment or default to SQLite for development
-DATABASE_URL = os.environ.get(
-    "DATABASE_URL",
-    "sqlite:///./seo_ai_models.db"
-)
+DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./seo_ai_models.db")
 
 # PostgreSQL URL format: postgresql://user:password@host:port/database
 # SQLite URL format: sqlite:///./database.db
@@ -25,7 +22,7 @@ if DATABASE_URL.startswith("sqlite"):
     engine = create_engine(
         DATABASE_URL,
         connect_args={"check_same_thread": False},  # Needed for SQLite
-        echo=False  # Set to True for SQL query logging
+        echo=False,  # Set to True for SQL query logging
     )
 else:
     engine = create_engine(
@@ -33,7 +30,7 @@ else:
         pool_pre_ping=True,  # Verify connections
         pool_size=10,
         max_overflow=20,
-        echo=False
+        echo=False,
     )
 
 # Create session factory

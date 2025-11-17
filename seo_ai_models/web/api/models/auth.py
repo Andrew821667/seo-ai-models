@@ -1,4 +1,3 @@
-
 """
 Модели данных для аутентификации и авторизации.
 """
@@ -11,6 +10,7 @@ from datetime import datetime
 
 class UserRole(str, Enum):
     """Роли пользователей в системе."""
+
     ADMIN = "admin"
     MANAGER = "manager"
     ANALYST = "analyst"
@@ -20,28 +20,31 @@ class UserRole(str, Enum):
 
 class UserCreate(BaseModel):
     """Модель для создания пользователя."""
+
     username: str = Field(..., min_length=3, max_length=50)
     email: EmailStr
     password: str = Field(..., min_length=8)
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     role: UserRole = UserRole.VIEWER
-    
-    @validator('username')
+
+    @validator("username")
     def username_alphanumeric(cls, v):
-        if not v.replace('_', '').replace('-', '').isalnum():
-            raise ValueError('Username must be alphanumeric')
+        if not v.replace("_", "").replace("-", "").isalnum():
+            raise ValueError("Username must be alphanumeric")
         return v
 
 
 class UserLogin(BaseModel):
     """Модель для входа пользователя."""
+
     username_or_email: str
     password: str
 
 
 class TokenResponse(BaseModel):
     """Модель ответа с токеном доступа."""
+
     access_token: str
     token_type: str = "bearer"
     expires_at: datetime
@@ -50,6 +53,7 @@ class TokenResponse(BaseModel):
 
 class UserResponse(BaseModel):
     """Модель ответа с данными пользователя."""
+
     id: str
     username: str
     email: EmailStr
@@ -63,6 +67,7 @@ class UserResponse(BaseModel):
 
 class UserUpdate(BaseModel):
     """Модель для обновления данных пользователя."""
+
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     email: Optional[EmailStr] = None
@@ -72,16 +77,19 @@ class UserUpdate(BaseModel):
 
 class PasswordChange(BaseModel):
     """Модель для изменения пароля."""
+
     current_password: str
     new_password: str = Field(..., min_length=8)
-    
-    @validator('new_password')
+
+    @validator("new_password")
     def password_strength(cls, v):
         # Проверка сложности пароля
         has_digit = any(c.isdigit() for c in v)
         has_upper = any(c.isupper() for c in v)
         has_lower = any(c.islower() for c in v)
-        
+
         if not (has_digit and has_upper and has_lower):
-            raise ValueError('Password must contain at least one digit, one uppercase and one lowercase letter')
+            raise ValueError(
+                "Password must contain at least one digit, one uppercase and one lowercase letter"
+            )
         return v

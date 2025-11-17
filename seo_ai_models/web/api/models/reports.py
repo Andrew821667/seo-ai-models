@@ -1,4 +1,3 @@
-
 """
 Модели данных для отчетов и визуализаций.
 """
@@ -11,6 +10,7 @@ from datetime import datetime
 
 class ReportType(str, Enum):
     """Типы отчетов."""
+
     OVERVIEW = "overview"
     CONTENT_ANALYSIS = "content_analysis"
     EEAT_ANALYSIS = "eeat_analysis"
@@ -23,6 +23,7 @@ class ReportType(str, Enum):
 
 class VisualizationType(str, Enum):
     """Типы визуализаций."""
+
     BAR_CHART = "bar_chart"
     LINE_CHART = "line_chart"
     PIE_CHART = "pie_chart"
@@ -37,6 +38,7 @@ class VisualizationType(str, Enum):
 
 class VisualizationCreate(BaseModel):
     """Модель для создания визуализации."""
+
     title: str = Field(..., min_length=3, max_length=100)
     visualization_type: VisualizationType
     data: Dict[str, Any]
@@ -46,6 +48,7 @@ class VisualizationCreate(BaseModel):
 
 class VisualizationResponse(BaseModel):
     """Модель ответа с данными визуализации."""
+
     id: str
     title: str
     visualization_type: VisualizationType
@@ -57,6 +60,7 @@ class VisualizationResponse(BaseModel):
 
 class ReportCreate(BaseModel):
     """Модель для создания отчета."""
+
     title: str = Field(..., min_length=3, max_length=100)
     report_type: ReportType
     description: Optional[str] = None
@@ -67,6 +71,7 @@ class ReportCreate(BaseModel):
 
 class ReportResponse(BaseModel):
     """Модель ответа с данными отчета."""
+
     id: str
     title: str
     project_id: str
@@ -82,6 +87,7 @@ class ReportResponse(BaseModel):
 
 class ReportUpdate(BaseModel):
     """Модель для обновления отчета."""
+
     title: Optional[str] = Field(None, min_length=3, max_length=100)
     description: Optional[str] = None
     metadata: Optional[Dict[str, Any]] = None

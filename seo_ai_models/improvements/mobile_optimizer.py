@@ -30,7 +30,7 @@ class MobileOptimizer:
             "score": 0,
             "issues": [],
             "passed_checks": [],
-            "recommendations": []
+            "recommendations": [],
         }
 
         score = 0
@@ -41,11 +41,13 @@ class MobileOptimizer:
             score += 20
             analysis["passed_checks"].append("Viewport meta tag")
         else:
-            analysis["issues"].append({
-                "issue": "Missing or incorrect viewport meta tag",
-                "priority": "critical",
-                "fix": "Add: <meta name='viewport' content='width=device-width, initial-scale=1'>"
-            })
+            analysis["issues"].append(
+                {
+                    "issue": "Missing or incorrect viewport meta tag",
+                    "priority": "critical",
+                    "fix": "Add: <meta name='viewport' content='width=device-width, initial-scale=1'>",
+                }
+            )
 
         # 2. Touch-friendly elements
         touch_check = self._check_touch_elements(url)
@@ -53,11 +55,13 @@ class MobileOptimizer:
             score += 15
             analysis["passed_checks"].append("Touch-friendly buttons")
         else:
-            analysis["issues"].append({
-                "issue": f"Touch targets too small: {touch_check['small_targets']} elements",
-                "priority": "high",
-                "fix": "Increase touch target size to minimum 48x48 pixels"
-            })
+            analysis["issues"].append(
+                {
+                    "issue": f"Touch targets too small: {touch_check['small_targets']} elements",
+                    "priority": "high",
+                    "fix": "Increase touch target size to minimum 48x48 pixels",
+                }
+            )
 
         # 3. Text readability
         text_check = self._check_text_readability(url)
@@ -65,11 +69,13 @@ class MobileOptimizer:
             score += 15
             analysis["passed_checks"].append("Text readability")
         else:
-            analysis["issues"].append({
-                "issue": "Text too small for mobile",
-                "priority": "high",
-                "fix": "Use minimum 16px font size for body text"
-            })
+            analysis["issues"].append(
+                {
+                    "issue": "Text too small for mobile",
+                    "priority": "high",
+                    "fix": "Use minimum 16px font size for body text",
+                }
+            )
 
         # 4. Responsive images
         images_check = self._check_responsive_images(url)
@@ -77,11 +83,13 @@ class MobileOptimizer:
             score += 10
             analysis["passed_checks"].append("Responsive images")
         else:
-            analysis["issues"].append({
-                "issue": "Images not responsive",
-                "priority": "medium",
-                "fix": "Use responsive images with srcset or CSS max-width: 100%"
-            })
+            analysis["issues"].append(
+                {
+                    "issue": "Images not responsive",
+                    "priority": "medium",
+                    "fix": "Use responsive images with srcset or CSS max-width: 100%",
+                }
+            )
 
         # 5. Horizontal scrolling
         scroll_check = self._check_horizontal_scroll(url)
@@ -89,11 +97,13 @@ class MobileOptimizer:
             score += 15
             analysis["passed_checks"].append("No horizontal scrolling")
         else:
-            analysis["issues"].append({
-                "issue": "Content requires horizontal scrolling",
-                "priority": "high",
-                "fix": "Ensure all content fits within viewport width"
-            })
+            analysis["issues"].append(
+                {
+                    "issue": "Content requires horizontal scrolling",
+                    "priority": "high",
+                    "fix": "Ensure all content fits within viewport width",
+                }
+            )
 
         # 6. Spacing between elements
         spacing_check = self._check_element_spacing(url)
@@ -101,11 +111,13 @@ class MobileOptimizer:
             score += 10
             analysis["passed_checks"].append("Adequate spacing")
         else:
-            analysis["issues"].append({
-                "issue": "Insufficient spacing between clickable elements",
-                "priority": "medium",
-                "fix": "Add minimum 8px spacing between interactive elements"
-            })
+            analysis["issues"].append(
+                {
+                    "issue": "Insufficient spacing between clickable elements",
+                    "priority": "medium",
+                    "fix": "Add minimum 8px spacing between interactive elements",
+                }
+            )
 
         # 7. Fast loading
         speed_check = self._check_mobile_speed(url)
@@ -113,27 +125,26 @@ class MobileOptimizer:
             score += 15
             analysis["passed_checks"].append("Fast mobile loading")
         else:
-            analysis["issues"].append({
-                "issue": f"Slow mobile load time: {speed_check['load_time']}s",
-                "priority": "high",
-                "fix": "Optimize images, minify CSS/JS, enable compression"
-            })
+            analysis["issues"].append(
+                {
+                    "issue": f"Slow mobile load time: {speed_check['load_time']}s",
+                    "priority": "high",
+                    "fix": "Optimize images, minify CSS/JS, enable compression",
+                }
+            )
 
         analysis["score"] = score
         analysis["mobile_friendly"] = score >= 70
 
-        logger.info(f"Mobile analysis: {score}/100 - {'PASS' if analysis['mobile_friendly'] else 'FAIL'}")
+        logger.info(
+            f"Mobile analysis: {score}/100 - {'PASS' if analysis['mobile_friendly'] else 'FAIL'}"
+        )
 
         return analysis
 
     def analyze_core_web_vitals(self, url: str) -> Dict[str, Any]:
         """Анализирует Core Web Vitals."""
-        vitals = {
-            "url": url,
-            "passed": False,
-            "metrics": {},
-            "recommendations": []
-        }
+        vitals = {"url": url, "passed": False, "metrics": {}, "recommendations": []}
 
         # LCP - Largest Contentful Paint
         lcp = self._measure_lcp(url)
@@ -141,21 +152,23 @@ class MobileOptimizer:
             "value": lcp,
             "unit": "seconds",
             "rating": self._rate_lcp(lcp),
-            "threshold": "< 2.5s (good), < 4.0s (needs improvement), >= 4.0s (poor)"
+            "threshold": "< 2.5s (good), < 4.0s (needs improvement), >= 4.0s (poor)",
         }
 
         if lcp > 2.5:
-            vitals["recommendations"].append({
-                "metric": "LCP",
-                "issue": f"LCP too high: {lcp}s",
-                "fixes": [
-                    "Optimize and compress images",
-                    "Remove render-blocking resources",
-                    "Improve server response time",
-                    "Use lazy loading for images",
-                    "Implement CDN"
-                ]
-            })
+            vitals["recommendations"].append(
+                {
+                    "metric": "LCP",
+                    "issue": f"LCP too high: {lcp}s",
+                    "fixes": [
+                        "Optimize and compress images",
+                        "Remove render-blocking resources",
+                        "Improve server response time",
+                        "Use lazy loading for images",
+                        "Implement CDN",
+                    ],
+                }
+            )
 
         # FID - First Input Delay
         fid = self._measure_fid(url)
@@ -163,20 +176,22 @@ class MobileOptimizer:
             "value": fid,
             "unit": "milliseconds",
             "rating": self._rate_fid(fid),
-            "threshold": "< 100ms (good), < 300ms (needs improvement), >= 300ms (poor)"
+            "threshold": "< 100ms (good), < 300ms (needs improvement), >= 300ms (poor)",
         }
 
         if fid > 100:
-            vitals["recommendations"].append({
-                "metric": "FID",
-                "issue": f"FID too high: {fid}ms",
-                "fixes": [
-                    "Minimize JavaScript execution time",
-                    "Break up long tasks",
-                    "Use web workers for heavy computations",
-                    "Reduce third-party script impact"
-                ]
-            })
+            vitals["recommendations"].append(
+                {
+                    "metric": "FID",
+                    "issue": f"FID too high: {fid}ms",
+                    "fixes": [
+                        "Minimize JavaScript execution time",
+                        "Break up long tasks",
+                        "Use web workers for heavy computations",
+                        "Reduce third-party script impact",
+                    ],
+                }
+            )
 
         # CLS - Cumulative Layout Shift
         cls = self._measure_cls(url)
@@ -184,26 +199,28 @@ class MobileOptimizer:
             "value": cls,
             "unit": "score",
             "rating": self._rate_cls(cls),
-            "threshold": "< 0.1 (good), < 0.25 (needs improvement), >= 0.25 (poor)"
+            "threshold": "< 0.1 (good), < 0.25 (needs improvement), >= 0.25 (poor)",
         }
 
         if cls > 0.1:
-            vitals["recommendations"].append({
-                "metric": "CLS",
-                "issue": f"CLS too high: {cls}",
-                "fixes": [
-                    "Set explicit width/height for images and embeds",
-                    "Avoid inserting content above existing content",
-                    "Use CSS aspect ratio boxes",
-                    "Reserve space for ads and embeds"
-                ]
-            })
+            vitals["recommendations"].append(
+                {
+                    "metric": "CLS",
+                    "issue": f"CLS too high: {cls}",
+                    "fixes": [
+                        "Set explicit width/height for images and embeds",
+                        "Avoid inserting content above existing content",
+                        "Use CSS aspect ratio boxes",
+                        "Reserve space for ads and embeds",
+                    ],
+                }
+            )
 
         # Overall pass/fail
         vitals["passed"] = (
-            vitals["metrics"]["lcp"]["rating"] == "good" and
-            vitals["metrics"]["fid"]["rating"] == "good" and
-            vitals["metrics"]["cls"]["rating"] == "good"
+            vitals["metrics"]["lcp"]["rating"] == "good"
+            and vitals["metrics"]["fid"]["rating"] == "good"
+            and vitals["metrics"]["cls"]["rating"] == "good"
         )
 
         logger.info(f"Core Web Vitals: {'PASS' if vitals['passed'] else 'FAIL'}")
@@ -218,7 +235,7 @@ class MobileOptimizer:
             "amp_url": None,
             "amp_valid": False,
             "errors": [],
-            "recommendations": []
+            "recommendations": [],
         }
 
         # Проверяем наличие AMP версии
@@ -234,11 +251,13 @@ class MobileOptimizer:
             amp_check["errors"] = validation["errors"]
 
         else:
-            amp_check["recommendations"].append({
-                "action": "Consider implementing AMP",
-                "benefit": "Faster mobile loading, potential featured snippet",
-                "difficulty": "medium"
-            })
+            amp_check["recommendations"].append(
+                {
+                    "action": "Consider implementing AMP",
+                    "benefit": "Faster mobile loading, potential featured snippet",
+                    "difficulty": "medium",
+                }
+            )
 
         logger.info(f"AMP check: {'Valid AMP' if amp_check['amp_valid'] else 'No AMP or invalid'}")
 
@@ -251,7 +270,7 @@ class MobileOptimizer:
             "viewport_fixed": False,
             "images_optimized": False,
             "fonts_adjusted": False,
-            "touch_targets_fixed": False
+            "touch_targets_fixed": False,
         }
 
         # 1. Viewport meta tag
@@ -279,23 +298,17 @@ class MobileOptimizer:
         small_targets = page_content.get("small_touch_targets", [])
         if small_targets:
             optimizations["touch_targets_fixed"] = True
-            optimizations["changes_made"].append(f"Increased size of {len(small_targets)} touch targets to 48x48px")
+            optimizations["changes_made"].append(
+                f"Increased size of {len(small_targets)} touch targets to 48x48px"
+            )
 
         logger.info(f"✅ Mobile optimization: {len(optimizations['changes_made'])} changes")
 
-        return {
-            "success": True,
-            "optimizations": optimizations
-        }
+        return {"success": True, "optimizations": optimizations}
 
     def generate_mobile_report(self, url: str) -> Dict[str, Any]:
         """Генерирует полный отчет по мобильной оптимизации."""
-        report = {
-            "url": url,
-            "generated_at": "2025-11-15",
-            "overall_score": 0,
-            "sections": {}
-        }
+        report = {"url": url, "generated_at": "2025-11-15", "overall_score": 0, "sections": {}}
 
         # Собираем все проверки
         mobile_friendly = self.analyze_mobile_friendliness(url)
@@ -308,9 +321,9 @@ class MobileOptimizer:
 
         # Общий score
         total_score = (
-            mobile_friendly["score"] * 0.4 +
-            (100 if core_vitals["passed"] else 50) * 0.4 +
-            (100 if amp_check["amp_valid"] else 0) * 0.2
+            mobile_friendly["score"] * 0.4
+            + (100 if core_vitals["passed"] else 50) * 0.4
+            + (100 if amp_check["amp_valid"] else 0) * 0.2
         )
 
         report["overall_score"] = round(total_score)
@@ -332,50 +345,31 @@ class MobileOptimizer:
     def _check_viewport_meta(self, url: str) -> Dict:
         """Проверяет viewport meta tag."""
         # Заглушка
-        return {
-            "passed": True,
-            "content": "width=device-width, initial-scale=1"
-        }
+        return {"passed": True, "content": "width=device-width, initial-scale=1"}
 
     def _check_touch_elements(self, url: str) -> Dict:
         """Проверяет размер touch targets."""
-        return {
-            "passed": False,
-            "small_targets": 5
-        }
+        return {"passed": False, "small_targets": 5}
 
     def _check_text_readability(self, url: str) -> Dict:
         """Проверяет читабельность текста."""
-        return {
-            "passed": True,
-            "min_font_size": 16
-        }
+        return {"passed": True, "min_font_size": 16}
 
     def _check_responsive_images(self, url: str) -> Dict:
         """Проверяет responsive images."""
-        return {
-            "passed": False,
-            "non_responsive_count": 3
-        }
+        return {"passed": False, "non_responsive_count": 3}
 
     def _check_horizontal_scroll(self, url: str) -> Dict:
         """Проверяет горизонтальную прокрутку."""
-        return {
-            "passed": True
-        }
+        return {"passed": True}
 
     def _check_element_spacing(self, url: str) -> Dict:
         """Проверяет spacing между элементами."""
-        return {
-            "passed": True
-        }
+        return {"passed": True}
 
     def _check_mobile_speed(self, url: str) -> Dict:
         """Проверяет скорость загрузки на мобильных."""
-        return {
-            "passed": False,
-            "load_time": 4.5
-        }
+        return {"passed": False, "load_time": 4.5}
 
     def _measure_lcp(self, url: str) -> float:
         """Измеряет Largest Contentful Paint."""
@@ -426,7 +420,4 @@ class MobileOptimizer:
     def _validate_amp(self, amp_url: str) -> Dict:
         """Валидирует AMP страницу."""
         # В реальности использовать AMP Validator API
-        return {
-            "valid": False,
-            "errors": ["Missing required AMP tag", "Invalid AMP component"]
-        }
+        return {"valid": False, "errors": ["Missing required AMP tag", "Invalid AMP component"]}

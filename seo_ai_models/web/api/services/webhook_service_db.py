@@ -52,7 +52,10 @@ class WebhookServiceDB:
         try:
             # Validate URL
             if not url.startswith(("http://", "https://")):
-                return {"success": False, "error": "Invalid webhook URL. Must start with http:// or https://"}
+                return {
+                    "success": False,
+                    "error": "Invalid webhook URL. Must start with http:// or https://",
+                }
 
             # Validate events
             if not events or not isinstance(events, list):
@@ -86,7 +89,9 @@ class WebhookServiceDB:
                     "secret": webhook.secret,
                     "success_count": webhook.success_count,
                     "error_count": webhook.error_count,
-                    "last_triggered_at": webhook.last_triggered_at.isoformat() if webhook.last_triggered_at else None,
+                    "last_triggered_at": (
+                        webhook.last_triggered_at.isoformat() if webhook.last_triggered_at else None
+                    ),
                     "created_at": webhook.created_at.isoformat(),
                     "updated_at": webhook.updated_at.isoformat(),
                     "metadata": webhook.extra_metadata,
@@ -119,7 +124,9 @@ class WebhookServiceDB:
                 "secret": webhook.secret,
                 "success_count": webhook.success_count,
                 "error_count": webhook.error_count,
-                "last_triggered_at": webhook.last_triggered_at.isoformat() if webhook.last_triggered_at else None,
+                "last_triggered_at": (
+                    webhook.last_triggered_at.isoformat() if webhook.last_triggered_at else None
+                ),
                 "created_at": webhook.created_at.isoformat(),
                 "updated_at": webhook.updated_at.isoformat(),
                 "metadata": webhook.extra_metadata,
@@ -155,7 +162,11 @@ class WebhookServiceDB:
                         "secret": webhook.secret,
                         "success_count": webhook.success_count,
                         "error_count": webhook.error_count,
-                        "last_triggered_at": webhook.last_triggered_at.isoformat() if webhook.last_triggered_at else None,
+                        "last_triggered_at": (
+                            webhook.last_triggered_at.isoformat()
+                            if webhook.last_triggered_at
+                            else None
+                        ),
                         "created_at": webhook.created_at.isoformat(),
                         "updated_at": webhook.updated_at.isoformat(),
                         "metadata": webhook.extra_metadata,
@@ -184,7 +195,10 @@ class WebhookServiceDB:
             # Validate URL if provided
             if "url" in update_data and update_data["url"]:
                 if not update_data["url"].startswith(("http://", "https://")):
-                    return {"success": False, "error": "Invalid webhook URL. Must start with http:// or https://"}
+                    return {
+                        "success": False,
+                        "error": "Invalid webhook URL. Must start with http:// or https://",
+                    }
 
             # Validate events if provided
             if "events" in update_data and update_data["events"]:
@@ -212,7 +226,11 @@ class WebhookServiceDB:
                     "secret": updated_webhook.secret,
                     "success_count": updated_webhook.success_count,
                     "error_count": updated_webhook.error_count,
-                    "last_triggered_at": updated_webhook.last_triggered_at.isoformat() if updated_webhook.last_triggered_at else None,
+                    "last_triggered_at": (
+                        updated_webhook.last_triggered_at.isoformat()
+                        if updated_webhook.last_triggered_at
+                        else None
+                    ),
                     "created_at": updated_webhook.created_at.isoformat(),
                     "updated_at": updated_webhook.updated_at.isoformat(),
                     "metadata": updated_webhook.extra_metadata,
@@ -231,7 +249,10 @@ class WebhookServiceDB:
 
         # Check project access
         if not self.check_project_access(webhook.project_id, user_id):
-            return {"success": False, "error": "Access denied. Only project owner can delete webhooks."}
+            return {
+                "success": False,
+                "error": "Access denied. Only project owner can delete webhooks.",
+            }
 
         try:
             success = self.webhook_repo.delete(webhook_id)

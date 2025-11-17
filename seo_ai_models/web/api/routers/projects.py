@@ -7,8 +7,12 @@ from typing import List, Optional
 import logging
 
 from ..models.projects import (
-    ProjectCreate, ProjectResponse, ProjectUpdate,
-    TaskCreate, TaskResponse, TaskUpdate
+    ProjectCreate,
+    ProjectResponse,
+    ProjectUpdate,
+    TaskCreate,
+    TaskResponse,
+    TaskUpdate,
 )
 from ..services.project_service_db import ProjectServiceDB
 from ..dependencies import get_project_service, get_current_user_id
@@ -22,13 +26,14 @@ logger = logging.getLogger(__name__)
 
 # ===== PROJECT ENDPOINTS =====
 
+
 @router.get("/", response_model=List[ProjectResponse])
 async def get_projects(
     status: Optional[str] = None,
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=100),
     user_id: str = Depends(get_current_user_id),
-    service: ProjectServiceDB = Depends(get_project_service)
+    service: ProjectServiceDB = Depends(get_project_service),
 ):
     """
     Получение списка проектов пользователя с фильтрацией и пагинацией.
@@ -48,7 +53,7 @@ async def get_projects(
     if not result["success"]:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=result.get("error", "Failed to retrieve projects")
+            detail=result.get("error", "Failed to retrieve projects"),
         )
 
     return result["projects"]
@@ -58,7 +63,7 @@ async def get_projects(
 async def create_project(
     project_data: ProjectCreate,
     user_id: str = Depends(get_current_user_id),
-    service: ProjectServiceDB = Depends(get_project_service)
+    service: ProjectServiceDB = Depends(get_project_service),
 ):
     """
     Создание нового проекта.
@@ -76,13 +81,13 @@ async def create_project(
         website=project_data.website,
         owner_id=user_id,
         description=project_data.description or "",
-        metadata=project_data.metadata
+        metadata=project_data.metadata,
     )
 
     if not result["success"]:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=result.get("error", "Failed to create project")
+            detail=result.get("error", "Failed to create project"),
         )
 
     return result["project"]
@@ -92,7 +97,7 @@ async def create_project(
 async def get_project(
     project_id: str,
     user_id: str = Depends(get_current_user_id),
-    service: ProjectServiceDB = Depends(get_project_service)
+    service: ProjectServiceDB = Depends(get_project_service),
 ):
     """
     Получение информации о проекте по ID.
@@ -112,19 +117,12 @@ async def get_project(
 
         if "not found" in error.lower():
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Project {project_id} not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail=f"Project {project_id} not found"
             )
         elif "access denied" in error.lower():
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Access denied"
-            )
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
         else:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=error
-            )
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=error)
 
     return result["project"]
 
@@ -134,7 +132,7 @@ async def update_project(
     project_id: str,
     project_data: ProjectUpdate,
     user_id: str = Depends(get_current_user_id),
-    service: ProjectServiceDB = Depends(get_project_service)
+    service: ProjectServiceDB = Depends(get_project_service),
 ):
     """
     Обновление проекта по ID.
@@ -167,19 +165,12 @@ async def update_project(
 
         if "not found" in error.lower():
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Project {project_id} not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail=f"Project {project_id} not found"
             )
         elif "access denied" in error.lower():
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Access denied"
-            )
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
         else:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=error
-            )
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error)
 
     return result["project"]
 
@@ -188,7 +179,7 @@ async def update_project(
 async def delete_project(
     project_id: str,
     user_id: str = Depends(get_current_user_id),
-    service: ProjectServiceDB = Depends(get_project_service)
+    service: ProjectServiceDB = Depends(get_project_service),
 ):
     """
     Удаление проекта по ID (soft delete).
@@ -218,26 +209,28 @@ async def delete_project(
         if "not found" in error.lower():
             logger.warning(f"Project {project_id} not found")
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Project {project_id} not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail=f"Project {project_id} not found"
             )
         elif "access denied" in error.lower():
             logger.warning(f"User {user_id} access denied for project {project_id}")
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Access denied. Only project owner can delete the project."
+                detail="Access denied. Only project owner can delete the project.",
             )
         else:
             logger.error(f"Error deleting project {project_id}: {error}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Failed to delete project: {error}"
+                detail=f"Failed to delete project: {error}",
             )
 
-    logger.info(f"Project {project_id} successfully deleted. {result.get('tasks_deleted', 0)} tasks deleted.")
+    logger.info(
+        f"Project {project_id} successfully deleted. {result.get('tasks_deleted', 0)} tasks deleted."
+    )
 
 
 # ===== TASK ENDPOINTS =====
+
 
 @router.get("/{project_id}/tasks", response_model=List[TaskResponse])
 async def get_project_tasks(
@@ -247,7 +240,7 @@ async def get_project_tasks(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=100),
     user_id: str = Depends(get_current_user_id),
-    service: ProjectServiceDB = Depends(get_project_service)
+    service: ProjectServiceDB = Depends(get_project_service),
 ):
     """
     Получение списка задач проекта с фильтрацией и пагинацией.
@@ -270,25 +263,21 @@ async def get_project_tasks(
         error = result.get("error", "Unknown error")
 
         if "access denied" in error.lower():
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Access denied"
-            )
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
         else:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=error
-            )
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=error)
 
     return result["tasks"]
 
 
-@router.post("/{project_id}/tasks", response_model=TaskResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/{project_id}/tasks", response_model=TaskResponse, status_code=status.HTTP_201_CREATED
+)
 async def create_task(
     project_id: str,
     task_data: TaskCreate,
     user_id: str = Depends(get_current_user_id),
-    service: ProjectServiceDB = Depends(get_project_service)
+    service: ProjectServiceDB = Depends(get_project_service),
 ):
     """
     Создание новой задачи в проекте.
@@ -311,7 +300,7 @@ async def create_task(
         priority=task_data.priority or "medium",
         assignee_id=task_data.assignee_id,
         due_date=task_data.due_date,
-        metadata=task_data.metadata
+        metadata=task_data.metadata,
     )
 
     if not result["success"]:
@@ -319,14 +308,10 @@ async def create_task(
 
         if "access denied" in error.lower():
             raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Access denied to project"
+                status_code=status.HTTP_403_FORBIDDEN, detail="Access denied to project"
             )
         else:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=error
-            )
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error)
 
     return result["task"]
 
@@ -336,7 +321,7 @@ async def get_task(
     project_id: str,
     task_id: str,
     user_id: str = Depends(get_current_user_id),
-    service: ProjectServiceDB = Depends(get_project_service)
+    service: ProjectServiceDB = Depends(get_project_service),
 ):
     """
     Получение информации о задаче по ID.
@@ -357,24 +342,17 @@ async def get_task(
 
         if "not found" in error.lower():
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Task {task_id} not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail=f"Task {task_id} not found"
             )
         elif "access denied" in error.lower():
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Access denied"
-            )
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
         elif "does not belong" in error.lower():
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Task {task_id} does not belong to project {project_id}"
+                detail=f"Task {task_id} does not belong to project {project_id}",
             )
         else:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=error
-            )
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=error)
 
     return result["task"]
 
@@ -385,7 +363,7 @@ async def update_task(
     task_id: str,
     task_data: TaskUpdate,
     user_id: str = Depends(get_current_user_id),
-    service: ProjectServiceDB = Depends(get_project_service)
+    service: ProjectServiceDB = Depends(get_project_service),
 ):
     """
     Обновление задачи по ID.
@@ -423,19 +401,12 @@ async def update_task(
 
         if "not found" in error.lower():
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Task {task_id} not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail=f"Task {task_id} not found"
             )
         elif "access denied" in error.lower():
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Access denied"
-            )
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
         else:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=error
-            )
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error)
 
     return result["task"]
 
@@ -445,7 +416,7 @@ async def delete_task(
     project_id: str,
     task_id: str,
     user_id: str = Depends(get_current_user_id),
-    service: ProjectServiceDB = Depends(get_project_service)
+    service: ProjectServiceDB = Depends(get_project_service),
 ):
     """
     Удаление задачи по ID (soft delete).
@@ -476,26 +447,25 @@ async def delete_task(
         if "not found" in error.lower():
             logger.warning(f"Task {task_id} not found")
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Task {task_id} not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail=f"Task {task_id} not found"
             )
         elif "access denied" in error.lower():
             logger.warning(f"User {user_id} access denied for task {task_id}")
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Access denied. You don't have permission to delete this task."
+                detail="Access denied. You don't have permission to delete this task.",
             )
         elif "does not belong" in error.lower():
             logger.warning(f"Task {task_id} does not belong to project {project_id}")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Task {task_id} does not belong to project {project_id}"
+                detail=f"Task {task_id} does not belong to project {project_id}",
             )
         else:
             logger.error(f"Error deleting task {task_id}: {error}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Failed to delete task: {error}"
+                detail=f"Failed to delete task: {error}",
             )
 
     logger.info(f"Task {task_id} successfully deleted from project {project_id}")

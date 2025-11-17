@@ -17,6 +17,8 @@ import logging
 from typing import Dict, Any, List, Optional
 from datetime import datetime
 
+logger = logging.getLogger(__name__)
+
 # Base advisor
 from .seo_advisor.advisor import SEOAdvisor, SEOAnalysisReport
 
@@ -27,7 +29,7 @@ from ..autofix.fixers import (
     ImageAltTagsFixer,
     ContentRefreshFixer,
     SchemaMarkupFixer,
-    InternalLinksFixer
+    InternalLinksFixer,
 )
 
 # Improvement modules (optional)
@@ -42,8 +44,9 @@ try:
         PredictiveAnalytics,
         CROIntegration,
         MobileOptimizer,
-        AIContentGenerator
+        AIContentGenerator,
     )
+
     IMPROVEMENTS_AVAILABLE = True
 except ImportError as e:
     logger.warning(f"Some improvement modules not available: {e}")
@@ -73,12 +76,12 @@ class EnhancedSEOAdvisor:
 
     def __init__(
         self,
-        industry: str = 'default',
+        industry: str = "default",
         auto_execute: bool = True,
         cms_connector=None,
         llm_service=None,
         crawler=None,
-        analytics_connector=None
+        analytics_connector=None,
     ):
         """
         Инициализация Enhanced SEO Advisor.
@@ -95,10 +98,7 @@ class EnhancedSEOAdvisor:
         self.base_advisor = SEOAdvisor(industry=industry)
 
         # AutoFix Engine
-        self.autofix_engine = AutoFixEngine(
-            cms_connector=cms_connector,
-            auto_execute=auto_execute
-        )
+        self.autofix_engine = AutoFixEngine(cms_connector=cms_connector, auto_execute=auto_execute)
 
         # Register fixers
         self._register_fixers(llm_service, cms_connector)
@@ -108,50 +108,35 @@ class EnhancedSEOAdvisor:
             self.content_refresh = ContentRefreshAutomation(
                 cms_connector=cms_connector,
                 llm_service=llm_service,
-                autofix_engine=self.autofix_engine
+                autofix_engine=self.autofix_engine,
             )
 
             self.visual_analyzer = VisualContentAnalyzer(
-                llm_service=llm_service,
-                autofix_engine=self.autofix_engine
+                llm_service=llm_service, autofix_engine=self.autofix_engine
             )
 
             self.intent_optimizer = IntentBasedOptimizer(
-                llm_service=llm_service,
-                autofix_engine=self.autofix_engine
+                llm_service=llm_service, autofix_engine=self.autofix_engine
             )
 
-            self.competitor_monitor = CompetitorMonitor(
-                crawler=crawler,
-                llm_service=llm_service
-            )
+            self.competitor_monitor = CompetitorMonitor(crawler=crawler, llm_service=llm_service)
 
             self.international_seo = InternationalSEO(
-                llm_service=llm_service,
-                cms_connector=cms_connector
+                llm_service=llm_service, cms_connector=cms_connector
             )
 
-            self.link_building = LinkBuildingAssistant(
-                llm_service=llm_service,
-                crawler=crawler
-            )
+            self.link_building = LinkBuildingAssistant(llm_service=llm_service, crawler=crawler)
 
-            self.predictive = PredictiveAnalytics(
-                analytics_connector=analytics_connector
-            )
+            self.predictive = PredictiveAnalytics(analytics_connector=analytics_connector)
 
             self.cro = CROIntegration(
-                analytics_connector=analytics_connector,
-                llm_service=llm_service
+                analytics_connector=analytics_connector, llm_service=llm_service
             )
 
-            self.mobile_optimizer = MobileOptimizer(
-                crawler=crawler
-            )
+            self.mobile_optimizer = MobileOptimizer(crawler=crawler)
 
             self.ai_content = AIContentGenerator(
-                llm_service=llm_service,
-                seo_advisor=self.base_advisor
+                llm_service=llm_service, seo_advisor=self.base_advisor
             )
         else:
             # Stub implementations
@@ -177,7 +162,7 @@ class EnhancedSEOAdvisor:
         content: str,
         keywords: List[str],
         auto_fix: bool = True,
-        fix_complexity_limit: FixComplexity = FixComplexity.SIMPLE
+        fix_complexity_limit: FixComplexity = FixComplexity.SIMPLE,
     ) -> Dict[str, Any]:
         """
         ПОЛНЫЙ АНАЛИЗ + АВТОМАТИЧЕСКИЕ ИСПРАВЛЕНИЯ.
@@ -205,7 +190,7 @@ class EnhancedSEOAdvisor:
             "issues_detected": [],
             "fixes_applied": [],
             "improvements_available": [],
-            "overall_score": 0
+            "overall_score": 0,
         }
 
         # 1. БАЗОВЫЙ SEO АНАЛИЗ
@@ -236,11 +221,7 @@ class EnhancedSEOAdvisor:
 
         # 3. СБОР ВСЕХ ПРОБЛЕМ
         issues = self._collect_issues(
-            base_analysis,
-            visual_analysis,
-            mobile_analysis,
-            vitals,
-            page_content
+            base_analysis, visual_analysis, mobile_analysis, vitals, page_content
         )
         result["issues_detected"] = issues
 
@@ -255,7 +236,8 @@ class EnhancedSEOAdvisor:
 
             # Фильтруем по complexity limit
             allowed_fixes = [
-                action for action in fix_plan
+                action
+                for action in fix_plan
                 if action.complexity.value <= fix_complexity_limit.value
             ]
 
@@ -263,7 +245,7 @@ class EnhancedSEOAdvisor:
             if allowed_fixes:
                 execution_result = self.autofix_engine.execute_plan(
                     allowed_fixes,
-                    require_approval_for=[FixComplexity.COMPLEX, FixComplexity.CRITICAL]
+                    require_approval_for=[FixComplexity.COMPLEX, FixComplexity.CRITICAL],
                 )
 
                 result["fixes_applied"] = execution_result.get("executed", [])
@@ -281,7 +263,9 @@ class EnhancedSEOAdvisor:
         # Сохраняем в историю
         self.analysis_history.append(result)
 
-        logger.info(f"Analysis complete: {result['overall_score']}/100, {len(result['fixes_applied'])} fixes applied")
+        logger.info(
+            f"Analysis complete: {result['overall_score']}/100, {len(result['fixes_applied'])} fixes applied"
+        )
 
         return result
 
@@ -291,19 +275,12 @@ class EnhancedSEOAdvisor:
 
     def monitor_competitors(self, domain: str, competitors: List[str], keywords: List[str]) -> Dict:
         """Мониторинг конкурентов."""
-        results = {
-            "domain": domain,
-            "competitors": [],
-            "keyword_gaps": [],
-            "opportunities": []
-        }
+        results = {"domain": domain, "competitors": [], "keyword_gaps": [], "opportunities": []}
 
         for competitor in competitors:
             # Добавляем конкурента
             self.competitor_monitor.add_competitor(
-                name=competitor,
-                domain=competitor,
-                keywords=keywords
+                name=competitor, domain=competitor, keywords=keywords
             )
 
             # Gap analysis
@@ -337,29 +314,18 @@ class EnhancedSEOAdvisor:
 
     def _register_fixers(self, llm_service, cms_connector):
         """Регистрирует все fixers в AutoFix Engine."""
-        self.autofix_engine.register_action(
-            "missing_meta_tags",
-            MetaTagsFixer(llm_service)
-        )
+        self.autofix_engine.register_action("missing_meta_tags", MetaTagsFixer(llm_service))
+
+        self.autofix_engine.register_action("missing_alt_tags", ImageAltTagsFixer(llm_service))
 
         self.autofix_engine.register_action(
-            "missing_alt_tags",
-            ImageAltTagsFixer(llm_service)
+            "outdated_content", ContentRefreshFixer(cms_connector, llm_service)
         )
 
-        self.autofix_engine.register_action(
-            "outdated_content",
-            ContentRefreshFixer(cms_connector, llm_service)
-        )
+        self.autofix_engine.register_action("missing_schema", SchemaMarkupFixer())
 
         self.autofix_engine.register_action(
-            "missing_schema",
-            SchemaMarkupFixer()
-        )
-
-        self.autofix_engine.register_action(
-            "insufficient_internal_links",
-            InternalLinksFixer(cms_connector)
+            "insufficient_internal_links", InternalLinksFixer(cms_connector)
         )
 
     def _serialize_analysis(self, analysis: SEOAnalysisReport) -> Dict:
@@ -374,10 +340,10 @@ class EnhancedSEOAdvisor:
                 "scores": analysis.content_quality.content_scores,
                 "strengths": analysis.content_quality.strengths,
                 "weaknesses": analysis.content_quality.weaknesses,
-                "improvements": analysis.content_quality.potential_improvements
+                "improvements": analysis.content_quality.potential_improvements,
             },
             "recommendations": analysis.recommendations,
-            "priorities": analysis.priorities
+            "priorities": analysis.priorities,
         }
 
     def _extract_page_content(self, url: str, content: str) -> Dict:
@@ -389,61 +355,73 @@ class EnhancedSEOAdvisor:
             "images": [],
             "headings": [],
             "title": "",
-            "description": ""
+            "description": "",
         }
 
-    def _collect_issues(self, base_analysis, visual_analysis, mobile_analysis, vitals, page_content) -> List[Dict]:
+    def _collect_issues(
+        self, base_analysis, visual_analysis, mobile_analysis, vitals, page_content
+    ) -> List[Dict]:
         """Собирает все обнаруженные проблемы."""
         issues = []
 
         # Issues from base analysis
-        if hasattr(base_analysis, 'content_quality'):
+        if hasattr(base_analysis, "content_quality"):
             for weakness in base_analysis.content_quality.weaknesses:
-                issues.append({
-                    "type": "content_quality",
-                    "severity": "medium",
-                    "description": weakness,
-                    "fixable": True
-                })
+                issues.append(
+                    {
+                        "type": "content_quality",
+                        "severity": "medium",
+                        "description": weakness,
+                        "fixable": True,
+                    }
+                )
 
         # Visual issues
         if visual_analysis.get("missing_alt"):
-            issues.append({
-                "type": "missing_alt_tags",
-                "severity": "high",
-                "description": f"{len(visual_analysis['missing_alt'])} images without alt tags",
-                "fixable": True,
-                "auto_fixable": True
-            })
+            issues.append(
+                {
+                    "type": "missing_alt_tags",
+                    "severity": "high",
+                    "description": f"{len(visual_analysis['missing_alt'])} images without alt tags",
+                    "fixable": True,
+                    "auto_fixable": True,
+                }
+            )
 
         if visual_analysis.get("oversized"):
-            issues.append({
-                "type": "oversized_images",
-                "severity": "medium",
-                "description": f"{len(visual_analysis['oversized'])} oversized images",
-                "fixable": True,
-                "auto_fixable": True
-            })
+            issues.append(
+                {
+                    "type": "oversized_images",
+                    "severity": "medium",
+                    "description": f"{len(visual_analysis['oversized'])} oversized images",
+                    "fixable": True,
+                    "auto_fixable": True,
+                }
+            )
 
         # Mobile issues
         for issue in mobile_analysis.get("issues", []):
-            issues.append({
-                "type": "mobile_friendliness",
-                "severity": issue.get("priority", "medium"),
-                "description": issue.get("issue", ""),
-                "fixable": True,
-                "fix_instructions": issue.get("fix", "")
-            })
+            issues.append(
+                {
+                    "type": "mobile_friendliness",
+                    "severity": issue.get("priority", "medium"),
+                    "description": issue.get("issue", ""),
+                    "fixable": True,
+                    "fix_instructions": issue.get("fix", ""),
+                }
+            )
 
         # Core Web Vitals issues
         for recommendation in vitals.get("recommendations", []):
-            issues.append({
-                "type": "core_web_vitals",
-                "severity": "high",
-                "description": recommendation.get("issue", ""),
-                "fixable": True,
-                "fixes": recommendation.get("fixes", [])
-            })
+            issues.append(
+                {
+                    "type": "core_web_vitals",
+                    "severity": "high",
+                    "description": recommendation.get("issue", ""),
+                    "fixable": True,
+                    "fixes": recommendation.get("fixes", []),
+                }
+            )
 
         return issues
 
@@ -455,7 +433,7 @@ class EnhancedSEOAdvisor:
             "missing_alt_tags": analysis.get("visual", {}).get("missing_alt", []),
             "oversized_images": analysis.get("visual", {}).get("oversized", []),
             "mobile_issues": analysis.get("mobile", {}).get("issues", []),
-            "vitals_issues": analysis.get("core_web_vitals", {}).get("recommendations", [])
+            "vitals_issues": analysis.get("core_web_vitals", {}).get("recommendations", []),
         }
 
     def _suggest_improvements(self, analysis: Dict) -> List[Dict]:
@@ -467,32 +445,38 @@ class EnhancedSEOAdvisor:
         if base_analysis.get("recommendations"):
             for category, recs in base_analysis.get("recommendations", {}).items():
                 for rec in recs:
-                    improvements.append({
-                        "category": category,
-                        "improvement": rec,
-                        "priority": "medium",
-                        "module": "base_seo"
-                    })
+                    improvements.append(
+                        {
+                            "category": category,
+                            "improvement": rec,
+                            "priority": "medium",
+                            "module": "base_seo",
+                        }
+                    )
 
         # Visual improvements
         visual = analysis.get("visual", {})
         if visual.get("optimization_potential", 0) > 0:
-            improvements.append({
-                "category": "visual",
-                "improvement": f"Optimize images to save {visual['optimization_potential']}% size",
-                "priority": "medium",
-                "module": "visual_analyzer"
-            })
+            improvements.append(
+                {
+                    "category": "visual",
+                    "improvement": f"Optimize images to save {visual['optimization_potential']}% size",
+                    "priority": "medium",
+                    "module": "visual_analyzer",
+                }
+            )
 
         # Mobile improvements
         mobile = analysis.get("mobile", {})
         if not mobile.get("mobile_friendly", True):
-            improvements.append({
-                "category": "mobile",
-                "improvement": "Improve mobile friendliness",
-                "priority": "high",
-                "module": "mobile_optimizer"
-            })
+            improvements.append(
+                {
+                    "category": "mobile",
+                    "improvement": "Improve mobile friendliness",
+                    "priority": "high",
+                    "module": "mobile_optimizer",
+                }
+            )
 
         return improvements
 
@@ -543,10 +527,12 @@ class EnhancedSEOAdvisor:
             **analysis,
             "additional_insights": {
                 "content_refresh": self.content_refresh.get_refresh_report(),
-                "link_opportunities": self.link_building.find_link_opportunities(url, "general")[:10],
+                "link_opportunities": self.link_building.find_link_opportunities(url, "general")[
+                    :10
+                ],
                 "cro_analysis": self.cro.analyze_conversion_elements(page_content),
-                "mobile_report": self.mobile_optimizer.generate_mobile_report(url)
-            }
+                "mobile_report": self.mobile_optimizer.generate_mobile_report(url),
+            },
         }
 
         return report

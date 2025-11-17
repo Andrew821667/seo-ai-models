@@ -32,7 +32,7 @@ class CacheService:
                 password=REDIS_PASSWORD,
                 decode_responses=True,
                 socket_connect_timeout=5,
-                socket_timeout=5
+                socket_timeout=5,
             )
             # Test connection
             self.redis_client.ping()
@@ -192,6 +192,7 @@ def cache_result(ttl: int = CACHE_TTL, key_prefix: str = ""):
         def get_user(user_id: str):
             return fetch_user_from_db(user_id)
     """
+
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -215,6 +216,7 @@ def cache_result(ttl: int = CACHE_TTL, key_prefix: str = ""):
             return result
 
         return wrapper
+
     return decorator
 
 

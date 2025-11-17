@@ -26,10 +26,7 @@ async def get_metrics():
     metrics_data = metrics_service.get_metrics()
     content_type = metrics_service.get_content_type()
 
-    return Response(
-        content=metrics_data,
-        media_type=content_type
-    )
+    return Response(content=metrics_data, media_type=content_type)
 
 
 @router.get("/health")
@@ -39,8 +36,4 @@ async def metrics_health():
 
     Returns basic health information.
     """
-    return {
-        "status": "healthy",
-        "service": "metrics",
-        "metrics_available": True
-    }
+    return {"status": "healthy", "service": "metrics", "metrics_available": True}

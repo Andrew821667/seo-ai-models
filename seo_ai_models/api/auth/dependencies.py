@@ -16,8 +16,7 @@ security = HTTPBearer()
 
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
-    db: Session = Depends(get_db)
+    credentials: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db)
 ) -> User:
     """Get current authenticated user."""
     token = credentials.credentials
@@ -53,8 +52,7 @@ async def get_current_user(
 
     if not user.is_active:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="User account is disabled"
+            status_code=status.HTTP_403_FORBIDDEN, detail="User account is disabled"
         )
 
     return user
@@ -63,14 +61,12 @@ async def get_current_user(
 def require_permission(permission: Permission):
     """Dependency factory for permission checking."""
 
-    async def permission_checker(
-        current_user: User = Depends(get_current_user)
-    ) -> User:
+    async def permission_checker(current_user: User = Depends(get_current_user)) -> User:
         """Check if user has required permission."""
         if not has_permission(current_user.role, permission):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Permission denied: {permission.value} required"
+                detail=f"Permission denied: {permission.value} required",
             )
         return current_user
 
@@ -80,14 +76,11 @@ def require_permission(permission: Permission):
 def require_role(role: UserRole):
     """Dependency factory for role checking."""
 
-    async def role_checker(
-        current_user: User = Depends(get_current_user)
-    ) -> User:
+    async def role_checker(current_user: User = Depends(get_current_user)) -> User:
         """Check if user has required role."""
         if current_user.role != role and current_user.role != UserRole.ADMIN:
             raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Role {role.value} required"
+                status_code=status.HTTP_403_FORBIDDEN, detail=f"Role {role.value} required"
             )
         return current_user
 

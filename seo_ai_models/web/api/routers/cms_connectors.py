@@ -1,4 +1,3 @@
-
 """
 Роутер для работы с коннекторами к CMS системам.
 """
@@ -25,15 +24,15 @@ logger = logging.getLogger(__name__)
 async def get_cms_connectors(token: str = Depends(oauth2_scheme)):
     """
     Получение списка доступных CMS коннекторов.
-    
+
     Args:
         token: Токен доступа.
-        
+
     Returns:
         List[Dict[str, Any]]: Список коннекторов.
     """
     # Здесь будет код для получения списка коннекторов
-    
+
     # Пока просто заглушка
     return [
         {
@@ -45,8 +44,8 @@ async def get_cms_connectors(token: str = Depends(oauth2_scheme)):
             "settings_schema": {
                 "site_url": {"type": "string", "required": True},
                 "username": {"type": "string", "required": True},
-                "password": {"type": "string", "required": True, "format": "password"}
-            }
+                "password": {"type": "string", "required": True, "format": "password"},
+            },
         },
         {
             "id": "drupal",
@@ -57,9 +56,9 @@ async def get_cms_connectors(token: str = Depends(oauth2_scheme)):
             "settings_schema": {
                 "site_url": {"type": "string", "required": True},
                 "username": {"type": "string", "required": True},
-                "password": {"type": "string", "required": True, "format": "password"}
-            }
-        }
+                "password": {"type": "string", "required": True, "format": "password"},
+            },
+        },
     ]
 
 
@@ -69,11 +68,11 @@ async def create_cms_connection(
     connector_id: str = Body(..., embed=True),
     settings: Dict[str, Any] = Body(..., embed=True),
     project_id: str = Body(..., embed=True),
-    token: str = Depends(oauth2_scheme)
+    token: str = Depends(oauth2_scheme),
 ):
     """
     Создание подключения к CMS для проекта.
-    
+
     Args:
         connector_id: ID коннектора.
         settings: Настройки подключения.
@@ -81,34 +80,33 @@ async def create_cms_connection(
         token: Токен доступа.
     """
     # Здесь будет код для создания подключения
-    
+
     return {
         "id": "connection123",
         "connector_id": connector_id,
         "project_id": project_id,
         "status": "connected",
-        "created_at": datetime.now()
+        "created_at": datetime.now(),
     }
 
 
 # Маршрут для получения списка подключений проекта
 @router.get("/connections", response_model=List[Dict[str, Any]])
 async def get_cms_connections(
-    project_id: Optional[str] = None,
-    token: str = Depends(oauth2_scheme)
+    project_id: Optional[str] = None, token: str = Depends(oauth2_scheme)
 ):
     """
     Получение списка подключений к CMS.
-    
+
     Args:
         project_id: Фильтр по ID проекта.
         token: Токен доступа.
-        
+
     Returns:
         List[Dict[str, Any]]: Список подключений.
     """
     # Здесь будет код для получения списка подключений
-    
+
     # Пока просто заглушка
     return [
         {
@@ -116,7 +114,7 @@ async def get_cms_connections(
             "connector_id": "wordpress",
             "project_id": project_id or "project123",
             "status": "connected",
-            "created_at": datetime.now()
+            "created_at": datetime.now(),
         }
     ]
 
@@ -128,23 +126,23 @@ async def get_cms_content(
     content_type: Optional[str] = None,
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=100),
-    token: str = Depends(oauth2_scheme)
+    token: str = Depends(oauth2_scheme),
 ):
     """
     Получение контента из CMS.
-    
+
     Args:
         connection_id: ID подключения.
         content_type: Тип контента (например, post, page).
         skip: Количество пропускаемых записей (для пагинации).
         limit: Максимальное количество возвращаемых записей.
         token: Токен доступа.
-        
+
     Returns:
         List[Dict[str, Any]]: Список элементов контента.
     """
     # Здесь будет код для получения контента из CMS
-    
+
     # Пока просто заглушка
     return [
         {
@@ -154,7 +152,7 @@ async def get_cms_content(
             "type": "post",
             "status": "published",
             "created_at": datetime.now(),
-            "updated_at": datetime.now()
+            "updated_at": datetime.now(),
         }
     ]
 
@@ -165,11 +163,11 @@ async def send_cms_content(
     connection_id: str = Body(..., embed=True),
     content_type: str = Body(..., embed=True),
     content_data: Dict[str, Any] = Body(..., embed=True),
-    token: str = Depends(oauth2_scheme)
+    token: str = Depends(oauth2_scheme),
 ):
     """
     Отправка контента в CMS.
-    
+
     Args:
         connection_id: ID подключения.
         content_type: Тип контента (например, post, page).
@@ -177,13 +175,13 @@ async def send_cms_content(
         token: Токен доступа.
     """
     # Здесь будет код для отправки контента в CMS
-    
+
     return {
         "id": "post123",
         "title": content_data.get("title", ""),
         "status": "published",
         "url": "https://example.com/post123",
-        "created_at": datetime.now()
+        "created_at": datetime.now(),
     }
 
 
@@ -193,22 +191,22 @@ async def get_cms_statistics(
     connection_id: str,
     start_date: Optional[datetime] = None,
     end_date: Optional[datetime] = None,
-    token: str = Depends(oauth2_scheme)
+    token: str = Depends(oauth2_scheme),
 ):
     """
     Получение статистики из CMS.
-    
+
     Args:
         connection_id: ID подключения.
         start_date: Начальная дата.
         end_date: Конечная дата.
         token: Токен доступа.
-        
+
     Returns:
         Dict[str, Any]: Статистика.
     """
     # Здесь будет код для получения статистики из CMS
-    
+
     # Пока просто заглушка
     return {
         "posts_count": 100,
@@ -218,5 +216,5 @@ async def get_cms_statistics(
         "comments_count": 500,
         "users_count": 5,
         "latest_post_date": datetime.now(),
-        "latest_comment_date": datetime.now()
+        "latest_comment_date": datetime.now(),
     }

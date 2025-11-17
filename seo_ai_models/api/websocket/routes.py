@@ -21,7 +21,7 @@ async def websocket_endpoint(
     websocket: WebSocket,
     token: str = Query(...),
     room: str = Query("global"),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """
     WebSocket endpoint for real-time updates.
@@ -61,8 +61,7 @@ async def websocket_endpoint(
             # Handle different message types
             if message_type == "ping":
                 await manager.send_personal_message(
-                    {"type": "pong", "timestamp": data.get("timestamp")},
-                    websocket
+                    {"type": "pong", "timestamp": data.get("timestamp")}, websocket
                 )
 
             elif message_type == "subscribe_analysis":
@@ -70,26 +69,21 @@ async def websocket_endpoint(
                 # Subscribe to specific analysis updates
                 # (Implementation can be extended)
                 await manager.send_personal_message(
-                    {"type": "subscribed", "analysis_id": analysis_id},
-                    websocket
+                    {"type": "subscribed", "analysis_id": analysis_id}, websocket
                 )
 
             elif message_type == "get_active_analyses":
                 # Send list of active analyses
                 analyses = progress_tracker.get_active_analyses()
                 await manager.send_personal_message(
-                    {"type": "active_analyses", "data": analyses},
-                    websocket
+                    {"type": "active_analyses", "data": analyses}, websocket
                 )
 
             elif message_type == "get_stats":
                 # Send connection stats (admin only)
                 if user.role.value == "admin":
                     stats = manager.get_stats()
-                    await manager.send_personal_message(
-                        {"type": "stats", "data": stats},
-                        websocket
-                    )
+                    await manager.send_personal_message({"type": "stats", "data": stats}, websocket)
 
     except WebSocketDisconnect:
         manager.disconnect(websocket)
@@ -102,10 +96,7 @@ async def websocket_endpoint(
 
 @router.websocket("/ws/analysis/{analysis_id}")
 async def analysis_websocket(
-    websocket: WebSocket,
-    analysis_id: str,
-    token: str = Query(...),
-    db: Session = Depends(get_db)
+    websocket: WebSocket, analysis_id: str, token: str = Query(...), db: Session = Depends(get_db)
 ):
     """
     WebSocket endpoint for specific analysis monitoring.
@@ -133,21 +124,15 @@ async def analysis_websocket(
         # Send current analysis state
         if analysis_id in progress_tracker.active_analyses:
             await manager.send_personal_message(
-                {
-                    "type": "analysis_state",
-                    "data": progress_tracker.active_analyses[analysis_id]
-                },
-                websocket
+                {"type": "analysis_state", "data": progress_tracker.active_analyses[analysis_id]},
+                websocket,
             )
 
         while True:
             data = await websocket.receive_json()
 
             if data.get("type") == "ping":
-                await manager.send_personal_message(
-                    {"type": "pong"},
-                    websocket
-                )
+                await manager.send_personal_message({"type": "pong"}, websocket)
 
     except WebSocketDisconnect:
         manager.disconnect(websocket)

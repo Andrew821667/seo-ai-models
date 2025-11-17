@@ -20,27 +20,15 @@ LLM_MODELS = {
     "anthropic": ["claude-3-opus", "claude-3-sonnet", "claude-3-haiku"],
     "gigachat": ["gigachat-pro", "gigachat-plus"],
     "yandexgpt": ["yandexgpt", "yandexgpt-mini"],
-    "local": ["llama-3-70b", "llama-3-8b", "deepseek-coder", "mistral-7b"]
+    "local": ["llama-3-70b", "llama-3-8b", "deepseek-coder", "mistral-7b"],
 }
 
 # Дефолтные модели для разных уровней использования
 DEFAULT_MODELS = {
-    "premium": {
-        "provider": "openai",
-        "model": "gpt-4o"
-    },
-    "standard": {
-        "provider": "openai",
-        "model": "gpt-4o-mini"
-    },
-    "basic": {
-        "provider": "openai",
-        "model": "gpt-3.5-turbo"
-    },
-    "micro": {
-        "provider": "local",
-        "model": "llama-3-8b"
-    }
+    "premium": {"provider": "openai", "model": "gpt-4o"},
+    "standard": {"provider": "openai", "model": "gpt-4o-mini"},
+    "basic": {"provider": "openai", "model": "gpt-3.5-turbo"},
+    "micro": {"provider": "local", "model": "llama-3-8b"},
 }
 
 # Параметры запросов по умолчанию
@@ -67,7 +55,7 @@ DEFAULT_REQUEST_PARAMS = {
         "temperature": 0.1,
         "max_tokens": 1024,
         "top_p": 0.9,
-    }
+    },
 }
 
 # Типы анализа контента для LLM
@@ -76,7 +64,7 @@ ANALYSIS_TYPES = {
     "citability": "Оценка вероятности цитирования",
     "structure": "Анализ структуры и предложения по улучшению",
     "eeat": "Анализ E-E-A-T для LLM-оптимизации",
-    "semantic": "Семантический анализ для LLM"
+    "semantic": "Семантический анализ для LLM",
 }
 
 # Ценность токенов (в рублях) для разных провайдеров и моделей
@@ -84,73 +72,34 @@ TOKEN_COSTS = {
     "openai": {
         "gpt-4o": {
             "input": 0.10,  # стоимость за 1K токенов ввода
-            "output": 0.30  # стоимость за 1K токенов вывода
+            "output": 0.30,  # стоимость за 1K токенов вывода
         },
-        "gpt-4o-mini": {
-            "input": 0.05,
-            "output": 0.15
-        },
-        "gpt-4-turbo": {
-            "input": 0.07,
-            "output": 0.21
-        },
-        "gpt-3.5-turbo": {
-            "input": 0.015,
-            "output": 0.03
-        }
+        "gpt-4o-mini": {"input": 0.05, "output": 0.15},
+        "gpt-4-turbo": {"input": 0.07, "output": 0.21},
+        "gpt-3.5-turbo": {"input": 0.015, "output": 0.03},
     },
     "anthropic": {
-        "claude-3-opus": {
-            "input": 0.15,
-            "output": 0.45
-        },
-        "claude-3-sonnet": {
-            "input": 0.08,
-            "output": 0.24
-        },
-        "claude-3-haiku": {
-            "input": 0.02,
-            "output": 0.06
-        }
+        "claude-3-opus": {"input": 0.15, "output": 0.45},
+        "claude-3-sonnet": {"input": 0.08, "output": 0.24},
+        "claude-3-haiku": {"input": 0.02, "output": 0.06},
     },
     "gigachat": {
-        "gigachat-pro": {
-            "input": 0.05,
-            "output": 0.12
-        },
-        "gigachat-plus": {
-            "input": 0.03,
-            "output": 0.07
-        }
+        "gigachat-pro": {"input": 0.05, "output": 0.12},
+        "gigachat-plus": {"input": 0.03, "output": 0.07},
     },
     "yandexgpt": {
-        "yandexgpt": {
-            "input": 0.04,
-            "output": 0.10
-        },
-        "yandexgpt-mini": {
-            "input": 0.02,
-            "output": 0.05
-        }
+        "yandexgpt": {"input": 0.04, "output": 0.10},
+        "yandexgpt-mini": {"input": 0.02, "output": 0.05},
     },
     "local": {
         "llama-3-70b": {
             "input": 0.01,
-            "output": 0.01  # Локальные модели имеют только стоимость вычислений
+            "output": 0.01,  # Локальные модели имеют только стоимость вычислений
         },
-        "llama-3-8b": {
-            "input": 0.005,
-            "output": 0.005
-        },
-        "deepseek-coder": {
-            "input": 0.005,
-            "output": 0.005
-        },
-        "mistral-7b": {
-            "input": 0.005,
-            "output": 0.005
-        }
-    }
+        "llama-3-8b": {"input": 0.005, "output": 0.005},
+        "deepseek-coder": {"input": 0.005, "output": 0.005},
+        "mistral-7b": {"input": 0.005, "output": 0.005},
+    },
 }
 
 # Дефолтные промпты для разных типов анализа
@@ -171,7 +120,6 @@ DEFAULT_PROMPTS = {
     Текст для анализа:
     {content}
     """,
-    
     "citability": """
     Ты эксперт по оптимизации контента для цитирования в ответах LLM-моделей.
     
@@ -189,7 +137,6 @@ DEFAULT_PROMPTS = {
     Текст для анализа:
     {content}
     """,
-    
     "structure": """
     Ты эксперт по структурированию контента для максимальной эффективности в эру LLM-поисковиков.
     
@@ -207,7 +154,6 @@ DEFAULT_PROMPTS = {
     Текст для анализа:
     {content}
     """,
-    
     "eeat": """
     Ты эксперт по E-E-A-T (Experience, Expertise, Authoritativeness, Trustworthiness) в контексте LLM-оптимизации.
     
@@ -224,7 +170,6 @@ DEFAULT_PROMPTS = {
     Текст для анализа:
     {content}
     """,
-    
     "semantic": """
     Ты эксперт по семантическому анализу в контексте поисковой оптимизации для LLM.
     
@@ -239,5 +184,5 @@ DEFAULT_PROMPTS = {
     
     Текст для анализа:
     {content}
-    """
+    """,
 }

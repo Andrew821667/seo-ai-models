@@ -14,6 +14,7 @@ from ...web.api.database.models import User, UserRole
 
 class Permission(str):
     """Granular permissions - using string constants instead of Enum"""
+
     # Analysis permissions
     RUN_ANALYSIS = "run_analysis"
     VIEW_ANALYSIS = "view_analysis"
@@ -78,6 +79,7 @@ ROLE_PERMISSIONS = {
 # Pydantic Schemas
 class UserBase(BaseModel):
     """Base user schema."""
+
     email: EmailStr
     username: str
     full_name: Optional[str] = None
@@ -85,12 +87,14 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     """User creation schema."""
+
     password: str
     role: UserRole = UserRole.USER
 
 
 class UserUpdate(BaseModel):
     """User update schema."""
+
     email: Optional[EmailStr] = None
     username: Optional[str] = None
     full_name: Optional[str] = None
@@ -100,6 +104,7 @@ class UserUpdate(BaseModel):
 
 class UserInDB(UserBase):
     """User in database schema."""
+
     id: str
     role: UserRole
     is_active: bool
@@ -113,6 +118,7 @@ class UserInDB(UserBase):
 
 class UserResponse(BaseModel):
     """Public user response schema."""
+
     id: str
     email: str
     username: str
@@ -128,6 +134,7 @@ class UserResponse(BaseModel):
 
 class Token(BaseModel):
     """JWT Token response."""
+
     access_token: str
     token_type: str = "bearer"
     expires_in: int
@@ -136,6 +143,7 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     """Token payload data."""
+
     user_id: str
     username: str
     role: UserRole
@@ -144,18 +152,21 @@ class TokenData(BaseModel):
 
 class LoginRequest(BaseModel):
     """Login request schema."""
+
     username: str
     password: str
 
 
 class ChangePasswordRequest(BaseModel):
     """Change password request."""
+
     old_password: str
     new_password: str
 
 
 class ResetPasswordRequest(BaseModel):
     """Reset password request."""
+
     email: EmailStr
 
 

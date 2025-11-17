@@ -8,7 +8,7 @@ import sys
 import os
 
 # Добавляем корневую директорию проекта в путь для импорта
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Импортируем тесты
 from seo_ai_models.tests.test_freemium_components import *

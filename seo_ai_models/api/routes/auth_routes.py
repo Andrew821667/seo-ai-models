@@ -15,14 +15,10 @@ from ..auth.models import (
     ChangePasswordRequest,
     UserRole,
     Permission,
-    get_user_permissions
+    get_user_permissions,
 )
 from ..auth.service import AuthService
-from ..auth.dependencies import (
-    get_current_user,
-    require_permission,
-    require_admin
-)
+from ..auth.dependencies import get_current_user, require_permission, require_admin
 from ..auth.models import User
 from ..infrastructure.database import get_db
 
@@ -31,22 +27,14 @@ router = APIRouter(prefix="/auth", tags=["authentication"])
 
 
 @router.post("/login", response_model=Token)
-async def login(
-    login_request: LoginRequest,
-    request: Request,
-    db: Session = Depends(get_db)
-):
+async def login(login_request: LoginRequest, request: Request, db: Session = Depends(get_db)):
     """
     Login with username and password.
 
     Returns JWT access token.
     """
     # Authenticate user
-    user = AuthService.authenticate_user(
-        db,
-        login_request.username,
-        login_request.password
-    )
+    user = AuthService.authenticate_user(db, login_request.username, login_request.password)
 
     if not user:
         raise HTTPException(
@@ -57,36 +45,25 @@ async def login(
 
     # Create access token
     access_token = AuthService.create_access_token(
-        user_id=user.id,
-        username=user.username,
-        role=user.role
+        user_id=user.id, username=user.username, role=user.role
     )
 
     # Create session
     ip_address = request.client.host if request.client else None
     user_agent = request.headers.get("user-agent")
 
-    AuthService.create_session(
-        db,
-        user,
-        access_token,
-        ip_address=ip_address,
-        user_agent=user_agent
-    )
+    AuthService.create_session(db, user, access_token, ip_address=ip_address, user_agent=user_agent)
 
     return Token(
         access_token=access_token,
         token_type="bearer",
         expires_in=1800,  # 30 minutes
-        user=UserResponse.from_orm(user)
+        user=UserResponse.from_orm(user),
     )
 
 
 @router.post("/logout")
-async def logout(
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
-):
+async def logout(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Logout and revoke current session."""
     # Token is in the current_user dependency, but we need to get it from request
     # This is a simplified version - in production, pass token explicitly
@@ -94,17 +71,13 @@ async def logout(
 
 
 @router.get("/me", response_model=UserResponse)
-async def get_current_user_info(
-    current_user: User = Depends(get_current_user)
-):
+async def get_current_user_info(current_user: User = Depends(get_current_user)):
     """Get current user information."""
     return UserResponse.from_orm(current_user)
 
 
 @router.get("/me/permissions", response_model=List[str])
-async def get_my_permissions(
-    current_user: User = Depends(get_current_user)
-):
+async def get_my_permissions(current_user: User = Depends(get_current_user)):
     """Get current user permissions."""
     permissions = get_user_permissions(current_user.role)
     return [p.value for p in permissions]
@@ -114,14 +87,13 @@ async def get_my_permissions(
 async def change_password(
     password_request: ChangePasswordRequest,
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Change current user password."""
     # Verify old password
     if not AuthService.verify_password(password_request.old_password, current_user.hashed_password):
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Incorrect current password"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect current password"
         )
 
     # Update password
@@ -136,7 +108,7 @@ async def change_password(
 async def create_user(
     user_create: UserCreate,
     current_user: User = Depends(require_permission(Permission.CREATE_USER)),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """
     Create a new user (Admin only).
@@ -147,17 +119,13 @@ async def create_user(
     existing_user = AuthService.get_user_by_username(db, user_create.username)
     if existing_user:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Username already exists"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Username already exists"
         )
 
     # Check if email exists
     existing_email = AuthService.get_user_by_email(db, user_create.email)
     if existing_email:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already exists"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already exists")
 
     # Create user
     user = AuthService.create_user(db, user_create)
@@ -170,7 +138,7 @@ async def list_users(
     current_user: User = Depends(require_permission(Permission.VIEW_USERS)),
     db: Session = Depends(get_db),
     skip: int = 0,
-    limit: int = 100
+    limit: int = 100,
 ):
     """
     List all users (Admin only).
@@ -183,16 +151,13 @@ async def list_users(
 async def get_user(
     user_id: str,
     current_user: User = Depends(require_permission(Permission.VIEW_USERS)),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Get user by ID (Admin only)."""
     user = AuthService.get_user_by_id(db, user_id)
 
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
     return UserResponse.from_orm(user)
 
@@ -202,16 +167,13 @@ async def update_user(
     user_id: str,
     user_update: UserUpdate,
     current_user: User = Depends(require_permission(Permission.UPDATE_USER)),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Update user (Admin only)."""
     user = AuthService.get_user_by_id(db, user_id)
 
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
     # Update fields
     if user_update.email is not None:
@@ -235,22 +197,18 @@ async def update_user(
 async def delete_user(
     user_id: str,
     current_user: User = Depends(require_permission(Permission.DELETE_USER)),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Delete user (Admin only)."""
     if user_id == current_user.id:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Cannot delete yourself"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot delete yourself"
         )
 
     user = AuthService.get_user_by_id(db, user_id)
 
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
     db.delete(user)
     db.commit()
@@ -259,16 +217,12 @@ async def delete_user(
 
 
 @router.get("/roles", response_model=List[str])
-async def list_roles(
-    current_user: User = Depends(get_current_user)
-):
+async def list_roles(current_user: User = Depends(get_current_user)):
     """List all available roles."""
     return [role.value for role in UserRole]
 
 
 @router.get("/permissions", response_model=List[str])
-async def list_permissions(
-    current_user: User = Depends(require_admin)
-):
+async def list_permissions(current_user: User = Depends(require_admin)):
     """List all available permissions (Admin only)."""
     return [permission.value for permission in Permission]

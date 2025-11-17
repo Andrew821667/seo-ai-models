@@ -24,7 +24,9 @@ class InternationalSEO:
         self.cms = cms_connector
         logger.info("InternationalSEO initialized")
 
-    def generate_hreflang_tags(self, page_url: str, language_versions: Dict[str, str]) -> List[Dict]:
+    def generate_hreflang_tags(
+        self, page_url: str, language_versions: Dict[str, str]
+    ) -> List[Dict]:
         """
         Генерирует hreflang теги для мультиязычных версий.
 
@@ -35,21 +37,13 @@ class InternationalSEO:
         hreflang_tags = []
 
         for lang_code, url in language_versions.items():
-            tag = {
-                "rel": "alternate",
-                "hreflang": lang_code,
-                "href": url
-            }
+            tag = {"rel": "alternate", "hreflang": lang_code, "href": url}
             hreflang_tags.append(tag)
 
         # Добавляем x-default для основной версии
         if language_versions:
             default_url = list(language_versions.values())[0]
-            hreflang_tags.append({
-                "rel": "alternate",
-                "hreflang": "x-default",
-                "href": default_url
-            })
+            hreflang_tags.append({"rel": "alternate", "hreflang": "x-default", "href": default_url})
 
         logger.info(f"Generated {len(hreflang_tags)} hreflang tags for {page_url}")
 
@@ -59,12 +53,7 @@ class InternationalSEO:
         """Валидирует существующие hreflang теги."""
         hreflang_tags = page_content.get("hreflang_tags", [])
 
-        validation = {
-            "valid": True,
-            "errors": [],
-            "warnings": [],
-            "tags_count": len(hreflang_tags)
-        }
+        validation = {"valid": True, "errors": [], "warnings": [], "tags_count": len(hreflang_tags)}
 
         if not hreflang_tags:
             validation["warnings"].append("No hreflang tags found")
@@ -103,17 +92,18 @@ class InternationalSEO:
         if not has_x_default:
             validation["warnings"].append("Consider adding x-default hreflang")
 
-        logger.info(f"Hreflang validation: {len(validation['errors'])} errors, {len(validation['warnings'])} warnings")
+        logger.info(
+            f"Hreflang validation: {len(validation['errors'])} errors, {len(validation['warnings'])} warnings"
+        )
 
         return validation
 
-    def localize_content(self, content: str, target_language: str, target_country: str) -> Dict[str, Any]:
+    def localize_content(
+        self, content: str, target_language: str, target_country: str
+    ) -> Dict[str, Any]:
         """Локализует контент для целевого рынка."""
         if not self.llm:
-            return {
-                "success": False,
-                "error": "LLM service not available"
-            }
+            return {"success": False, "error": "LLM service not available"}
 
         prompt = f"""Localize this content for {target_country} ({target_language} language):
 
@@ -137,7 +127,7 @@ Localized version:"""
             "localized_length": len(localized),
             "localized_content": localized,
             "target_language": target_language,
-            "target_country": target_country
+            "target_country": target_country,
         }
 
         logger.info(f"Localized content for {target_country} ({target_language})")
@@ -146,11 +136,7 @@ Localized version:"""
 
     def detect_international_duplicates(self, pages: List[Dict]) -> Dict[str, Any]:
         """Обнаруживает международные дубликаты контента."""
-        duplicates = {
-            "total_pages": len(pages),
-            "duplicate_groups": [],
-            "recommendations": []
-        }
+        duplicates = {"total_pages": len(pages), "duplicate_groups": [], "recommendations": []}
 
         # Группируем страницы по контенту
         content_groups = {}
@@ -169,44 +155,52 @@ Localized version:"""
         for content_hash, group in content_groups.items():
             if len(group) > 1:
                 duplicate_group = {
-                    "pages": [{"url": p["url"], "language": p.get("language", "unknown")} for p in group],
+                    "pages": [
+                        {"url": p["url"], "language": p.get("language", "unknown")} for p in group
+                    ],
                     "count": len(group),
-                    "severity": "high" if len(group) > 3 else "medium"
+                    "severity": "high" if len(group) > 3 else "medium",
                 }
                 duplicates["duplicate_groups"].append(duplicate_group)
 
                 # Рекомендации
-                duplicates["recommendations"].append({
-                    "issue": f"{len(group)} pages with similar content",
-                    "solution": "Add hreflang tags or canonical URLs to specify language/region versions"
-                })
+                duplicates["recommendations"].append(
+                    {
+                        "issue": f"{len(group)} pages with similar content",
+                        "solution": "Add hreflang tags or canonical URLs to specify language/region versions",
+                    }
+                )
 
         logger.info(f"Found {len(duplicates['duplicate_groups'])} duplicate groups")
 
         return duplicates
 
-    def optimize_for_geo_targeting(self, domain: str, target_countries: List[str]) -> Dict[str, Any]:
+    def optimize_for_geo_targeting(
+        self, domain: str, target_countries: List[str]
+    ) -> Dict[str, Any]:
         """Оптимизация геотаргетинга."""
         optimization = {
             "domain": domain,
             "target_countries": target_countries,
             "recommendations": [],
-            "technical_setup": []
+            "technical_setup": [],
         }
 
         # Определяем структуру URL
         domain_type = self._detect_domain_structure(domain)
 
         if domain_type == "single":
-            optimization["recommendations"].append({
-                "type": "domain_structure",
-                "message": "Consider using ccTLDs, subdomains, or subdirectories for international versions",
-                "options": [
-                    "ccTLD: example.de, example.fr (best for SEO, more expensive)",
-                    "Subdomain: de.example.com, fr.example.com (easier management)",
-                    "Subdirectory: example.com/de/, example.com/fr/ (easiest to implement)"
-                ]
-            })
+            optimization["recommendations"].append(
+                {
+                    "type": "domain_structure",
+                    "message": "Consider using ccTLDs, subdomains, or subdirectories for international versions",
+                    "options": [
+                        "ccTLD: example.de, example.fr (best for SEO, more expensive)",
+                        "Subdomain: de.example.com, fr.example.com (easier management)",
+                        "Subdirectory: example.com/de/, example.com/fr/ (easiest to implement)",
+                    ],
+                }
+            )
 
         # Технические настройки
         optimization["technical_setup"] = [
@@ -215,18 +209,17 @@ Localized version:"""
             "Use local hosting or CDN for target regions",
             "Register domain in Google Search Console for each country",
             "Add language meta tags: <meta http-equiv='content-language' content='de'>",
-            f"Create XML sitemaps for each language version"
+            f"Create XML sitemaps for each language version",
         ]
 
         # Country-specific recommendations
         for country in target_countries:
             country_tips = self._get_country_specific_tips(country)
-            optimization["recommendations"].append({
-                "country": country,
-                "tips": country_tips
-            })
+            optimization["recommendations"].append({"country": country, "tips": country_tips})
 
-        logger.info(f"Generated geo-targeting recommendations for {len(target_countries)} countries")
+        logger.info(
+            f"Generated geo-targeting recommendations for {len(target_countries)} countries"
+        )
 
         return optimization
 
@@ -269,7 +262,7 @@ Description: [translated description]"""
             "score": 0,
             "issues": [],
             "passed_checks": [],
-            "recommendations": []
+            "recommendations": [],
         }
 
         checks = [
@@ -277,7 +270,7 @@ Description: [translated description]"""
             self._check_language_meta_tags(domain),
             self._check_url_structure(domain),
             self._check_content_localization(domain),
-            self._check_geo_targeting_settings(domain)
+            self._check_geo_targeting_settings(domain),
         ]
 
         total_checks = len(checks)
@@ -289,11 +282,13 @@ Description: [translated description]"""
             if check["passed"]:
                 audit["passed_checks"].append(check["name"])
             else:
-                audit["issues"].append({
-                    "check": check["name"],
-                    "issue": check["issue"],
-                    "recommendation": check["recommendation"]
-                })
+                audit["issues"].append(
+                    {
+                        "check": check["name"],
+                        "issue": check["issue"],
+                        "recommendation": check["recommendation"],
+                    }
+                )
 
         logger.info(f"International SEO audit: {audit['score']}/100")
 
@@ -307,20 +302,20 @@ Description: [translated description]"""
             return True
 
         # ISO 639-1 (2 letter) или ISO 639-1 + ISO 3166-1 (en-US)
-        pattern = r'^[a-z]{2}(-[A-Z]{2})?$'
+        pattern = r"^[a-z]{2}(-[A-Z]{2})?$"
         return bool(re.match(pattern, lang_code))
 
     def _normalize_content(self, text: str) -> str:
         """Нормализует текст для сравнения."""
         # Удаляем пунктуацию, приводим к lowercase
-        normalized = re.sub(r'[^\w\s]', '', text.lower())
+        normalized = re.sub(r"[^\w\s]", "", text.lower())
         return normalized
 
     def _detect_domain_structure(self, domain: str) -> str:
         """Определяет тип структуры домена."""
-        if '/' in domain:
+        if "/" in domain:
             return "subdirectory"
-        elif domain.count('.') > 1:
+        elif domain.count(".") > 1:
             return "subdomain"
         else:
             return "single"
@@ -331,23 +326,23 @@ Description: [translated description]"""
             "DE": [
                 "Germans prefer detailed product information",
                 "Use formal 'Sie' in B2B contexts",
-                "Include precise technical specifications"
+                "Include precise technical specifications",
             ],
             "FR": [
                 "French users value quality content over quantity",
                 "Use proper French language (avoid anglicisms)",
-                "Include cultural references relevant to France"
+                "Include cultural references relevant to France",
             ],
             "JP": [
                 "Japanese users prefer mobile-first design",
                 "Use polite language forms (keigo)",
-                "Include detailed images and diagrams"
+                "Include detailed images and diagrams",
             ],
             "US": [
                 "Americans prefer concise, action-oriented content",
                 "Use clear CTAs and direct language",
-                "Optimize for voice search"
-            ]
+                "Optimize for voice search",
+            ],
         }
 
         return tips_db.get(country, ["Research local market preferences"])
@@ -356,8 +351,8 @@ Description: [translated description]"""
         """Парсит переведенные meta-теги из ответа LLM."""
         result = {}
 
-        title_match = re.search(r'Title:\s*(.+?)(?:\n|$)', translation)
-        desc_match = re.search(r'Description:\s*(.+?)(?:\n|$)', translation)
+        title_match = re.search(r"Title:\s*(.+?)(?:\n|$)", translation)
+        desc_match = re.search(r"Description:\s*(.+?)(?:\n|$)", translation)
 
         if title_match:
             result["title"] = title_match.group(1).strip()
@@ -374,17 +369,12 @@ Description: [translated description]"""
             "name": "Hreflang Implementation",
             "passed": False,
             "issue": "No hreflang tags detected",
-            "recommendation": "Implement hreflang tags for all language versions"
+            "recommendation": "Implement hreflang tags for all language versions",
         }
 
     def _check_language_meta_tags(self, domain: str) -> Dict:
         """Проверяет language meta теги."""
-        return {
-            "name": "Language Meta Tags",
-            "passed": True,
-            "issue": None,
-            "recommendation": None
-        }
+        return {"name": "Language Meta Tags", "passed": True, "issue": None, "recommendation": None}
 
     def _check_url_structure(self, domain: str) -> Dict:
         """Проверяет URL структуру."""
@@ -392,7 +382,7 @@ Description: [translated description]"""
             "name": "URL Structure",
             "passed": False,
             "issue": "No clear language/region indicators in URLs",
-            "recommendation": "Use subdirectories or subdomains for language versions"
+            "recommendation": "Use subdirectories or subdomains for language versions",
         }
 
     def _check_content_localization(self, domain: str) -> Dict:
@@ -401,7 +391,7 @@ Description: [translated description]"""
             "name": "Content Localization",
             "passed": False,
             "issue": "Content appears to be machine-translated",
-            "recommendation": "Use professional translators for quality localization"
+            "recommendation": "Use professional translators for quality localization",
         }
 
     def _check_geo_targeting_settings(self, domain: str) -> Dict:
@@ -410,5 +400,5 @@ Description: [translated description]"""
             "name": "Geo-Targeting Settings",
             "passed": True,
             "issue": None,
-            "recommendation": None
+            "recommendation": None,
         }

@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 @router.get("/stats", response_model=Dict[str, Any])
 async def get_cache_stats(
     cache: CacheService = Depends(get_cache_service_dependency),
-    user_id: str = Depends(get_current_user_id)
+    user_id: str = Depends(get_current_user_id),
 ):
     """
     Get cache statistics.
@@ -44,7 +44,7 @@ async def get_cache_stats(
 @router.delete("/clear")
 async def clear_cache(
     cache: CacheService = Depends(get_cache_service_dependency),
-    user_id: str = Depends(get_current_user_id)
+    user_id: str = Depends(get_current_user_id),
 ):
     """
     Clear all cache.
@@ -56,29 +56,24 @@ async def clear_cache(
 
     if not cache.enabled:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Cache service is not available"
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Cache service is not available"
         )
 
     success = cache.clear_all()
 
     if not success:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to clear cache"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to clear cache"
         )
 
-    return {
-        "success": True,
-        "message": "All cache cleared successfully"
-    }
+    return {"success": True, "message": "All cache cleared successfully"}
 
 
 @router.delete("/invalidate/{pattern}")
 async def invalidate_cache_pattern(
     pattern: str,
     cache: CacheService = Depends(get_cache_service_dependency),
-    user_id: str = Depends(get_current_user_id)
+    user_id: str = Depends(get_current_user_id),
 ):
     """
     Invalidate cache entries matching pattern.
@@ -93,8 +88,7 @@ async def invalidate_cache_pattern(
 
     if not cache.enabled:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Cache service is not available"
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Cache service is not available"
         )
 
     deleted = cache.delete_pattern(pattern)
@@ -103,14 +97,12 @@ async def invalidate_cache_pattern(
         "success": True,
         "pattern": pattern,
         "keys_deleted": deleted,
-        "message": f"Invalidated {deleted} cache entries"
+        "message": f"Invalidated {deleted} cache entries",
     }
 
 
 @router.get("/health")
-async def cache_health(
-    cache: CacheService = Depends(get_cache_service_dependency)
-):
+async def cache_health(cache: CacheService = Depends(get_cache_service_dependency)):
     """
     Check cache service health.
 
@@ -119,5 +111,5 @@ async def cache_health(
     return {
         "status": "healthy" if cache.enabled else "degraded",
         "enabled": cache.enabled,
-        "service": "redis"
+        "service": "redis",
     }

@@ -1,4 +1,3 @@
-
 """
 Модели данных для проектов и задач.
 """
@@ -11,6 +10,7 @@ from datetime import datetime
 
 class ProjectStatus(str, Enum):
     """Статусы проекта."""
+
     DRAFT = "draft"
     ACTIVE = "active"
     ON_HOLD = "on_hold"
@@ -20,6 +20,7 @@ class ProjectStatus(str, Enum):
 
 class TaskPriority(str, Enum):
     """Приоритеты задач."""
+
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
@@ -28,6 +29,7 @@ class TaskPriority(str, Enum):
 
 class TaskStatus(str, Enum):
     """Статусы задач."""
+
     PENDING = "pending"
     IN_PROGRESS = "in_progress"
     REVIEW = "review"
@@ -37,6 +39,7 @@ class TaskStatus(str, Enum):
 
 class ProjectCreate(BaseModel):
     """Модель для создания проекта."""
+
     name: str = Field(..., min_length=3, max_length=100)
     description: Optional[str] = None
     website: Optional[HttpUrl] = None
@@ -46,6 +49,7 @@ class ProjectCreate(BaseModel):
 
 class ProjectResponse(BaseModel):
     """Модель ответа с данными проекта."""
+
     id: str
     name: str
     description: Optional[str] = None
@@ -60,6 +64,7 @@ class ProjectResponse(BaseModel):
 
 class ProjectUpdate(BaseModel):
     """Модель для обновления проекта."""
+
     name: Optional[str] = Field(None, min_length=3, max_length=100)
     description: Optional[str] = None
     website: Optional[HttpUrl] = None
@@ -69,6 +74,7 @@ class ProjectUpdate(BaseModel):
 
 class TaskCreate(BaseModel):
     """Модель для создания задачи."""
+
     title: str = Field(..., min_length=3, max_length=200)
     description: Optional[str] = None
     status: TaskStatus = TaskStatus.PENDING
@@ -80,6 +86,7 @@ class TaskCreate(BaseModel):
 
 class TaskResponse(BaseModel):
     """Модель ответа с данными задачи."""
+
     id: str
     title: str
     project_id: str
@@ -95,6 +102,7 @@ class TaskResponse(BaseModel):
 
 class TaskUpdate(BaseModel):
     """Модель для обновления задачи."""
+
     title: Optional[str] = Field(None, min_length=3, max_length=200)
     description: Optional[str] = None
     status: Optional[TaskStatus] = None

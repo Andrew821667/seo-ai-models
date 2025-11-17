@@ -65,12 +65,7 @@ class WebhookServiceCached(WebhookServiceDB):
         return result
 
     def create_webhook(
-        self,
-        project_id: str,
-        url: str,
-        events: List[str],
-        user_id: str,
-        **kwargs
+        self, project_id: str, url: str, events: List[str], user_id: str, **kwargs
     ) -> Dict[str, Any]:
         """Create webhook and invalidate cache."""
         result = super().create_webhook(project_id, url, events, user_id, **kwargs)

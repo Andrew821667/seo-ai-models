@@ -9,12 +9,18 @@ import asyncio
 from typing import Dict, List, Optional, Union, Any
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup, Tag, NavigableString
-from playwright.async_api import async_playwright, Page, Browser, TimeoutError as PlaywrightTimeoutError
+from playwright.async_api import (
+    async_playwright,
+    Page,
+    Browser,
+    TimeoutError as PlaywrightTimeoutError,
+)
 
 from seo_ai_models.parsers.extractors.content_extractor import ContentExtractor
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
+
 
 class SPAContentExtractor(ContentExtractor):
     """
@@ -32,7 +38,7 @@ class SPAContentExtractor(ContentExtractor):
         wait_for_timeout: int = 5000,  # мс максимального ожидания загрузки
         wait_for_selectors: List[str] = None,  # CSS-селекторы для ожидания
         headless: bool = True,
-        browser_type: str = "chromium"
+        browser_type: str = "chromium",
     ):
         """
         Инициализация SPAContentExtractor.
@@ -53,7 +59,11 @@ class SPAContentExtractor(ContentExtractor):
         self.wait_for_idle = wait_for_idle
         self.wait_for_timeout = wait_for_timeout
         self.wait_for_selectors = wait_for_selectors or [
-            'main', 'article', '#content', '.content', 'body'
+            "main",
+            "article",
+            "#content",
+            ".content",
+            "body",
         ]
         self.headless = headless
         self.browser_type = browser_type
@@ -65,6 +75,7 @@ class SPAContentExtractor(ContentExtractor):
         Returns:
             Контекстный менеджер для браузера Playwright
         """
+
         class BrowserContextManager:
             def __init__(self, extractor):
                 self.extractor = extractor
@@ -73,7 +84,7 @@ class SPAContentExtractor(ContentExtractor):
 
             async def __aenter__(self):
                 self.playwright = await async_playwright().start()
-                
+
                 # Выбор браузера в зависимости от настройки
                 if self.extractor.browser_type == "firefox":
                     browser_instance = self.playwright.firefox
@@ -81,7 +92,7 @@ class SPAContentExtractor(ContentExtractor):
                     browser_instance = self.playwright.webkit
                 else:
                     browser_instance = self.playwright.chromium  # По умолчанию
-                
+
                 self.browser = await browser_instance.launch(headless=self.extractor.headless)
                 return self.browser
 
@@ -90,7 +101,7 @@ class SPAContentExtractor(ContentExtractor):
                     await self.browser.close()
                 if self.playwright:
                     await self.playwright.__aexit__(exc_type, exc_val, exc_tb)
-                
+
         return BrowserContextManager(self)
 
     async def _render_page(self, url: str) -> Optional[str]:
@@ -117,12 +128,12 @@ class SPAContentExtractor(ContentExtractor):
             browser = await browser_instance.launch(headless=self.headless)
 
             try:
-                context = await browser.new_context(viewport={'width': 1366, 'height': 768})
+                context = await browser.new_context(viewport={"width": 1366, "height": 768})
                 page = await context.new_page()
 
                 try:
                     # Переход на страницу и ожидание загрузки
-                    await page.goto(url, wait_until='networkidle', timeout=self.wait_for_timeout)
+                    await page.goto(url, wait_until="networkidle", timeout=self.wait_for_timeout)
 
                     # Дополнительная задержка для полной загрузки динамического контента
                     await page.wait_for_timeout(self.wait_for_idle)
@@ -139,7 +150,8 @@ class SPAContentExtractor(ContentExtractor):
                     html_content = await page.content()
 
                     # Выполнение дополнительных скриптов для раскрытия скрытого контента
-                    await page.evaluate("""() => {
+                    await page.evaluate(
+                        """() => {
                         // Нажать на все кнопки "Показать больше" или похожие
                         const showMoreButtons = Array.from(document.querySelectorAll('button, a')).filter(
                             el => el.innerText && (
@@ -157,7 +169,8 @@ class SPAContentExtractor(ContentExtractor):
                             el.setAttribute('aria-expanded', 'true');
                             el.click();
                         });
-                    }""")
+                    }"""
+                    )
 
                     # Ожидание дополнительного контента после раскрытия
                     await page.wait_for_timeout(1000)
@@ -190,19 +203,13 @@ class SPAContentExtractor(ContentExtractor):
         try:
             html_content = await self._render_page(url)
             if not html_content:
-                return {
-                    "url": url,
-                    "error": "Failed to render page content"
-                }
+                return {"url": url, "error": "Failed to render page content"}
 
             return self.extract_content(html_content, url)
 
         except Exception as e:
             logger.error(f"Ошибка при извлечении контента из {url}: {str(e)}")
-            return {
-                "url": url,
-                "error": str(e)
-            }
+            return {"url": url, "error": str(e)}
 
     def extract_content_from_url(self, url: str) -> Dict[str, Any]:
         """

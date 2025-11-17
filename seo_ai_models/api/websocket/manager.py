@@ -43,15 +43,14 @@ class ConnectionManager:
         self.connection_metadata[websocket] = {
             "user_id": user_id,
             "room": room,
-            "connected_at": datetime.utcnow().isoformat()
+            "connected_at": datetime.utcnow().isoformat(),
         }
 
         logger.info(f"WebSocket connected: user={user_id}, room={room}")
 
         # Send welcome message
         await self.send_personal_message(
-            {"type": "connection", "status": "connected", "room": room},
-            websocket
+            {"type": "connection", "status": "connected", "room": room}, websocket
         )
 
     def disconnect(self, websocket: WebSocket):
@@ -136,10 +135,7 @@ class ConnectionManager:
             "total_connections": sum(len(conns) for conns in self.active_connections.values()),
             "unique_users": len(self.active_connections),
             "rooms": len(self.rooms),
-            "rooms_detail": {
-                room: len(connections)
-                for room, connections in self.rooms.items()
-            }
+            "rooms_detail": {room: len(connections) for room, connections in self.rooms.items()},
         }
 
 
@@ -164,17 +160,13 @@ class AnalysisProgressTracker:
             "progress": 0,
             "current_step": "Initializing",
             "started_at": datetime.utcnow().isoformat(),
-            "steps": []
+            "steps": [],
         }
 
         await self.broadcast_update(analysis_id)
 
     async def update_progress(
-        self,
-        analysis_id: str,
-        progress: int,
-        current_step: str,
-        details: dict = None
+        self, analysis_id: str, progress: int, current_step: str, details: dict = None
     ):
         """Update analysis progress."""
         if analysis_id not in self.active_analyses:
@@ -185,12 +177,14 @@ class AnalysisProgressTracker:
         analysis["current_step"] = current_step
 
         # Add step to history
-        analysis["steps"].append({
-            "step": current_step,
-            "progress": progress,
-            "timestamp": datetime.utcnow().isoformat(),
-            "details": details or {}
-        })
+        analysis["steps"].append(
+            {
+                "step": current_step,
+                "progress": progress,
+                "timestamp": datetime.utcnow().isoformat(),
+                "details": details or {},
+            }
+        )
 
         await self.broadcast_update(analysis_id)
 
@@ -233,10 +227,7 @@ class AnalysisProgressTracker:
         analysis = self.active_analyses[analysis_id]
         user_id = analysis["user_id"]
 
-        message = {
-            "type": "analysis_update",
-            "data": analysis
-        }
+        message = {"type": "analysis_update", "data": analysis}
 
         # Send to user
         await self.manager.send_to_user(message, user_id)

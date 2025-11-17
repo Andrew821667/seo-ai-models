@@ -34,7 +34,7 @@ class CompetitorMonitor:
             "keywords": keywords,
             "added_date": datetime.now().isoformat(),
             "last_checked": None,
-            "baseline_data": None
+            "baseline_data": None,
         }
 
         self.competitors_data[domain] = competitor
@@ -45,24 +45,14 @@ class CompetitorMonitor:
         competitor["baseline_data"] = baseline
         competitor["last_checked"] = datetime.now().isoformat()
 
-        return {
-            "success": True,
-            "competitor": competitor
-        }
+        return {"success": True, "competitor": competitor}
 
     def monitor_rankings(self, keywords: List[str]) -> Dict[str, Any]:
         """Отслеживает позиции конкурентов по ключевым словам."""
-        rankings = {
-            "timestamp": datetime.now().isoformat(),
-            "keywords": {},
-            "changes_detected": []
-        }
+        rankings = {"timestamp": datetime.now().isoformat(), "keywords": {}, "changes_detected": []}
 
         for keyword in keywords:
-            keyword_data = {
-                "keyword": keyword,
-                "competitors_positions": {}
-            }
+            keyword_data = {"keyword": keyword, "competitors_positions": {}}
 
             for domain, competitor in self.competitors_data.items():
                 if keyword in competitor["keywords"]:
@@ -74,21 +64,27 @@ class CompetitorMonitor:
                     keyword_data["competitors_positions"][domain] = {
                         "current": current_position,
                         "previous": previous_position,
-                        "change": previous_position - current_position if previous_position else 0
+                        "change": previous_position - current_position if previous_position else 0,
                     }
 
                     # Детект изменений
                     if previous_position and abs(current_position - previous_position) >= 3:
-                        rankings["changes_detected"].append({
-                            "competitor": competitor["name"],
-                            "keyword": keyword,
-                            "movement": "up" if current_position < previous_position else "down",
-                            "positions": abs(current_position - previous_position)
-                        })
+                        rankings["changes_detected"].append(
+                            {
+                                "competitor": competitor["name"],
+                                "keyword": keyword,
+                                "movement": (
+                                    "up" if current_position < previous_position else "down"
+                                ),
+                                "positions": abs(current_position - previous_position),
+                            }
+                        )
 
             rankings["keywords"][keyword] = keyword_data
 
-        logger.info(f"Monitored rankings for {len(keywords)} keywords. Changes: {len(rankings['changes_detected'])}")
+        logger.info(
+            f"Monitored rankings for {len(keywords)} keywords. Changes: {len(rankings['changes_detected'])}"
+        )
 
         return rankings
 
@@ -111,7 +107,7 @@ class CompetitorMonitor:
             "has_schema": bool(content.get("schema_markup")),
             "meta_quality": self._assess_meta_quality(content),
             "content_structure": self._analyze_structure(content),
-            "key_topics": self._extract_topics(content.get("text", ""))
+            "key_topics": self._extract_topics(content.get("text", "")),
         }
 
         # LLM-анализ для более глубоких инсайтов
@@ -125,12 +121,7 @@ class CompetitorMonitor:
 
     def gap_analysis(self, our_domain: str, competitor_domain: str) -> Dict[str, Any]:
         """Gap-анализ: что есть у конкурента, чего нет у нас."""
-        gaps = {
-            "content_gaps": [],
-            "keyword_gaps": [],
-            "feature_gaps": [],
-            "opportunities": []
-        }
+        gaps = {"content_gaps": [], "keyword_gaps": [], "feature_gaps": [], "opportunities": []}
 
         # Сравниваем контент
         our_pages = self._get_domain_pages(our_domain)
@@ -169,7 +160,7 @@ class CompetitorMonitor:
             "total_backlinks": 0,
             "new_backlinks": [],
             "lost_backlinks": [],
-            "top_referring_domains": []
+            "top_referring_domains": [],
         }
 
         # Заглушка - в продакшене использовать API вроде Ahrefs/Majestic
@@ -183,7 +174,7 @@ class CompetitorMonitor:
             "generated_at": datetime.now().isoformat(),
             "competitors_monitored": len(self.competitors_data),
             "alerts": [],
-            "summary": {}
+            "summary": {},
         }
 
         for domain, competitor in self.competitors_data.items():
@@ -207,7 +198,7 @@ class CompetitorMonitor:
         report["summary"] = {
             "total_alerts": len(report["alerts"]),
             "ranking_changes": len([a for a in report["alerts"] if a["type"] == "ranking"]),
-            "new_content": len([a for a in report["alerts"] if a["type"] == "content"])
+            "new_content": len([a for a in report["alerts"] if a["type"] == "content"]),
         }
 
         logger.info(f"Alert report generated: {report['summary']['total_alerts']} alerts")
@@ -222,7 +213,7 @@ class CompetitorMonitor:
             "domain": domain,
             "keywords_positions": {},
             "content_snapshot": {},
-            "collected_at": datetime.now().isoformat()
+            "collected_at": datetime.now().isoformat(),
         }
 
         for keyword in keywords:
@@ -236,6 +227,7 @@ class CompetitorMonitor:
         # Заглушка - в реальности парсить Google/Yandex
         # Или использовать API вроде SerpAPI
         import random
+
         return random.randint(1, 100)
 
     def _get_previous_position(self, domain: str, keyword: str) -> int:
@@ -254,7 +246,7 @@ class CompetitorMonitor:
             "title_optimal": 30 <= len(title) <= 60,
             "description_length": len(description),
             "description_optimal": 120 <= len(description) <= 160,
-            "has_keywords": bool(content.get("target_keywords"))
+            "has_keywords": bool(content.get("target_keywords")),
         }
 
     def _analyze_structure(self, content: Dict) -> Dict:
@@ -265,14 +257,15 @@ class CompetitorMonitor:
             "has_h1": any(h.get("level") == 1 for h in headings),
             "h2_count": sum(1 for h in headings if h.get("level") == 2),
             "h3_count": sum(1 for h in headings if h.get("level") == 3),
-            "well_structured": len(headings) >= 3
+            "well_structured": len(headings) >= 3,
         }
 
     def _extract_topics(self, text: str) -> List[str]:
         """Извлекает ключевые топики из текста."""
         # Упрощенная версия - в реальности использовать NLP
-        words = re.findall(r'\b[a-zA-Zа-яА-Я]{5,}\b', text.lower())
+        words = re.findall(r"\b[a-zA-Zа-яА-Я]{5,}\b", text.lower())
         from collections import Counter
+
         common = Counter(words).most_common(10)
         return [word for word, _ in common]
 
