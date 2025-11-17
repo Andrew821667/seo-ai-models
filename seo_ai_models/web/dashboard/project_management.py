@@ -427,7 +427,7 @@ class ProjectManagement:
         """
         project = self.get_project(project_id)
         if not project:
-            return analysis
+            return None
         
         # Генерируем уникальный ID для анализа
         import uuid

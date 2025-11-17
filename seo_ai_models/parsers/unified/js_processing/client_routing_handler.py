@@ -10,6 +10,7 @@ import logging
 import time
 from datetime import datetime
 from typing import Dict, List, Set, Optional, Any
+from urllib.parse import urlparse
 
 class ClientRoutingHandler:
     """
