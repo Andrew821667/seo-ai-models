@@ -232,7 +232,7 @@ class CitabilityScorer:
             # Извлекаем оценки факторов
             factors = self.citability_factors.get(category, self.citability_factors["general"])
             for factor in factors:
-                factor_pattern = f"{factor}.*?(\d+)[^а-я0-9]*"
+                factor_pattern = f"{factor}.*?(\\d+)[^а-я0-9]*"
                 factor_match = re.search(factor_pattern, text, re.IGNORECASE)
                 if factor_match:
                     citability_data["scores"]["factors"][factor] = int(factor_match.group(1))
@@ -264,7 +264,7 @@ class CitabilityScorer:
             # Если были указаны запросы, пытаемся извлечь анализ для них
             if queries:
                 for query in queries:
-                    query_pattern = f"{re.escape(query)}.*?(\d+)[^а-я0-9]*"
+                    query_pattern = f"{re.escape(query)}.*?(\\d+)[^а-я0-9]*"
                     query_match = re.search(query_pattern, text, re.IGNORECASE)
                     if query_match:
                         citability_score = int(query_match.group(1))

@@ -307,7 +307,7 @@ class LLMEEATAnalyzer:
             ]
 
             for component in components:
-                component_pattern = f"{component}.*?(\d+)[^а-я0-9]*"
+                component_pattern = f"{component}.*?(\\d+)[^а-я0-9]*"
                 component_match = re.search(component_pattern, text, re.IGNORECASE)
                 if component_match:
                     eeat_data["scores"][component] = int(component_match.group(1))

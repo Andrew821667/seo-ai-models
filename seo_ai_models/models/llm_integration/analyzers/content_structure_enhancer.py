@@ -281,7 +281,7 @@ class ContentStructureEnhancer:
 
             # Пытаемся извлечь оценки из текста
             for element in ["headings", "paragraphs", "lists", "tables", "highlights", "overall"]:
-                pattern = f"{element}.*?(\d+)[^а-я0-9]*"
+                pattern = f"{element}.*?(\\d+)[^а-я0-9]*"
                 match = re.search(pattern, text, re.IGNORECASE)
                 if match:
                     structure_data["scores"][element] = int(match.group(1))

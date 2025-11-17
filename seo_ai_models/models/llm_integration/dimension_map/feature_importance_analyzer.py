@@ -375,7 +375,7 @@ class FeatureImportanceAnalyzer:
 
             # Извлекаем оценки важности факторов
             for factor in factors:
-                pattern = f"{re.escape(factor)}.*?(\d+)[^а-я0-9]*"
+                pattern = f"{re.escape(factor)}.*?(\\d+)[^а-я0-9]*"
                 match = re.search(pattern, text, re.IGNORECASE)
                 if match:
                     importance_data["factor_importance"][factor] = int(match.group(1))
@@ -502,7 +502,7 @@ class FeatureImportanceAnalyzer:
 
             # Извлекаем оценки факторов
             for factor in factors:
-                pattern = f"{re.escape(factor)}.*?(\d+)[^а-я0-9]*"
+                pattern = f"{re.escape(factor)}.*?(\\d+)[^а-я0-9]*"
                 match = re.search(pattern, text, re.IGNORECASE)
                 if match:
                     analysis_data["factor_scores"][factor] = int(match.group(1))
