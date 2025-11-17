@@ -189,7 +189,9 @@ pip install requests beautifulsoup4 lxml
 
 ## Установка
 
-### Минимальная установка (только базовый функционал)
+### Базовая установка (основной функционал)
+
+Включает numpy, scikit-learn, tiktoken для работы SEOAdvisor:
 
 ```bash
 pip install seo-ai-models
@@ -197,7 +199,7 @@ pip install seo-ai-models
 
 ### Установка с дополнительными возможностями
 
-Для работы с машинным обучением и NLP:
+Для расширенного NLP анализа (spacy, nltk, gensim):
 ```bash
 pip install seo-ai-models[ml]
 ```
