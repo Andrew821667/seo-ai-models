@@ -189,8 +189,45 @@ pip install requests beautifulsoup4 lxml
 
 ## Установка
 
+### Минимальная установка (только базовый функционал)
+
 ```bash
-pip install -r requirements.txt
+pip install seo-ai-models
+```
+
+### Установка с дополнительными возможностями
+
+Для работы с машинным обучением и NLP:
+```bash
+pip install seo-ai-models[ml]
+```
+
+Для парсинга SPA-сайтов и работы с поисковыми API:
+```bash
+pip install seo-ai-models[parsing]
+```
+
+Для веб-интерфейса и API:
+```bash
+pip install seo-ai-models[web]
+```
+
+Для разработки (включает инструменты тестирования и линтинга):
+```bash
+pip install seo-ai-models[dev]
+```
+
+Полная установка со всеми зависимостями:
+```bash
+pip install seo-ai-models[all]
+```
+
+### Установка из исходников
+
+```bash
+git clone https://github.com/Andrew821667/seo-ai-models.git
+cd seo-ai-models
+pip install -e ".[all]"
 ```
 
 ## Примеры использования
