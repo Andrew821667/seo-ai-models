@@ -4,8 +4,7 @@ name: SEO Analysis for legalaipro.ru
 # И возможность запуска вручную
 on:
   schedule:
-    - cron: '0 9 * * 1'  # Каждый понедельник в 9:00 UTC
-  workflow_dispatch:  # Ручной запуск через GitHub UI
+    - cron: '0 0 * * 0'  # Каждое воскресенье в 00:00 UTC (03:00 MSK)  workflow_dispatch:  # Ручной запуск через GitHub UI
     inputs:
       url:
         description: 'URL для анализа'
@@ -70,3 +69,38 @@ jobs:
           else
             echo "❌ SEO Analysis failed or no results generated"
           fi
+
+                - name: Generate SEO recommendations
+        run: |
+          if [ -f analysis_result.json ]; then
+            echo "Generating recommendations in Russian..."
+            python -m seo_ai_models.generate_recommendations --input analysis_result.json --output recommendations.txt --lang ru
+          fi
+        continue-on-error: true
+      
+      - name: Send email report
+        uses: dawidd6/action-send-mail@v3
+        if: always()
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: 'Отчет SEO анализа для legalaipro.ru - ${{ github.run_number }}'
+          to: ${{ secrets.EMAIL_TO }}
+          from: SEO Analysis Bot
+          body: |
+            Здравствуйте!
+            
+            Завершен SEO анализ сайта legalaipro.ru
+            
+            Статус: ${{ job.status }}
+            Дата запуска: ${{ github.event.head_commit.timestamp }}
+            
+            Результаты анализа доступны в артефактах по ссылке:
+            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            
+            С уважением,
+            SEO Analysis Bot
+          attachments: analysis_result.json,recommendations.txt
+          ignore_missing_attachments: true
