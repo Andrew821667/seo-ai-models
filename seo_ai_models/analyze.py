@@ -49,3 +49,6 @@ def analyze_url_full(url):
                         # Парсим URL
         print(f"f📄 Парсинг страницы {url}...")
         parsed_data = parser.parse_url(url)
+            except Exception as e:
+        print(f"❌ Ошибка при анализе: {e}")
+        return None
