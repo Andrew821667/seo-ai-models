@@ -43,9 +43,9 @@ def analyze_url_full(url):
     
     try:
         # Инициализируем парсер с правильными параметрами
-        print("⚙️  Инициализация UnifiedParser...
+        print("⚙️  Инициализация UnifiedParser...")
                 parser = UnifiedParser()
 
                         # Парсим URL
-        print(f"📄 Парсинг страницы {url}...")
+        print(f"f📄 Парсинг страницы {url}...")
         parsed_data = parser.parse_url(url)
