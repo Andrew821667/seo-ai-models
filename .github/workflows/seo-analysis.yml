@@ -1,0 +1,72 @@
+name: SEO Analysis for legalaipro.ru
+
+# Запуск еженедельно по понедельникам в 9:00 UTC (12:00 MSK)
+# И возможность запуска вручную
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Каждый понедельник в 9:00 UTC
+  workflow_dispatch:  # Ручной запуск через GitHub UI
+    inputs:
+      url:
+        description: 'URL для анализа'
+        required: false
+        default: 'https://legalaipro.ru'
+
+jobs:
+  seo-analysis:
+    name: Run SEO Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install -e ".[dev]"
+          pip install -r requirements.txt || true
+        timeout-minutes: 45
+      
+      - name: Install Playwright browsers
+        run: |
+          pip install playwright
+          python -m playwright install chromium
+        timeout-minutes: 10
+      
+      - name: Run SEO Analysis
+        run: |
+          TARGET_URL="${{ github.event.inputs.url || 'https://legalaipro.ru' }}"
+          echo "Analyzing: $TARGET_URL"
+          python -m seo_ai_models.demo_parsing pipeline --mode site --url "$TARGET_URL" --max-pages 50 --output analysis_result.json
+        timeout-minutes: 30
+      
+      - name: Upload analysis results
+        uses: actions/upload-artifact@v4
+        with:
+          name: seo-analysis-results-${{ github.run_number }}
+          path: analysis_result.json
+          retention-days: 30
+      
+      - name: Comment results summary
+        if: always()
+        run: |
+          if [ -f analysis_result.json ]; then
+            echo "✅ SEO Analysis completed successfully"
+            echo "Results saved as artifact: seo-analysis-results-${{ github.run_number }}"
+          else
+            echo "❌ SEO Analysis failed or no results generated"
+          fi
