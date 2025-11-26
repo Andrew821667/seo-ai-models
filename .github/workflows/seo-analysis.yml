@@ -6,11 +6,11 @@ on:
   schedule:
     - cron: '0 0 * * 0'  # Каждое воскресенье в 00:00 UTC (03:00 MSK)
   workflow_dispatch:  # Ручной запуск через GitHub UI
-    inputs:
-      url:
-        description: 'URL для анализа'
-        required: false
-        default: 'https://legalaipro.ru'
+     inputs:
+       url:
+         description: 'URL для анализа'
+         required: false
+         default: 'https://legalaipro.ru'
 jobs:
   seo-analysis:
     name: Run SEO Analysis
@@ -88,18 +88,23 @@ jobs:
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: 'Отчет SEO анализа для legalaipro.ru - ${{ github.run_number }}'
       to: ${{ secrets.EMAIL_USERNAME }}
-      from: SEO Analysis Bot          body: |
-            Здравствуйте!
+            from: SEO Analysis Bot
+                        body: |
+              Здравствуйте!
+
+              Завершен SEO анализ сайта legalaipro.ru
+
+              Статус: ${{ job.status }}
+              Дата запуска: ${{ github.event.head_commit.timestamp }}
+
+              Результаты анализа доступны в артефактах по ссылке:
+              https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+              С уважением,
+              SEO Analysis BotЗдравствуйте!
             
-            Завершен SEO анализ сайта legalaipro.ru
             
-            Статус: ${{ job.status }}
-            Дата запуска: ${{ github.event.head_commit.timestamp }}
             
-            Результаты анализа доступны в артефактах по ссылке:
-            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-            
-            С уважением,
             SEO Analysis Bot
           attachments: analysis_result.json,recommendations.txt
           ignore_missing_attachments: true
