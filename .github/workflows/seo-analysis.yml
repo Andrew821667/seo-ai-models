@@ -6,11 +6,11 @@ on:
   schedule:
     - cron: '0 0 * * 0'  # Каждое воскресенье в 00:00 UTC (03:00 MSK)
   workflow_dispatch:  # Ручной запуск через GitHub UI
-    inputs:      url:
+    inputs:
+      url:
         description: 'URL для анализа'
         required: false
         default: 'https://legalaipro.ru'
-
 jobs:
   seo-analysis:
     name: Run SEO Analysis
