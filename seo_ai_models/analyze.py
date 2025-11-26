@@ -53,7 +53,7 @@ def analyze_url_full(url):
         
         # Парсим URL
         print(f"📄 Парсинг страницы {url}...")
-        parsed_data = parser.analyze_url_sync(url)
+        parsed_data = parser.parse(url)
         
         if not parsed_data.get("success"):
             error_msg = parsed_data.get('error', 'Неизвестная ошибка')
