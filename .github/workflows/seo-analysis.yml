@@ -6,24 +6,25 @@ on:
   schedule:
     - cron: '0 0 * * 0'  # Каждое воскресенье в 00:00 UTC (03:00 MSK)
   workflow_dispatch:  # Ручной запуск через GitHub UI
-     inputs:
-       url:
-         description: 'URL для анализа'
-         required: false
-         default: 'https://legalaipro.ru'
+    inputs:
+      url:
+        description: 'URL для анализа'
+        required: false
+        default: 'https://legalaipro.ru'
+
 jobs:
   seo-analysis:
     name: Run SEO Analysis
     runs-on: ubuntu-latest
-        steps:
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-      
+
       - name: Cache pip packages
         uses: actions/cache@v4
         with:
@@ -31,34 +32,35 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
-      
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
           pip install -e ".[dev]"
           pip install -r requirements.txt || true
         timeout-minutes: 45
-      
+
       - name: Install Playwright browsers
         run: |
           pip install playwright
           python -m playwright install chromium
         timeout-minutes: 10
-      
+
       - name: Run SEO Analysis
         run: |
-          TARGET_URL="${{ github.event.inputs.url || 'https://legalaipro.ru' }}"
-          echo "Analyzing: $TARGET_URL"
-          python -m seo_ai_models.demo_parsing pipeline --mode site --url "$TARGET_URL" --max-pages 50 --output analysis_result.json
+          python -m seo_ai_models.analyze --url ${{ inputs.url || 'https://legalaipro.ru' }}
         timeout-minutes: 30
-      
+
       - name: Upload analysis results
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: seo-analysis-results-${{ github.run_number }}
-          path: analysis_result.json
+          path: |
+            analysis_result.json
+            recommendations_ru.md
           retention-days: 30
-      
+
       - name: Comment results summary
         if: always()
         run: |
@@ -69,14 +71,22 @@ jobs:
             echo "❌ SEO Analysis failed or no results generated"
           fi
 
-                - name: Generate SEO recommendations
+      - name: Generate SEO recommendations
         run: |
           if [ -f analysis_result.json ]; then
             echo "Generating recommendations in Russian..."
-            python -m seo_ai_models.generate_recommendations --input analysis_result.json --output recommendations.txt --lang ru
+            python -m seo_ai_models.generate_recommendations --input analysis_result.json --output recommendations_ru.md
           fi
+
+      - name: Upload recommendations
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: recommendations-${{ github.run_number }}
+          path: recommendations_ru.md
+          retention-days: 30
         continue-on-error: true
-      
+
       - name: Send email report
         uses: dawidd6/action-send-mail@v3
         if: always()
@@ -85,25 +95,19 @@ jobs:
           server_port: 587
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: 'Отчет SEO анализа для legalaipro.ru - ${{ github.run_number }}'
-      to: ${{ secrets.EMAIL_USERNAME }}
-            from: SEO Analysis Bot
-                        body: |
-              Здравствуйте!
+          subject: 'Отчет SEO анализа для legalaipro.ru – ${{ github.run_number }}'
+          to: ${{ secrets.EMAIL_USERNAME }}
+          from: SEO Analysis Bot
+          body: |
+            Здравствуйте!
 
-              Завершен SEO анализ сайта legalaipro.ru
+            Завершен SEO анализ сайта legalaipro.ru
 
-              Статус: ${{ job.status }}
-              Дата запуска: ${{ github.event.head_commit.timestamp }}
+            Статус: ${{ job.status }}
+            Дата запуска: ${{ github.event.head_commit.timestamp }}
 
-              Результаты анализа доступны в артефактах по ссылке:
-              https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            Результаты анализа доступны в артефактах по ссылке:
+            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
-              С уважением,
-              SEO Analysis BotЗдравствуйте!
-            
-            
-            
+            С уважением,
             SEO Analysis Bot
-          attachments: analysis_result.json,recommendations.txt
-          ignore_missing_attachments: true
