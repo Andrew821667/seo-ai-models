@@ -87,8 +87,7 @@ jobs:
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: 'Отчет SEO анализа для legalaipro.ru - ${{ github.run_number }}'
-          to: ${{ secrets.EMAIL_TO }}
-          from: SEO Analysis Bot
+          to: ${{ secrets.EMAIL_USERNAME }}          from: SEO Analysis Bot
           body: |
             Здравствуйте!
             
