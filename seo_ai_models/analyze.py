@@ -63,7 +63,12 @@ def analyze_url_full(url):
     analyzer = EnhancedContentAnalyzer()
     
     # Выполняем полный анализ
-    analysis_result = analyzer.analyze(parsed_data)
+    # Извлекаем текстовый контент и HTML из спарсенных данных
+    text_content = parsed_data.get('text', '') or parsed_data.get('content', '') or ''
+    html_content = parsed_data.get('html', '') or parsed_data.get('html_content', '') or ''
+    
+    # Выполняем полный анализ
+    analysis_result = analyzer.analyze_content(text_content, html_content)
     
     if not analysis_result:
         print("❌ Ошибка: Анализ не вернул результатов")
