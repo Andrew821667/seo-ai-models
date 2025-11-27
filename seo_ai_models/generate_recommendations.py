@@ -32,8 +32,7 @@ def generate_recommendations(input_file: str, output_file: str) -> bool:
         
         # Генерируем рекомендации
         print("💡 Генерация SEO-рекомендаций...")
-        recommendations = suggester.generate_recommendations(analysis_data)
-        
+        recommendations = suggester.generate_suggestions(analysis_data)        
         # Формируем Markdown отчет
         print(f"📝 Создание Markdown отчета...")
         markdown_content = suggester.format_recommendations_markdown(recommendations)
