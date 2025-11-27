@@ -1,0 +1,88 @@
+#!/usr/bin/env python3
+"""
+Генерация SEO-рекомендаций на основе результатов анализа.
+"""
+import argparse
+import json
+import sys
+from pathlib import Path
+from seo_ai_models.models.seo_advisor.suggester.suggester import Suggester
+
+
+def generate_recommendations(input_file: str, output_file: str) -> bool:
+    """
+    Генерирует SEO-рекомендации на основе результатов анализа.
+    
+    Args:
+        input_file: Путь к JSON файлу с результатами анализа
+        output_file: Путь к выходному Markdown файлу
+    
+    Returns:
+        bool: True если успешно, False в противном случае
+    """
+    try:
+        # Читаем результаты анализа
+        print(f"📂 Чтение результатов анализа из {input_file}...")
+        with open(input_file, 'r', encoding='utf-8') as f:
+            analysis_data = json.load(f)
+        
+        # Инициализируем генератор рекомендаций
+        print("⚙️ Инициализация Suggester...")
+        suggester = Suggester()
+        
+        # Генерируем рекомендации
+        print("💡 Генерация SEO-рекомендаций...")
+        recommendations = suggester.generate_recommendations(analysis_data)
+        
+        # Формируем Markdown отчет
+        print(f"📝 Создание Markdown отчета...")
+        markdown_content = suggester.format_recommendations_markdown(recommendations)
+        
+        # Сохраняем в файл
+        print(f"💾 Сохранение рекомендаций в {output_file}...")
+        with open(output_file, 'w', encoding='utf-8') as f:
+            f.write(markdown_content)
+        
+        print(f"\n✅ Рекомендации успешно сгенерированы!\n")
+        return True
+        
+    except FileNotFoundError:
+        print(f"❌ Ошибка: Файл {input_file} не найден")
+        return False
+    except json.JSONDecodeError as e:
+        print(f"❌ Ошибка парсинга JSON: {e}")
+        return False
+    except Exception as e:
+        print(f"❌ Неожиданная ошибка: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+
+def main():
+    """Главная функция для запуска из командной строки."""
+    parser = argparse.ArgumentParser(
+        description='Генерация SEO-рекомендаций на основе результатов анализа'
+    )
+    parser.add_argument(
+        '--input',
+        required=True,
+        help='Путь к JSON файлу с результатами анализа'
+    )
+    parser.add_argument(
+        '--output',
+        required=True,
+        help='Путь к выходному Markdown файлу'
+    )
+    
+    args = parser.parse_args()
+    
+    # Запускаем генерацию
+    success = generate_recommendations(args.input, args.output)
+    
+    # Возвращаем код выхода
+    sys.exit(0 if success else 1)
+
+
+if __name__ == "__main__":
+    main()
