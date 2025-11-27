@@ -98,7 +98,7 @@ class EnhancedContentAnalyzer:
         )
 
         # Выявление основных тем
-        main_topics = self.text_processor.extract_main_topics(content)
+        main_topics = self.text_processor.extract_keywords(content)
         metrics["main_topics"] = main_topics
 
         # Оценки для SEO и юзабилити
@@ -172,11 +172,9 @@ class EnhancedContentAnalyzer:
         keyword_stats["density"] = total_matches / word_count if word_count > 0 else 0
 
         # Расчет prominence (заметности) ключевых слов
-        prominence_scores = self.text_processor.calculate_keyword_prominence(
-            content, target_keywords
-        )
+        # Prominence не реализован, используем заглушку
+        prominence_scores = {}
         keyword_stats["prominence"] = prominence_scores
-
         # Средняя prominence
         if prominence_scores:
             keyword_stats["prominence_avg"] = sum(prominence_scores.values()) / len(
