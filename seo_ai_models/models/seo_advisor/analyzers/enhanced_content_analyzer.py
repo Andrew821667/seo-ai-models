@@ -73,7 +73,7 @@ class EnhancedContentAnalyzer:
             metrics["avg_sentence_length"] = len(words) / len(sentences) if sentences else 0
 
         # Оценка читабельности с учетом языка
-        readability_metrics = self.text_processor.calculate_enhanced_readability(content, language)
+        readability_metrics = self.text_processor.calculate_readability(content, language)
         metrics.update(
             {
                 "readability": readability_metrics.get("readability_score", 0),
