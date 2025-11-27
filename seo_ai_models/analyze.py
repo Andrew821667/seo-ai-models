@@ -48,3 +48,77 @@ def analyze_url_full(url):
                     # Парсим URL
     print(f"f📄 Парсинг страницы {url}...")
     parsed_data = parser.parse_url(url)
+
+    # Проверяем результат парсинга
+    if not parsed_data:
+        print("❌ Ошибка: Не удалось спарсить страницу")
+        return None
+    
+    print(f"✅ Страница успешно спарсена")
+    print(f"   Заголовок: {parsed_data.get('title', 'N/A')}")
+    print(f"   Описание: {parsed_data.get('meta_description', 'N/A')[:100]}...")
+    
+    # Инициализируем анализатор контента
+    print("\n📊 Запуск анализа контента...")
+    analyzer = EnhancedContentAnalyzer()
+    
+    # Выполняем полный анализ
+    analysis_result = analyzer.analyze(parsed_data)
+    
+    if not analysis_result:
+        print("❌ Ошибка: Анализ не вернул результатов")
+        return None
+    
+    print("✅ Анализ успешно завершен")
+    
+    # Добавляем метаданные
+    analysis_result['metadata'] = {
+        'url': url,
+        'analyzed_at': datetime.now().isoformat(),
+        'analyzer_version': '1.0.0'
+    }
+    
+    # Сохраняем результаты в JSON файл
+    output_file = "analysis_result.json"
+    try:
+        with open(output_file, 'w', encoding='utf-8') as f:
+            json.dump(analysis_result, f, ensure_ascii=False, indent=2)
+        print(f"\n💾 Результаты сохранены в файл: {output_file}")
+    except Exception as e:
+        print(f"❌ Ошибка сохранения файла: {e}")
+        return None
+    
+    print(f"\n{'='*60}")
+    print("✅ SEO АНАЛИЗ ЗАВЕРШЕН УСПЕШНО")
+    print(f"{'='*60}\n")
+    
+    return analysis_result
+
+
+def main():
+    """
+    Главная функция для запуска из командной строки.
+    """
+    parser = argparse.ArgumentParser(
+        description='Полноценный SEO анализ сайта с использованием seo-ai-models'
+    )
+    parser.add_argument(
+        '--url',
+        required=True,
+        help='URL сайта для анализа'
+    )
+    
+    args = parser.parse_args()
+    
+    # Запускаем анализ
+    result = analyze_url_full(args.url)
+    
+    # Возвращаем код выхода
+    if result:
+        sys.exit(0)  # Успех
+    else:
+        sys.exit(1)  # Ошибка
+
+
+if __name__ == "__main__":
+    main()
