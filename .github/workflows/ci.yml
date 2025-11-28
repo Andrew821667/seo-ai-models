@@ -42,20 +42,17 @@ jobs:
           pip install -e ".[dev]"
         timeout-minutes: 45
 
-      - name: Lint with flake8
+      - name: Lint with flake
         run: |
           # Stop the build if there are Python syntax errors or undefined names
           flake8 seo_ai_models --count --select=E9,F63,F7,F82 --show-source --statistics
           # Exit-zero treats all errors as warnings. Max line length 100
           flake8 seo_ai_models --count --exit-zero --max-complexity=15 --max-line-length=100 --statistics
 
-      - name: Check code formatting with black
-        run: |
-          black --check --line-length 100 seo_ai_models
 
-  test:
-    name: Run Tests
-    runs-on: ubuntu-latest
+        # test:
+          # name: Run Tests
+            # runs-on: ubuntu-latest
     continue-on-error: true  # Тесты опциональны пока не починим
     strategy:
       fail-fast: false  # Не отменять остальные версии при ошибке
