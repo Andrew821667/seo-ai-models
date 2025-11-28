@@ -33,108 +33,58 @@ def generate_recommendations(input_file: str, output_file: str) -> bool:
         # Генерируем рекомендации
         print("▶ Генерация SEO-рекомендаций...")
         
-        # Извлекаем необходимые данные из analysis_data
-        # Создаем basic_recommendations из результатов анализа
+                # Извлекаем необходимые данные из analysis_data
+        # Создаем basic_recommendations на основе результатов анализа
         basic_recommendations = {}
         
-        # Создаем feature_scores на основе метрик анализа
-        feature_scores = {}
+        # Генерируем базовые рекомендации на основе метрик
+        
+        # Анализ content_length
+        if 'technical_seo' in analysis_data:
+            tech = analysis_data['technical_seo']
+            content_len = tech.get('content_length', 0)
+            
+            if content_len < 300:
+                basic_recommendations.setdefault('content_length', []).append(
+                    "Критически малый объем контента ({} слов). Рекомендуется минимум 500-1000 слов.".format(content_len)
+                )
+            elif content_len < 1000:
+                basic_recommendations.setdefault('content_length', []).append(
+                    "Объем контента ({} слов) ниже рекомендуемого. Добавьте детальное описание темы.".format(content_len)
+                )
+                
+        # Анализ meta_tags
+        if 'meta_tags' in analysis_data:
+            meta = analysis_data['meta_tags']
+            
+            if not meta.get('title'):
+                basic_recommendations.setdefault('meta_tags', []).append(
+                    "Отсутствует meta title. Добавьте уникальный заголовок с ключевыми словами."
+                )
+            elif len(meta.get('title', '')) < 30:
+                basic_recommendations.setdefault('meta_tags', []).append(
+                    "Meta title слишком короткий. Рекомендуемая длина: 50-60 символов."
+                )
+            elif len(meta.get('title', '')) > 70:
+                basic_recommendations.setdefault('meta_tags', []).append(
+                    "Meta title слишком длинный. Сократите до 60 символов."
+                )
+                
+            if not meta.get('description'):
+                basic_recommendations.setdefault('meta_tags', []).append(
+                    "Отсутствует meta description. Добавьте описание до 160 символов."
+                )
+                
+        # Анализ readability
         if 'content_analysis' in analysis_data:
             content = analysis_data['content_analysis']
             if 'readability' in content:
-                feature_scores['readability'] = content['readability'].get('score', 0.5)
-            if 'keyword_analysis' in content:
-                feature_scores['keyword_density'] = content['keyword_analysis'].get('density', 0.5)
-        
-        if 'technical_seo' in analysis_data:
-            tech = analysis_data['technical_seo']
-            feature_scores['content_length'] = min(1.0, tech.get('content_length', 0) / 2000)
-            
-        if 'meta_tags' in analysis_data:
-            meta = analysis_data['meta_tags']
-            feature_scores['meta_tags'] = 1.0 if meta.get('title') and meta.get('description') else 0.5
-            
-        # Определяем industry (по умолчанию 'general')
-        industry = analysis_data.get('industry', 'general')
-        
-        # Вызываем метод с правильными параметрами
-        recommendations = suggester.generate_suggestions(
-            basic_recommendations=basic_recommendations,
-            feature_scores=feature_scores,
-            industry=industry
-        )        # Формируем Markdown отчет
-        # Формируем Markdown отчет
-        print(f"■ Создание Markdown отчета...")
-        
-        markdown_lines = []
-        markdown_lines.append("# Рекомендации по SEO-оптимизации\n")
-        markdown_lines.append(f"*Дата генерации:* {analysis_data.get('timestamp', 'Неизвестно')}\n")
-        markdown_lines.append(f"*URL:* {analysis_data.get('url', 'Неизвестно')}\n\n")
-        markdown_lines.append("---\n\n")
-        
-        # Добавляем рекомендации по категориям
-        if recommendations:
-            for category, suggestions_list in recommendations.items():
-                # Заголовок категории
-                category_name = category.replace('_', ' ').title()
-                markdown_lines.append(f"## {category_name}\n\n")
-                
-                # Добавляем рекомендации
-                if suggestions_list:
-                    for suggestion in suggestions_list:
-                        markdown_lines.append(f"- {suggestion}\n")
-                    markdown_lines.append("\n")
-                else:
-                    markdown_lines.append("*Рекомендаций нет*\n\n")
-        else:
-            markdown_lines.append("Рекомендации не сгенерированы.\n")
-        
-        markdown_content = ''.join(markdown_lines)        
-        # Сохраняем в файл
-        print(f"💾 Сохранение рекомендаций в {output_file}...")
-        with open(output_file, 'w', encoding='utf-8') as f:
-            f.write(markdown_content)
-        
-        print(f"\n✅ Рекомендации успешно сгенерированы!\n")
-        return True
-        
-    except FileNotFoundError:
-        print(f"❌ Ошибка: Файл {input_file} не найден")
-        return False
-    except json.JSONDecodeError as e:
-        print(f"❌ Ошибка парсинга JSON: {e}")
-        return False
-    except Exception as e:
-        print(f"❌ Неожиданная ошибка: {e}")
-        import traceback
-        traceback.print_exc()
-        return False
-
-
-def main():
-    """Главная функция для запуска из командной строки."""
-    parser = argparse.ArgumentParser(
-        description='Генерация SEO-рекомендаций на основе результатов анализа'
-    )
-    parser.add_argument(
-        '--input',
-        required=True,
-        help='Путь к JSON файлу с результатами анализа'
-    )
-    parser.add_argument(
-        '--output',
-        required=True,
-        help='Путь к выходному Markdown файлу'
-    )
-    
-    args = parser.parse_args()
-    
-    # Запускаем генерацию
-    success = generate_recommendations(args.input, args.output)
-    
-    # Возвращаем код выхода
-    sys.exit(0 if success else 1)
-
-
-if __name__ == "__main__":
-    main()
+                read_score = content['readability'].get('score', 0)
+                if read_score < 0.4:
+                    basic_recommendations.setdefault('readability', []).append(
+                        "Низкая читабельность текста. Упростите предложения и добавьте подзаголовки."
+                    )
+                    
+        # Если нет ни одной рекомендации, добавим общую
+        if not basic_recommendations:
+            basic_recommendations['general'] = ['Основные SEO-метрики в норме. Продолжайте работу над контентом.']
