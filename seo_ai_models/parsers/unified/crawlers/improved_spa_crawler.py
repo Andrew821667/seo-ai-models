@@ -424,6 +424,13 @@ class ImprovedSPACrawler:
             # Дополнительное ожидание для элементов контента
             try:
                 # Ожидаем появления селекторов, указывающих на загрузку контента
+
+                                # Ждем загрузки метатегов для SPA-сайтов (Next.js, React)
+                                try:
+                                                        await page.wait_for_selector('title', timeout=3000)
+                                                        await page.wait_for_timeout(2000)  # Дополнительное ожидание для React hydration
+                                                    except Exception as e:
+                                                                            logger.debug(f"Timeout waiting for meta tags: {e}")
                 for selector in self.wait_for_selectors:
                     try:
                         await page.wait_for_selector(selector, timeout=self.wait_for_idle // 2)
