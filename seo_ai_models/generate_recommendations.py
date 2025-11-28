@@ -88,3 +88,102 @@ def generate_recommendations(input_file: str, output_file: str) -> bool:
         # Если нет ни одной рекомендации, добавим общую
         if not basic_recommendations:
             basic_recommendations['general'] = ['Основные SEO-метрики в норме. Продолжайте работу над контентом.']
+
+        
+        # Создаем feature_scores на основе метрик анализа
+        feature_scores = {}
+        if 'content_analysis' in analysis_data:
+            content = analysis_data['content_analysis']
+            if 'readability' in content:
+                feature_scores['readability'] = content['readability'].get('score', 0.5)
+            if 'keyword_analysis' in content:
+                feature_scores['keyword_density'] = content['keyword_analysis'].get('density', 0.5)
+        
+        if 'technical_seo' in analysis_data:
+            tech = analysis_data['technical_seo']
+            feature_scores['content_length'] = min(1.0, tech.get('content_length', 0) / 2000)
+            
+        if 'meta_tags' in analysis_data:
+            meta = analysis_data['meta_tags']
+            feature_scores['meta_tags'] = 1.0 if meta.get('title') and meta.get('description') else 0.5
+            
+        # Определяем industry (по умолчанию 'general')
+        industry = analysis_data.get('industry', 'general')
+        
+        # Вызываем метод с правильными параметрами
+        recommendations = suggester.generate_suggestions(
+            basic_recommendations=basic_recommendations,
+            feature_scores=feature_scores,
+            industry=industry
+        )
+        
+        # Формируем Markdown отчет
+        print(f"■ Создание Markdown отчета...")
+        
+        markdown_lines = []
+        markdown_lines.append("# Рекомендации по SEO-оптимизации\n")
+        markdown_lines.append(f"*Дата генерации:* {analysis_data.get('timestamp', 'Неизвестно')}\n")
+        markdown_lines.append(f"*URL:* {analysis_data.get('url', 'Неизвестно')}\n\n")
+        markdown_lines.append("---\n\n")
+        
+        # Добавляем рекомендации по категориям
+        if recommendations:
+            for category, suggestions_list in recommendations.items():
+                # Заголовок категории
+                category_name = category.replace('_', ' ').title()
+                markdown_lines.append(f"## {category_name}\n\n")
+                
+                # Добавляем рекомендации
+                if suggestions_list:
+                    for suggestion in suggestions_list:
+                        markdown_lines.append(f"- {suggestion}\n")
+                    markdown_lines.append("\n")
+                else:
+                    markdown_lines.append("*Рекомендаций нет*\n\n")
+        else:
+            markdown_lines.append("Рекомендации не сгенерированы.\n")
+        
+        markdown_content = ''.join(markdown_lines)
+        
+        # Сохраняем рекомендации в файл
+        print(f"💾 Сохранение рекомендаций в {output_file}...")
+        with open(output_file, 'w', encoding='utf-8') as f:
+            f.write(markdown_content)
+        
+        print("✅ Рекомендации успешно сгенерированы!")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Ошибка при генерации рекомендаций: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+
+def main():
+    """Главная функция для запуска из командной строки."""
+    parser = argparse.ArgumentParser(
+        description='Генерация SEO-рекомендаций на основе результатов анализа'
+    )
+    parser.add_argument(
+        '--input',
+        required=True,
+        help='Путь к JSON файлу с результатами анализа'
+    )
+    parser.add_argument(
+        '--output',
+        required=True,
+        help='Путь к выходному Markdown файлу'
+    )
+    
+    args = parser.parse_args()
+    
+    # Запускаем генерацию
+    success = generate_recommendations(args.input, args.output)
+    
+    # Возвращаем код выхода
+    sys.exit(0 if success else 1)
+
+
+if __name__ == "__main__":
+    main()
