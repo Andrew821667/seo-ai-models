@@ -70,6 +70,46 @@ class MetaExtractor:
         if canonical and canonical.get("href"):
             meta_data["canonical"] = canonical["href"]
 
+                # Extract meta from Next.js __NEXT_DATA__ if present (common in Next.js SPAs)
+        try:
+            next_data_script = soup.find("script", id="__NEXT_DATA__", type="application/json")
+            if next_data_script and next_data_script.string:
+                import json
+                next_data = json.loads(next_data_script.string)
+                
+                # Try to extract title and description from Next.js page props
+                page_props = next_data.get("props", {}).get("pageProps", {})
+                
+                # Check for SEO/meta data in various common locations
+                seo_data = page_props.get("seo", {}) or page_props.get("meta", {}) or page_props
+                
+                # Extract title if not already found
+                if "title" not in meta_data or not meta_data["title"]:
+                    title = (
+                        seo_data.get("title") or 
+                        seo_data.get("metaTitle") or 
+                        page_props.get("title") or
+                        next_data.get("props", {}).get("title", "")
+                    )
+                    if title:
+                        meta_data["title"] = title
+                        logger.info(f"Extracted title from __NEXT_DATA__: {title}")
+                
+                # Extract description if not already found
+                if "description" not in meta_data or not meta_data["description"]:
+                    description = (
+                        seo_data.get("description") or 
+                        seo_data.get("metaDescription") or
+                        page_props.get("description", "")
+                    )
+                    if description:
+                        meta_data["description"] = description
+                        logger.info(f"Extracted description from __NEXT_DATA__: {description[:100]}")
+                        
+        except (json.JSONDecodeError, AttributeError, KeyError) as e:
+            logger.warning(f"Could not extract meta from __NEXT_DATA__: {e}")
+
+
         return meta_data
 
     def extract_structured_data(self, soup: BeautifulSoup) -> List[Dict[str, Any]]:
