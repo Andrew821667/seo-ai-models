@@ -109,16 +109,36 @@ def fetch_url_with_javascript_sync(
             - Сообщение об ошибке или None в случае успеха
     """
     try:
-        # Заглушка для режима отладки
-        # В реальной реализации здесь использовался бы playwright
-        logger.info(f"Simulating JavaScript rendering for {url}")
-        html, status, error = fetch_url(url)
-        if html:
-            # Имитируем контент с выполненным JavaScript
-            html = html + "<!-- JavaScript rendered content -->"
-            return html, status, None
-        return None, status, error
-
+        from playwright.sync_api import sync_playwright
+        
+        logger.info(f"Rendering {url} with Playwright browser")
+        
+        with sync_playwright() as p:
+            # Запускаем браузер
+            browser = p.chromium.launch(headless=headless)
+            context = browser.new_context(user_agent=user_agent)
+            page = context.new_page()
+            
+            try:
+                # Переходим на страницу
+                response = page.goto(url, wait_until="domcontentloaded", timeout=wait_for_timeout)
+                status_code = response.status if response else 0
+                
+                # Ждём выполнения JavaScript
+                page.wait_for_timeout(wait_for_idle)
+                
+                # Получаем отрендеренный HTML
+                html = page.content()
+                
+                browser.close()
+                logger.info(f"Successfully rendered {url} with Playwright")
+                return html, status_code, None
+                
+            except Exception as e:
+                browser.close()
+                error_message = f"Playwright error for {url}: {str(e)}"
+                logger.error(error_message)
+                return None, 0, error_message
     except Exception as e:
         error_message = f"Error rendering JavaScript for {url}: {str(e)}"
         logger.error(error_message)
