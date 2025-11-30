@@ -119,7 +119,7 @@ class MetaExtractor:
                 else:
         logger.warning("No title tag found in HTML")
 
-        аем мета-теги
+        # Извлекаем мета-теги
         for meta in soup.find_all("meta"):
             name = meta.get("name", "").lower()
             property = meta.get("property", "").lower()
