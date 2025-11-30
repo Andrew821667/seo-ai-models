@@ -108,26 +108,9 @@ class MetaExtractor:
             "other": {},
         }
 
-                # Add diagnostic logging
-        logger.info(f"Extracting meta tags from HTML (length: {len(soup.prettify())} chars)")
-
-        # Заголовок
-        title_tag = soup.find("title")
-        if title_tag:
-            meta_tags["title"] = title_tag.text.strip()
-                    logger.info(f"Found title tag: '{title_tag.text.strip()[:100]}...'")
-                else:
-        logger.warning("No title tag found in HTML")
-
-        # Извлекаем мета-теги
-        for meta in soup.find_all("meta"):
-            name = meta.get("name", "").lower()
-            property = meta.get("property", "").lower()
-            content = meta.get("content", "")
-
+        
             if name == "description":
                 meta_tags["description"] = content
-                            logger.info(f"Found description meta: '{content[:100]}...'" if len(content) > 100 else f"Found description meta: '{content}'")
             elif name == "keywords":
                 meta_tags["keywords"] = content
             elif name == "robots":
