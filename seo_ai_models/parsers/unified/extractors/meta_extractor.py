@@ -119,7 +119,7 @@ class MetaExtractor:
                 else:
         logger.warning("No title tag found in HTML")
 
-        # Извлекаем мета-теги
+        аем мета-теги
         for meta in soup.find_all("meta"):
             name = meta.get("name", "").lower()
             property = meta.get("property", "").lower()
@@ -131,7 +131,7 @@ class MetaExtractor:
             elif name == "keywords":
                 meta_tags["keywords"] = content
             elif name == "robots":
-                meta_tags["robots"] = content
+                obots"] = content
             elif property.startswith("og:"):
                 meta_tags["og"][property[3:]] = content
             elif property.startswith("twitter:"):
