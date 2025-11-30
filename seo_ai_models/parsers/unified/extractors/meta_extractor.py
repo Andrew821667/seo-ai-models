@@ -108,25 +108,23 @@ class MetaExtractor:
             "other": {},
         }
 
-                # Заголовок
-                title_tag = soup.find("title")
-                if title_tag:
-                                meta_tags["title"] = title_tag.text.strip()
+        # Заголовок
+        title_tag = soup.find("title")
+        if title_tag:
+            meta_tags["title"] = title_tag.text.strip()
 
-                # Извлекаем мета-теги
-                for meta in soup.find_all("meta"):
-                                name = meta.get("name", "").lower()
-                                property = meta.get("property", "").lower()
-                                content = meta.get("content", "")
-                    
+        # Извлекаем мета-теги
+        for meta in soup.find_all("meta"):
+            name = meta.get("name", "").lower()
+            property = meta.get("property", "").lower()
+            content = meta.get("content", "")
 
-        
             if name == "description":
                 meta_tags["description"] = content
             elif name == "keywords":
                 meta_tags["keywords"] = content
             elif name == "robots":
-                                meta_tags["robots"] = content
+                meta_tags["robots"] = content
             elif property.startswith("og:"):
                 meta_tags["og"][property[3:]] = content
             elif property.startswith("twitter:"):
