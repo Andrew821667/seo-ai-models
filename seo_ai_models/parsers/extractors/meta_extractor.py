@@ -51,6 +51,7 @@ class MetaExtractor:
             Dict: Мета-теги и их содержимое
         """
         meta_data = {}
+                logger.info(f"HTML content length: {len(str(soup))}")
 
         # Извлечение стандартных мета-тегов
         for meta in soup.find_all("meta"):
@@ -72,13 +73,17 @@ class MetaExtractor:
 
                 # Extract meta from Next.js __NEXT_DATA__ if present (common in Next.js SPAs)
         try:
-            next_data_script = soup.find("script", id="__NEXT_DATA__", type="application/json")
+            next_data_script = soup.find("script", id="__NEXT_DATA__", type="application/json"
+                                                    logger.info(f"Searching for __NEXT_DATA__ script tag...")
+                                                    logger.info(f"__NEXT_DATA__ script found: {next_data_script is not None}"))
             if next_data_script and next_data_script.string:
                 import json
                 next_data = json.loads(next_data_script.string)
+                            logger.info(f"next_data keys: {list(next_data.keys()) if isinstance(next_data, dict) else 'Not a dict'}")
                 
                 # Try to extract title and description from Next.js page props
                 page_props = next_data.get("props", {}).get("pageProps", {})
+                            logger.info(f"page_props keys: {list(page_props.keys()) if isinstance(page_props, dict) else 'Not a dict'}")
                 
                 # Check for SEO/meta data in various common locations
                 seo_data = page_props.get("seo", {}) or page_props.get("meta", {}) or page_props
