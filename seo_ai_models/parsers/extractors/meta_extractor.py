@@ -73,7 +73,7 @@ class MetaExtractor:
 
                 # Extract meta from Next.js __NEXT_DATA__ if present (common in Next.js SPAs)
         try:
-            next_data_script = soup.find("script", id="__NEXT_DATA__", type="application/json"
+            next_data_script = soup.find("script", id="__NEXT_DATA__", type="application/json")
                                                     logger.info(f"Searching for __NEXT_DATA__ script tag...")
                                                     logger.info(f"__NEXT_DATA__ script found: {next_data_script is not None}"))
             if next_data_script and next_data_script.string:
