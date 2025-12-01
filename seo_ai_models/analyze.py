@@ -58,8 +58,10 @@ def analyze_url_full(url):
         return None
     
     print(f"✅ Страница успешно спарсена")
-    print(f"   Заголовок: {parsed_data.get('title', 'N/A')}")
-    print(f"   Описание: {parsed_data.get('meta_description', 'N/A')[:100]}...")
+        page_data = parsed_data.get('page_data', {})
+    metadata = page_data.get('metadata', {})
+    print(f"    Заголовок: {metadata.get('title', 'N/A')}")
+    print(f"    Описание: {metadata.get('description', 'N/A')[:100]}...")
     
     # Инициализируем анализатор контента
     print("\n📊 Запуск анализа контента...")
