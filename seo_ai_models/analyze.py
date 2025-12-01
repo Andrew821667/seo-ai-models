@@ -23,24 +23,23 @@ except ImportError as e:
     print("Установите все зависимости через: pip install -r requirements.txt")
     MODULES_AVAILABLE = False
 
-
 def analyze_url_full(url):
     """
-    Полноценный анализ URL с использованием UnifiedParser и EnhancedContentAnalyzer.    
+    Полноценный анализ URL с использованием UnifiedParser и EnhancedContentAnalyzer.
     Args:
         url: URL для анализа
-        
+
     Returns:
         dict: Полные результаты анализа
     """
     print(f"\n{'='*60}")
     print(f"🔍 SEO АНАЛИЗ: {url}")
     print(f"{'='*60}\n")
-    
+
     if not MODULES_AVAILABLE:
         print("❌ Модули недоступны. Невозможно выполнить анализ.")
         return None
-    
+
     # Инициализируем парсер с правильными параметрами
     print("⚙️  Инициализация UnifiedParser...")
     parser = UnifiedParser(
@@ -48,46 +47,46 @@ def analyze_url_full(url):
         auto_detect_spa=True,  # На случай, если force_spa_mode не сработает
     )
 
-                    # Парсим URL
-    print(f"f📄 Парсинг страницы {url}...")
+    # Парсим URL
+    print(f"📄 Парсинг страницы {url}...")
     parsed_data = parser.parse_url(url)
 
     # Проверяем результат парсинга
     if not parsed_data:
         print("❌ Ошибка: Не удалось спарсить страницу")
         return None
-    
+
     print(f"✅ Страница успешно спарсена")
-            page_data = parsed_data.get('page_data', {})
-        metadata = page_data.get('metadata', {})
-        print(f"    Заголовок: {metadata.get('title', 'N/A')}")
-        print(f"    Описание: {metadata.get('description', 'N/A')[:100]}...")
-    
+    page_data = parsed_data.get('page_data', {})
+    metadata = page_data.get('metadata', {})
+    print(f"    Заголовок: {metadata.get('title', 'N/A')}")
+    print(f"    Описание: {metadata.get('description', 'N/A')[:100] if metadata.get('description') else 'N/A'}...")
+
     # Инициализируем анализатор контента
     print("\n📊 Запуск анализа контента...")
     analyzer = EnhancedContentAnalyzer()
-    
+
     # Выполняем полный анализ
     # Извлекаем текстовый контент и HTML из спарсенных данных
     text_content = parsed_data.get('text', '') or parsed_data.get('content', '') or ''
     html_content = parsed_data.get('html', '') or parsed_data.get('html_content', '') or ''
-    
+
     # Выполняем полный анализ
     analysis_result = analyzer.analyze_content(text_content, html_content)
-    
+
     if not analysis_result:
         print("❌ Ошибка: Анализ не вернул результатов")
         return None
-    
+
     print("✅ Анализ успешно завершен")
-    
+
     # Добавляем метаданные
     analysis_result['metadata'] = {
         'url': url,
         'analyzed_at': datetime.now().isoformat(),
         'analyzer_version': '1.0.0'
     }
-    
+
     # Сохраняем результаты в JSON файл
     output_file = "analysis_result.json"
     try:
@@ -97,13 +96,12 @@ def analyze_url_full(url):
     except Exception as e:
         print(f"❌ Ошибка сохранения файла: {e}")
         return None
-    
+
     print(f"\n{'='*60}")
     print("✅ SEO АНАЛИЗ ЗАВЕРШЕН УСПЕШНО")
     print(f"{'='*60}\n")
-    
-    return analysis_result
 
+    return analysis_result
 
 def main():
     """
@@ -117,18 +115,17 @@ def main():
         required=True,
         help='URL сайта для анализа'
     )
-    
+
     args = parser.parse_args()
-    
+
     # Запускаем анализ
     result = analyze_url_full(args.url)
-    
+
     # Возвращаем код выхода
     if result:
         sys.exit(0)  # Успех
     else:
         sys.exit(1)  # Ошибка
-
 
 if __name__ == "__main__":
     main()
