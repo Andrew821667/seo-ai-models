@@ -49,18 +49,26 @@ def analyze_url_full(url):
 
     # Парсим URL
     print(f"📄 Парсинг страницы {url}...")
-    parsed_data = parser.parse_url(url)
+    try:
+        parsed_data = parser.parse_url(url)
+    except Exception as e:
+        print(f"❌ Ошибка при парсинге: {e}")
+        import traceback
+        traceback.print_exc()
+        return None
 
     # Проверяем результат парсинга
     if not parsed_data:
-        print("❌ Ошибка: Не удалось спарсить страницу")
+        print("❌ Ошибка: Не удалось спарсить страницу (парсер вернул None)")
         return None
 
     print(f"✅ Страница успешно спарсена")
+    print(f"   Ключи в parsed_data: {list(parsed_data.keys())}")
+
     page_data = parsed_data.get('page_data', {})
     metadata = page_data.get('metadata', {})
-    print(f"    Заголовок: {metadata.get('title', 'N/A')}")
-    print(f"    Описание: {metadata.get('description', 'N/A')[:100] if metadata.get('description') else 'N/A'}...")
+    print(f"   Заголовок: {metadata.get('title', 'N/A')}")
+    print(f"   Описание: {metadata.get('description', 'N/A')[:100] if metadata.get('description') else 'N/A'}...")
 
     # Инициализируем анализатор контента
     print("\n📊 Запуск анализа контента...")
@@ -70,6 +78,16 @@ def analyze_url_full(url):
     # Извлекаем текстовый контент и HTML из спарсенных данных
     text_content = parsed_data.get('text', '') or parsed_data.get('content', '') or ''
     html_content = parsed_data.get('html', '') or parsed_data.get('html_content', '') or ''
+
+    print(f"   Длина text_content: {len(text_content)} символов")
+    print(f"   Длина html_content: {len(html_content)} символов")
+
+    if len(text_content) == 0 and len(html_content) == 0:
+        print("   ⚠️ ВНИМАНИЕ: Получен пустой контент от парсера!")
+        print("   Возможные причины:")
+        print("   - Сайт использует JavaScript для рендеринга")
+        print("   - Сайт блокирует ботов")
+        print("   - Проблемы с Playwright")
 
     # Выполняем полный анализ
     analysis_result = analyzer.analyze_content(text_content, html_content)
