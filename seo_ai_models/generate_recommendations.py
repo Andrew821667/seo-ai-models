@@ -292,9 +292,27 @@ def generate_recommendations(input_file: str, output_file: str) -> bool:
 def main():
     """Главная функция для запуска из командной строки."""
     parser = argparse.ArgumentParser(
-        description='Генерация SEO-рекомендаций'
+        description='Генерация SEO-рекомендаций на основе результатов анализа'
     )
     parser.add_argument(
         '--input',
         required=True,
-        help='Путь к JSON файлу с результатами'
+        help='Путь к JSON файлу с результатами анализа'
+    )
+    parser.add_argument(
+        '--output',
+        required=True,
+        help='Путь к выходному Markdown файлу'
+    )
+
+    args = parser.parse_args()
+
+    # Запускаем генерацию
+    success = generate_recommendations(args.input, args.output)
+
+    # Возвращаем код выхода
+    sys.exit(0 if success else 1)
+
+
+if __name__ == "__main__":
+    main()
