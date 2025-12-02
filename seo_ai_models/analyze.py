@@ -76,11 +76,20 @@ def analyze_url_full(url):
 
     # Выполняем полный анализ
     # Извлекаем текстовый контент и HTML из спарсенных данных
-    text_content = parsed_data.get('text', '') or parsed_data.get('content', '') or ''
-    html_content = parsed_data.get('html', '') or parsed_data.get('html_content', '') or ''
+    # ИСПРАВЛЕНО: данные находятся в page_data['content']['full_text']
+    content_data = page_data.get('content', {})
+    text_content = content_data.get('full_text', '')
+
+    # HTML можно получить из html_stats или использовать None
+    html_content = page_data.get('html', '') or page_data.get('html_content', '') or ''
 
     print(f"   Длина text_content: {len(text_content)} символов")
     print(f"   Длина html_content: {len(html_content)} символов")
+
+    # Дополнительная диагностика
+    if content_data:
+        print(f"   Word count из парсера: {content_data.get('word_count', 0)}")
+        print(f"   Параграфов: {len(content_data.get('paragraphs', []))}")
 
     if len(text_content) == 0 and len(html_content) == 0:
         print("   ⚠️ ВНИМАНИЕ: Получен пустой контент от парсера!")
