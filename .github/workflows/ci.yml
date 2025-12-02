@@ -49,10 +49,9 @@ jobs:
           # Exit-zero treats all errors as warnings. Max line length 100
           flake8 seo_ai_models --count --exit-zero --max-complexity=15 --max-line-length=100 --statistics
 
-
-        # test:
-          # name: Run Tests
-            # runs-on: ubuntu-latest
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
     continue-on-error: true  # Тесты опциональны пока не починим
     strategy:
       fail-fast: false  # Не отменять остальные версии при ошибке
