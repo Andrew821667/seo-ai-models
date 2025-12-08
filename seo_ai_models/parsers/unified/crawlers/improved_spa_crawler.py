@@ -208,6 +208,9 @@ class ImprovedSPACrawler:
 
                 context = await browser.new_context(**context_options)
 
+                            # Устанавливаем увеличенный таймаут для контекста
+                            context.set_default_timeout(self.wait_for_timeout)
+
                 # Устанавливаем куки, если предоставлены
                 if self.cookies:
                     await context.add_cookies(self.cookies)
@@ -245,6 +248,9 @@ class ImprovedSPACrawler:
                     try:
                         # Создаем новую страницу
                         page = await context.new_page()
+
+                                    # Устанавливаем увеличенный таймаут для всех операций страницы
+                                    page.set_default_timeout(self.wait_for_timeout)
 
                         # Задаем обработчики события для отладки
                         page.on(
