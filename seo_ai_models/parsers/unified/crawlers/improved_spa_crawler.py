@@ -431,8 +431,7 @@ class ImprovedSPACrawler:
                 self.routing_handler.record_route_change(from_url, url)
 
             # Переходим по URL и ждем загрузки
-            response = await page.goto(url, wait_until="networkidle", timeout=self.wait_for_timeout)
-
+            response = await page.goto(url, wait_until="load", timeout=self.wait_for_timeout)
             # Дополнительное ожидание для элементов контента
             try:
                 # Ожидаем появления селекторов, указывающих на загрузку контента
