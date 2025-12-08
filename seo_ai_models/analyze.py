@@ -52,8 +52,8 @@ def analyze_url_full(url):
         emulate_user_behavior=True,  # Эмулируем поведение пользователя
     print(f"📄 Парсинг страницы {url}...")
     try:
-        parsed_data = parser.parse_url(url)
-    except Exception as e:
+        ed_data = parser.parse_url(url)
+    pt Exception as e:
         print(f"❌ Ошибка при парсинге: {e}")
         import traceback
         traceback.print_exc()
