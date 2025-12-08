@@ -46,8 +46,6 @@ def analyze_url_full(url):
     parser = UnifiedParser(
         force_spa_mode=True,  # Принудительно используем SPA-режим для всех сайтов
         auto_detect_spa=True,  # На случай, если force_spa_mode не сработает
-        bypass_protection=True,  # Включаем обход защиты от ботов
-        emulate_user_behavior=True,  # Эмулируем поведение пользователя
     )
 
     # Парсим URL
