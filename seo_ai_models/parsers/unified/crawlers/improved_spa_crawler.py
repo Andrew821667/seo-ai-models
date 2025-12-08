@@ -54,7 +54,7 @@ class ImprovedSPACrawler:
         browser_type: str = "chromium",
         headless: bool = True,
         wait_for_idle: int = 2000,
-        wait_for_timeout: int = 10000,
+        wait_for_timeout: int = 60000,
         intercept_requests: bool = True,
         wait_for_selectors: Optional[List[str]] = None,
         browser_args: Optional[List[str]] = None,
