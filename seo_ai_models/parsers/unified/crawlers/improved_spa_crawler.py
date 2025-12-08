@@ -212,6 +212,9 @@ class ImprovedSPACrawler:
                 if self.cookies:
                     await context.add_cookies(self.cookies)
 
+                                # Устанавливаем увеличенный таймаут для контекста
+                context.set_default_timeout(self.wait_for_timeout)
+
                 # Добавляем обработчики событий для перехвата запросов
                 if self.intercept_requests:
                     await context.route("**/*", self._handle_request)
@@ -246,6 +249,9 @@ class ImprovedSPACrawler:
                         # Задаем обработчики события для отладки
                         page.on(
                             "console", lambda msg: logger.debug(f"Консоль {msg.type}: {msg.text}")
+                                            
+                # Устанавливаем увеличенный таймаут для всех операций страницы
+                page.set_default_timeout(self.wait_for_timeout)
                         )
                         page.on("pageerror", lambda err: logger.warning(f"Ошибка страницы: {err}"))
 
