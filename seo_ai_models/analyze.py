@@ -48,6 +48,8 @@ def analyze_url_full(url):
     )
 
     # Парсим URL
+            bypass_protection=True,  # Включаем обход защиты от ботов
+        emulate_user_behavior=True,  # Эмулируем поведение пользователя
     print(f"📄 Парсинг страницы {url}...")
     try:
         parsed_data = parser.parse_url(url)
