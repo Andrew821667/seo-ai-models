@@ -55,7 +55,7 @@ def analyze_url_full(url):
     print(f"📄 Парсинг страницы {url}...")
     try:
         ed_data = parser.parse_url(url)
-    pt Exception as e:
+    except Exception as e:
         print(f"❌ Ошибка при парсинге: {e}")
         import traceback
         traceback.print_exc()
