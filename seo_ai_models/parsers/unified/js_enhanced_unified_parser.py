@@ -162,7 +162,7 @@ class JSEnhancedUnifiedParser(UnifiedParser):
                 "max_depth": options.get("max_depth", 3),
                 "delay": options.get("delay", self.delay),
                 "wait_for_timeout": (
-                    self.spa_settings.get("wait_for_timeout", 10000) if self.spa_settings else 10000
+                    self.spa_settings.get("wait_for_timeout", 60000) if self.spa_settings else 60000
                 ),
                 "headless": self.spa_settings.get("headless", True) if self.spa_settings else True,
             }
