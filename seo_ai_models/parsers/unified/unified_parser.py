@@ -103,7 +103,7 @@ class UnifiedParser(ParserInterface):
         # Настройки SPA по умолчанию
         self.spa_settings = spa_settings or {
             "wait_for_idle": 2000,  # мс
-            "wait_for_timeout": 10000,  # мс
+            "wait_for_timeout": 60000,  # мс
             "headless": True,
             "browser_type": "chromium",
             "intercept_ajax": True,
